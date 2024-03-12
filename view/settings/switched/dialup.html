@@ -1,0 +1,143 @@
+<form autocomplete="off">
+    <div class="form-body" id="conNoticeDiv" style="margin-left: 15px; margin-right: 15px;">
+        <div class="form-title" style="display: none;" data-trans="dial_setting">Dial-up Settings</div>
+        <div class="content">
+            <div class="row-fluid">
+                <label class="span4 side-left"><span data-trans="wan_connection_model">WAN Connection Mode</span>
+                    <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                </label>
+                <div class="span8">
+                    <input type="radio" name="modeGroup" id="auto_mode" value="auto_dial" data-bind="checked: selectMode, enable: enableFlag">
+                    <label for="auto_mode" data-trans="auto_select" data-trans="auto_select">Automatic</label>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <label class="span4 side-right">
+                    <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                </label>
+                <div class="span8">
+                    <input type="radio" name="modeGroup" id="manual_mode" value="manual_dial" data-bind="checked: selectMode, enable: enableFlag">
+                    <label for="manual_mode" data-trans="manual_select">Manual</label>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <p id="roamBtn" class="checkbox floatleft margintop5 marginleft5 marginright5 checkboxToggle checkbox_selected" data-bind="css:{'checkbox_selected': isAllowedRoaming()=='on'}, click: setAllowedRoaming" style="margin-left: 2px;" manualcontrol="true">
+                        <input type="checkbox" id="isAllowedRoaming" value="on" data-bind="checked:isAllowedRoaming()=='on'">
+                    </p>
+                    <label class="update_inline floatleft lineheight25" data-trans="dial_roaming_remind">Check here, you can connect to internet in the roaming status.</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-buttons">
+            <input type="button" class="btn-1" data-bind="click: save, enable: enableFlag" data-trans="apply" value="Apply">
+        </div>
+
+        <div style="color:red;">
+            <span data-trans="disconnectNetSelectionTip"></span>
+            <img style="width:60px;height:45px;" src="img/disconnectNet_en.png" id="disconnectNetTip" />)
+             <span data-trans="disconnectNetSelectionTip2"></span>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(function() {
+        var service = window._service;
+
+        /**
+         * 联网设置view model
+         * @class DialVM
+         */
+        function DialVM() {
+            var mode = service.getConnectionMode();
+            var self = this;
+
+            self.selectMode = ko.observable(mode.connectionMode);
+            self.enableFlag = ko.observable(true);
+            self.isAllowedRoaming = ko.observable(mode.isAllowedRoaming);
+            var originalRoaming = mode.isAllowedRoaming;
+
+            self.setAllowedRoaming = function() {
+                if (!$("#roamBtn").hasClass("disable")) {
+                    var checkbox = $("#isAllowedRoaming:checked");
+                    if (checkbox && checkbox.length == 0) {
+                        self.isAllowedRoaming("on");
+                    } else {
+                        self.isAllowedRoaming("off");
+                    }
+                }
+            };
+
+            /**
+             * 修改联网模式
+             * @method save
+             */
+            self.save = function() {
+                showLoading();
+                var selectMode = self.selectMode();
+                originalRoaming = self.isAllowedRoaming();               
+                service.setConnectionMode({
+                    connectionMode: selectMode,
+                    isAllowedRoaming: self.isAllowedRoaming()
+                }, function(result) {
+                    hideLoading();
+
+                    if (result.result == "success") {
+                        successOverlay();
+                    } else {
+                        errorOverlay();
+                    }
+                });
+            };
+
+            var checkbox = $(".checkboxToggle");
+            self.checkEnable = function() {
+                var status = service.getStatusInfo();
+
+                if (status.connectStatus == "ppp_connected" || status.connectStatus == "ppp_connecting") {
+                    self.enableFlag(false);
+                    disableCheckbox(checkbox);
+                } else {
+                    self.enableFlag(true);
+                    enableCheckbox(checkbox);
+                }
+            };
+        }
+
+        /**
+         * 联网设置初始化
+         * @method init
+         */
+        function init() {
+            var container = $('#containerSettings');
+            ko.cleanNode(container[0]);
+            var vm = new DialVM();
+            ko.applyBindings(vm, container[0]);
+
+            vm.checkEnable();
+            addInterval(vm.checkEnable, 1000);
+        }
+
+        init();
+        $('#containerSettings').translate();
+
+        // 获取当前设备设置的语言
+        $.get('goform/goform_get_cmd_process?isTest=false&cmd=Language&multi_data=1&_=' + new Date().getTime(), {}, function(data) {
+            var result = data;
+            if (typeof(data) == 'string') {
+                result = $.parseJSON(data);
+            }
+
+            _baseLanguageChange(result.Language);
+        });
+    });
+
+    function _baseLanguageChange(lang) {
+        if (lang == 'ru') {
+            $('#disconnectNetTip').attr('src', "img/disconnectNet_ru.png");
+        } else {
+            $('#disconnectNetTip').attr('src', "img/disconnectNet_en.png");
+        }
+    }
+</script>

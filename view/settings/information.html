@@ -1,0 +1,249 @@
+<div class="form-body" id="setting-information" style="margin-left: 100px;">
+    <div class="form-title" style="display: none;">Device Information</div>
+    <div class="content">
+        <div class="row-fluid">
+            <label data-trans="model_name" class="span4 side-right">Model Name</label>
+            <label id="info_model" class="span8">81220FT</label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="msisdn" class="span4 side-right">MSISDN</label>
+            <label id="info_mdn" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="imei" class="span4 side-right">IMEI</label>
+            <label id="info_imei" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="imsi" class="span4 side-right">IMSI</label>
+            <label id="info_imsi" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="signal_strength_label" class="span4 side-right">Signal Strength</label>
+            <label id="info_signal" class="span8"></label>
+        </div>
+        <div>
+        <div>
+            <div class="row-fluid modify_link">
+                <label data-trans="network_name" class="span4 side-right">Network Name (SSID)</label>
+                <span class="span8">
+                    <span id="info_ssid"></span>
+                    <a id="to_wifi_basic" href="javascript:;" data-trans="modify"></a>
+                </span>
+            </div>
+            <div class="row-fluid">
+                <label data-trans="max_access_num" class="span4 side-right" style="width: 190px;">Max Access Number</label>
+                <label id="info_number" class="span4"></label>
+            </div>
+        </div>
+        <div style="display: none;">
+            <div class="row-fluid modify_link">
+                <label class="span4 side-right">Network Name (Main SSID)</label>
+                <span class="span8">
+                    <span></span>
+                    <a href="#wifi_basic"  data-trans="modify"></a>
+                </span>
+            </div>
+            <div class="row-fluid">
+                <label class="span4 side-right">Max Access Number (Main SSID)</label>
+                <label class="span8"></label>
+            </div>
+            <div class="row-fluid">
+                <label class="span4 side-right">Network Name (Guest SSID)</label>
+                <label class="span8"></label>
+            </div>
+            <div class="row-fluid">
+                <label class="span4 side-right">Max Access Number (Guest SSID)</label>
+                <label class="span8"></label>
+            </div>
+        </div>
+        <div class="row-fluid modify_link">
+            <label data-trans="wifi_range" class="span4 side-right">Wi-Fi Performance</label>
+            <span class="span8">
+                <span id="info_wifi_per"></span>
+                <a id="to_set_power" href="javascript:;" data-trans="modify"></a>
+            </span>
+        </div>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="lan_domain" class="span4 side-right">LAN Domain</label>
+            <label id="info_domain" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="ip_address" class="span4 side-right">IP Address</label>
+            <label id="info_ip" class="span8"></label>
+        </div>
+        <div class="row-fluid" style="display: none">
+            <label data-trans="mac_address" class="span4 side-right">MAC Address</label>
+            <label id="info_mac" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="wan_ip_address" class="span4 side-right">WAN IP Address</label>
+            <label id="info_wan_ip" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="ipv6_wan_ip_address" class="span4 side-right">WAN IPv6 Address</label>
+            <label id="info_wan_ipv6" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="software_version" class="span4 side-right">Software Version</label>
+            <label id="info_sw" class="span8"></label>
+        </div>
+        <div class="row-fluid">
+            <label data-trans="hardware_version" class="span4 side-right">Hardware Version</label>
+            <label id="info_hw" class="span8"></label>
+        </div>
+    </div>
+</div>
+<script>
+    window.LTELanguageInitPart('#setting-information')
+    function load_mark() {
+        var config = window._service.config
+        var service=window._service
+        var initStatus = {};
+        function load_info(){
+            var data = fetchDeviceInfo();
+            var apnSettings = service.getApnSettings();
+            var addrInfo = getWanIpAddr(data);
+            
+            initShownStatus(data)
+            var tmpl = {
+                simSerialNumber: verifyDeviceInfo(data.simSerialNumber),
+                msisdn:verifyDeviceInfo(data.msisdn),
+                imei: verifyDeviceInfo(data.imei),
+                imsi: verifyDeviceInfo(data.imsi),
+                signal: signalFormat(data.signal),
+                hasWifi: config.HAS_WIFI,
+                isCPE: config.PRODUCT_TYPE == 'CPE',
+                hasRj45: config.RJ45_SUPPORT,
+                showMultiSsid: config.HAS_MULTI_SSID && data.multi_ssid_enable == "1",
+                ssid: verifyDeviceInfo(data.ssid),
+                max_access_num: verifyDeviceInfo(data.max_access_num),
+                m_ssid: verifyDeviceInfo(data.m_ssid),
+                m_max_access_num: verifyDeviceInfo(data.m_max_access_num),
+                wifi_long_mode: "wifi_des_" + data.wifiRange,
+                lanDomain: verifyDeviceInfo(data.lanDomain),
+                ipAddress: verifyDeviceInfo(data.ipAddress),
+                showMacAddress: config.SHOW_MAC_ADDRESS,
+                macAddress: verifyDeviceInfo(data.macAddress),
+                showIpv4WanIpAddr: initStatus.showIpv4WanIpAddr,
+                wanIpAddress: addrInfo.wanIpAddress,
+                showIpv6WanIpAddr: initStatus.showIpv6WanIpAddr,
+                ipv6WanIpAddress: addrInfo.ipv6WanIpAddress,
+                sw_version: verifyDeviceInfo(data.sw_version),
+                hw_version: verifyDeviceInfo(data.hw_version)
+            };
+
+            $('#info_model').text('MTS 81231FT')
+            $('#info_mdn').text(tmpl.msisdn)
+            $('#info_imei').text(tmpl.imei)
+            $('#info_imsi').text(tmpl.imsi)
+            $('#info_signal').html(tmpl.signal)
+            $('#info_number').html(tmpl.max_access_num)
+            $('#info_ssid').text(tmpl.ssid)
+            $('#info_wifi_per').text($.i18n.prop(tmpl.wifi_long_mode))
+            $('#info_ip').text(tmpl.ipAddress)
+            $('#info_domain').text(tmpl.lanDomain)
+            $('#info_mac').text(tmpl.macAddress)
+            if(data.connectStatus=='ppp_disconnected'){	
+             $('#info_wan_ip').text('— —')
+            $('#info_wan_ipv6').text('— —')
+            }else{
+            	if((apnSettings.pdpType=='Ip') || (apnSettings.pdpType=='IP') || (apnSettings.pdpType=='ip')) {
+            		$('#info_wan_ip').text(tmpl.wanIpAddress)
+            		$('#info_wan_ipv6').text('— —')
+            	}else{
+            		$('#info_wan_ip').text(tmpl.wanIpAddress)
+            		$('#info_wan_ipv6').text(tmpl.ipv6WanIpAddress)
+            	}
+            	
+                
+            }
+            
+            $('#info_sw').text(tmpl.sw_version)
+            $('#info_hw').text(tmpl.hw_version)
+        }
+         
+       
+        /**
+         * 获取设备信息显示相关信息
+         * @method fetchDeviceInfo
+         */	
+        function fetchDeviceInfo() {
+            var data =service.getDeviceInfo();
+            return data;
+        }
+
+        function initShownStatus(data) {
+            var ipv6Mode = data.ipv6PdpType.toLowerCase().indexOf("v6") > 0;
+            if(config.RJ45_SUPPORT){
+                var mode = checkCableMode(data.blc_wan_mode);
+                if (mode) {
+                    initStatus.showIpv6WanIpAddr = false;
+                    initStatus.showIpv4WanIpAddr = true;
+                } else if (config.IPV6_SUPPORT) {//支持IPV6
+                    if (data.pdpType == "IP") {//ipv4
+                        initStatus.showIpv6WanIpAddr = false;
+                        initStatus.showIpv4WanIpAddr = true;
+                    } else if (ipv6Mode) {//ipv6(&ipv4)
+                        if (data.ipv6PdpType == "IPv6") {
+                            initStatus.showIpv6WanIpAddr = true;
+                            initStatus.showIpv4WanIpAddr = false;
+                        } else {
+                            initStatus.showIpv6WanIpAddr = true;
+                            initStatus.showIpv4WanIpAddr = true;
+                        }
+                    }
+                } else {//不支持IPV6
+                    initStatus.showIpv6WanIpAddr = false;
+                    initStatus.showIpv4WanIpAddr = true;
+                }
+            } else {
+                if (config.IPV6_SUPPORT) {//支持IPV6
+                    if (data.pdpType == "IP") {//ipv4
+                        initStatus.showIpv6WanIpAddr = false;
+                        initStatus.showIpv4WanIpAddr = true;
+                    } else if (ipv6Mode) {//ipv6(&ipv4)
+                        if (data.ipv6PdpType == "IPv6") {
+                            initStatus.showIpv6WanIpAddr = true;
+                            initStatus.showIpv4WanIpAddr = false;
+                        } else {
+                            initStatus.showIpv6WanIpAddr = true;
+                            initStatus.showIpv4WanIpAddr = true;
+                        }
+                    }
+                } else {//不支持IPV6
+                    initStatus.showIpv6WanIpAddr = false;
+                    initStatus.showIpv4WanIpAddr = true;
+                }
+            }
+        }
+        /**
+         * 获取wanIP地址
+         * @method getWanIpAddr
+         */	
+        function getWanIpAddr(data) {
+            var addrInfo = {
+                wanIpAddress: '',
+                ipv6WanIpAddress: ''
+            };
+            addrInfo.wanIpAddress = verifyDeviceInfo(data.wanIpAddress);
+            addrInfo.ipv6WanIpAddress = verifyDeviceInfo(data.ipv6WanIpAddress);
+            return addrInfo;
+        }
+        
+        $('#to_wifi_basic').click(function() {
+            goRouter('#settings_wifi_basic')
+        })
+
+        $('#to_set_power').click(function() {
+            goRouter('#settings_system_power')
+        })
+
+        load_info()
+        addInterval(function() {
+            load_info()
+        }, 1000);
+    }
+    load_mark()
+</script>
+

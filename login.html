@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <link href="favicon.ico" rel="shortcut icon" />
+    <meta name="viewport" initial-scale="1.0" />
+    <link rel="stylesheet" href="media/fonts/fonts.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/chosen.css" />
+    <link rel="stylesheet" href="css/common_mts.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="js/jquery.mCustomScrollbar.min.css">
+    <script src="js/jquery-1.8.2.min.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/jquery.simplemodal-1.4.5.js"></script>
+    <script src="js/jquery.base64.js"></script>
+    <script src="js/jquery.validate.en.js"></script>
+    <script src="js/lib/jquery/jquery.i18n.properties-1.0.9.js"></script>
+    <script src="js/config/language.js"></script>
+    <script src="/js/lib/jquery/translate.js"></script>
+    <style>
+        .lng-en .login-logo {
+            background-image: url(../media/img/logn-en.png);
+            background-repeat: no-repeat;
+        }
+        
+        .lng-ru .login-logo {
+            background-image: url(../media/img/logn-su.png);
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="msgOverlay">
+        <div>
+            <span id="msgDiv"></span>
+        </div>
+    </div>
+    <div id="topStatus" class="row-fluid" style="background-color: rgb(221, 221, 221);">
+        <div id="lang">
+            <div id="langLogoBar" class="row-fluid langborder langborderBg">
+                <div class="span3" style="text-align: center">
+                    <div class="main-logo" style="float: right; margin-top: 16px; margin-bottom: 10px;">
+                        <div class="main-logo login-logo"></div>
+                    </div>
+                    <div style="float: right; margin-top: 40px; margin-bottom: 10px;"></div>
+                </div>
+            </div>
+            <div class="row-fluid marginbottom5">
+                <div id="themeContainer" class="side-right marginTopCus" style="margin-top:-20px;">
+                    <select id="language" class="marginright10 hide" style="display: inline-block;" onchange="window.LTELanguageChange($('#language').val());">
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                    <span>
+                        <a id="help" class="logout marginright10 hide" target="_blank"  style="display: inline;" data-trans="help"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainContainer" class="row-fluid loginBackgroundBlue" style="height: auto;">
+        <div id="container" class="span6 paddingnone widthauto fixContainerWidth" style="box-sizing: border-box;margin-left: 0px; margin-bottom: 199.5px; height: 517px; border: none; padding-top: 0px;">
+            <div id="loginForms">
+                <div id="loginContainer" class="login_frame_en">
+                    <div id="frmLogin">
+                        <div class="field-group">
+                            <div class="field-group_l">
+                                <label class="label" for="txtUsername" data-trans='username'></label>
+                            </div>
+                            <div class="field-group_r">
+                                <input id="txtUsername" autocomplete="off" type="text" maxlength="30" name="txtUsername" />
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="field-group">
+                            <div class="field-group_l">
+                                <label class="label" for="txtPwd" data-trans='password'></label>
+                            </div>
+                            <div class="field-group_r">
+                                <input id="txtPwd" autocomplete="off" type="password" maxlength="30" name="txtPwd" />
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="field-group">
+                            <div>
+                                <input id="btnLogin" type="button" class="btn-1 " data-trans="login" style="margin-left: 25px;" />
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+
+                    <div id="div_loading" style="display:none;">
+                        <img id="loadingImg" src="img/loading.gif" />
+                    </div>
+
+                    <div class="login_bottom"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="main-footer" style="margin-top: 0px;clear: both;">
+        <div class="main-content-section">
+            <div class="top-bg"></div>
+            <div class="container_foot_cus">
+                <p data-trans="footer_content"></p>
+            </div>
+        </div>
+    </footer>
+    <div id="confirm" class="base-popup service-message-popup" style="top:0;width:400px;text-align: center">
+        <div class="popup-wrap">
+            <h4 class="p-heading" id="confirm-title"></h4>
+            <p class="p-text" id="confirm-content"></p>
+            <div class="btn-wrap">
+                <a class="btn" id="yesbtn" data-trans="yes">Yes</a>
+                <a class="btn gray" id="nobtn" data-trans="no">No</a>
+            </div>
+            <div class="close-btn send-sms-dialog-close" id="closeBtn">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $.get('goform/goform_get_cmd_process?isTest=false&cmd=Language&multi_data=1&_=' + new Date().getTime(), {}, function(data) {
+                var result = $.parseJSON(data);
+                var lang = window.CurrentLang;
+                if (result && result.Language && window.SupportLang[result.Language]) {
+                    lang = result.Language;
+                    $('#language').val(lang);
+                }
+                window.LTELanguageChange(lang);
+            });
+
+            $('#txtUsername').focus();
+            $(document).keydown(function(evt) {
+                if (evt.ctrlKey || evt.altKey) {
+                    // Exclude key press "CRTL+key" & "ALT+key"
+                    return;
+                }
+
+                if (13 == evt.keyCode && ($('#txtPwd').is(':focus'))) {
+                    // Enter key
+                    $('#btnLogin').trigger('click');
+                }
+            });
+            $('#help').click(function (){
+        	if($('#language').val() =='ru'){
+        		$("#help").attr('href','help_ru.html')
+        	}else{
+        		$("#help").attr('href','help.html')
+        	}
+        })
+      
+
+            $('#btnLogin').click(function() {
+                var username = $('#txtUsername').val();
+                if (!username.length) {
+                    showAlert($.i18n.prop('input_username'), function() {
+                        $('#txtUsername').focus()
+                    });
+                    return;
+                }
+
+                var password = $('#txtPwd').val();
+                if (!password.length) {
+                    showAlert($.i18n.prop('input_password'), function() {
+                        $('#txtPwd').focus()
+                    });
+                    return;
+                }
+
+                $('#div_loading').show()
+                $('#frmLogin').hide();
+                $.ajax({
+                    url: '/goform/goform_set_cmd_process',
+                    type: 'Post',
+                    timeout: 8000,
+                    cache: false,
+                    data: {
+                        goformId: 'LOGIN',
+                        password: $.base64.btoa($('#txtPwd').val()),
+                        username: $.base64.btoa($('#txtUsername').val())
+                    },
+                    success: function(data, status) {
+                        var result = 5;
+                        var val = $.parseJSON(data);
+                        if (val && val.result) {
+                            result = val.result;
+                        }
+                        parseLoginResult(result);
+                    }
+                });
+            })
+            $('body').translate();
+        });
+
+        function parseLoginResult(result) {
+            if (result == 0) {
+                location.href = 'index.html';
+                return true;
+            }
+                showAlert($.i18n.prop('incorrect_password'));
+           
+
+            $('#txtUsername').focus();
+            $('#div_loading').hide();
+            $('#frmLogin').show();
+        }
+    </script>
+</body>
+
+</html>

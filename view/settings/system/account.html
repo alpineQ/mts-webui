@@ -1,0 +1,168 @@
+<form id="settings_system_account" novalidate="novalidate" autocomplete="off">
+    <div class="form-body">
+        <div class="form-title" style="display: none;" data-trans="account_management">Account Management</div>
+        <div class="content">
+        <div class="row-fluid">
+            <label class="span4 side-right" for="txtCurrentPassword"><span data-trans="current_password">Current Password</span>
+            <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+            <div>
+                <input id="txtCurrentPassword" name="txtCurrentPassword" type="password" class="required" minlength="5" maxlength="30" />
+            </div>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <label class="span4 side-right" for="txtNewPassword" ><span data-trans="new_password">New Password</span>
+            <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+            <div>
+                <input id="txtNewPassword" name="txtNewPassword" type="password" class="required" minlength="5" maxlength="30" />
+            </div>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <label class="span4 side-right" for="txtConfirmPassword">
+            <span data-trans="confirm_password">Confirm New Password</span>
+            <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+            <div>
+                <input id="txtConfirmPassword" name="txtConfirmPassword" type="password" class="required" minlength="5" maxlength="30" />
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="form-buttons"  style="padding-right:20px;">
+            <input id="btnPwdApply" type="submit" class="btn-1" value="Apply"  data-trans="apply"/>
+            <input id="btnPwdCancel" type="button" class="btn-1 hide" value="Cancel"  data-trans="cancel"/>
+        </div>
+        <div class="form-note">
+        <div class="notes-title">&nbsp;</div>
+        <ul class="notes-content">
+            <li data-trans="password_note_info">You can change login password on this page.</li>
+            <li data-trans="password_note_valid">
+            The password can't be empty and must contain at most 32 characters.
+            </li>
+            <li data-trans="password_note_input">
+            The password contains 0-9 a-z A-Z ! # $ * + , - . % : = ? @ [ ] ^ _ {
+            | } ~
+            </li>
+        </ul>
+        </div>
+    </div>
+</form>
+
+<script>
+    window.LTELanguageInitPart('#settings_system_account')
+    function load_mark() {
+        function vilidatePassword() {
+            clearAllErrorLabel()
+            var currenPassword = $('#txtCurrentPassword').val()
+            var newPassword = $('#txtNewPassword').val()
+            var confirmPassword = $('#txtConfirmPassword').val()
+            if ('' == currenPassword) {
+                showErrorUnderTextbox(
+                'txtCurrentPassword',
+                $.i18n.prop('please_enter_current_pwd')
+                )
+                $('#txtCurrentPassword').focus()
+                return false
+            } else if (checkInputChar(currenPassword) == false) {
+                showErrorUnderTextbox('txtCurrentPassword', $.i18n.prop('password_is_error'))
+                $('#txtCurrentPassword').val('')
+                $('#txtCurrentPassword').focus()
+                return false
+            } else if ('' == newPassword) {
+                showErrorUnderTextbox(
+                'txtNewPassword',
+                $.i18n.prop('please_enter_pwd')
+                )
+                $('#txtNewPassword').focus()
+                return false
+            } else if ('' == confirmPassword) {
+                showErrorUnderTextbox(
+                'txtConfirmPassword',
+                $.i18n.prop('confirm_new_pwd')
+                )
+                $('#txtConfirmPassword').focus()
+                return false
+            } else if (true == hasSpaceOrTabAtHead(newPassword)) {
+                showErrorUnderTextbox(
+                'txtNewPassword',
+                $.i18n.prop('value_not_start_space')
+                )
+                $('#txtNewPassword').focus()
+                return false
+            } else if (true == hasSpaceOrTabAtHead(confirmPassword)) {
+                showErrorUnderTextbox(
+                'txtConfirmPassword',
+                $.i18n.prop('value_not_start_space')
+                )
+                $('#txtConfirmPassword').focus()
+                return false
+            } else if (newPassword != confirmPassword) {
+                showErrorUnderTextbox(
+                'txtConfirmPassword',
+                $.i18n.prop('new_pwd_not_match')
+                )
+                $('#txtNewPassword').focus()
+                $('#txtNewPassword').val('')
+                $('#txtConfirmPassword').val('')
+                return false
+            } else if (newPassword.length < 5) {
+                showErrorUnderTextbox(
+                'txtNewPassword',
+                $.i18n.prop('new_pwd_five_char')
+                )
+                $('#txtNewPassword').focus()
+                $('#txtConfirmPassword').val('')
+                return false
+            } else if (checkInputChar(newPassword) == false) {
+                showErrorUnderTextbox(
+                'txtNewPassword',
+                $.i18n.prop('new_pwd_rule')
+                )
+                $('#txtNewPassword').focus()
+                return false
+            } else {
+                return true
+            }
+        }
+
+        $('#btnPwdApply').click(function(event) {
+            event.preventDefault()
+            if (!vilidatePassword()) return
+
+            var currentPassword = $('#txtCurrentPassword').val()
+            var newPassword = $('#txtNewPassword').val()
+            
+            var para = {
+                oldPassword:currentPassword,
+                newPassword:newPassword
+            };
+            showLoading("saving");
+            window._service.changePassword(para, function (data) {
+                hideLoading();
+                $('#txtCurrentPassword').val("")
+                $('#txtNewPassword').val("")
+                $('#txtConfirmPassword').val("")
+                if (data && data.result == true) {
+                    showInfo("success_info")
+                } else {
+                    if (data && data.errorType == "badPassword") {
+                        showAlert("current_password_error",function(){
+                            $("#txtCurrentPassword").focus();
+                        });
+                    } else {
+                        showAlert("error_info")
+                    }
+                }
+            });
+        })
+    }
+
+    load_mark()
+</script>
+      

@@ -1,0 +1,233 @@
+[
+  {
+    "id": 1,
+    "speakerImg": "media/img/speakers/3.jpg",
+    "speakerName": "Олег Колченко",
+    "speakerCompany": "Группа Компаний «Мортон»",
+    "speakerPosition": "Вице-президент",
+    "time": "16:30",
+    "theme": "ИСТОРИЯ УСПЕХА ГРУППЫ КОМПАНИЙ «МОРТОН»",
+    "biography": "Родился в 1970 году в г.Караганда. В компанию «Мортон» пришел в 2005 году. В кратчайшие сроки сформировал одну из самых эффективных на рынке недвижимости структуру продаж новостроек с высокопрофессиональной службой маркетинга и рекламы. В 2014 году выручка ГК «Мортон» превысила 60,7 млрд. рублей, а объем реализованной за год недвижимости составил более 700 тыс. квадратных метров. В 2013 году назначен на должность Вице-президента ГК «Мортон». Женат, воспитывает двух детей."
+  },
+  {
+    "id": 2,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "ДМИТРИЙ ВЛАСОВ",
+    "speakerCompany": "RDI",
+    "speakerPosition": "Заместитель генерального директора по коммерческим вопросам",
+    "time": "16:30",
+    "theme": "ОН-ЛАЙН СЕРВИСЫ ДЛЯ ЖИТЕЛЕЙ",
+    "biography": "Дмитрий Власов окончил Московский институт коммунального хозяйства и строительства (коммерция в сфере недвижимости) и Школу бизнеса при Правительстве Москвы (управление персоналом). За свою карьеру он успел поработать в крупнейших компаниях отрасли. Трудовую деятельность Дмитрий начал в должности руководителя отдела коммерческой недвижимости компании Pine Wood Realty, затем работал консультантом в компании Knight Frank, а после директором отдела продаж в Инвестиционно-промышленной группе «Евразия». Последние 1,5 года г-н Власов занимал должность директора по продажам компании Rose Group (RGI International) Бориса Кузинца, где добился немалых успехов, значительно увеличив показатели продаж компании. С 2013 г, работает в компании RDI в должности Заместителя генерального директора по коммерческим вопросам/Коммерческий Директор"
+  },
+  {
+    "id": 3,
+    "speakerImg": "media/img/speakers/3.jpg",
+    "speakerName": "ИЛЬДАР ХУСАИНОВ",
+    "speakerCompany": "«Этажи»",
+    "speakerPosition": "Учредитель и директор компании",
+    "time": "16:30",
+    "theme": "ЭЛЕКТРОННОЕ АГЕНТСТВО НЕДВИЖИМОСТИ БУДУЩЕГО",
+    "biography": "Родился в Тюмени в 1980 году. Окончил Тюменский государственный нефтегазовый университет в 2002 году, в 2005 заочно окончил Тюменский государственный университет. </br>Первое и единственное место работы - учредитель и директор в компании "Этажи" с 16 октября 2000 года по настоящее время, за это время компания прошла путь от маленького агентства с двумя сотрудниками, до лидера риэлтерского рынка с 35 филиалами и более 3000 сотрудниками. Женат, трое детей."
+  },
+  {
+    "id": 5,
+    "speakerImg": "media/img/speakers/4.jpg",
+    "speakerName": "АЛЕКСЕЙ НЕПЕЙВОДА",
+    "speakerCompany": "Группа Компаний «МИЦ»",
+    "speakerPosition": "Руководитель отдела маркетинга и рекламы",
+    "time": "16:30",
+    "theme": "ОН-ЛАЙН СЕРВИСЫ",
+    "biography": "Родился 23 декабря 1986г. в г. Завитинск Амурской области (РФ)<br> Руководитель отдела маркетинга и рекламы Группы компаний «МИЦ» (www.mosipoteka.ru) <br> Образование:<br> Окончил факультет маркетинга Белорусского Государственного Экономического Университета (бывш. БГИНХ им. Куйбышева) по специализации промышленный маркетинг.<br> Опыт работы:<br> FMCG<br> 2008-2009 гг. – Представительство завода «Лебедянский» в Республике Беларусь. Специалист по маркетингу<br> 2009-2010 — Представительство «ПепсиКо Холдингс» в Республике Беларусь<br> Специалист по продажам (канал традиционная розница)<br> Специалист по продажам (ключевые клиенты канала HoReCa)<br> 2010-2011 — Группа компаний «Сэльвин» (Республика Беларусь)<br> Трейд-маркетолог (портфель концернов «Werner&Mertz», „PZ Cussons“, „SCA“, „Reckitt Benckiser“)<br> Строительство и девелопмент<br> 2011 – наст. время — Группа компаний «МИЦ» (Москва, Российская Федерация)<br> Маркетолог - маркетолог с 2011-2012, руководитель отдела маркетинга и рекламы с 2012 по наст. время<br> Член Гильдии маркетологов РФ»"
+  },
+  {
+    "id": 6,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 7,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 8,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 9,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 10,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 11,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 12,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 13,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 14,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 15,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 16,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 17,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 18,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 19,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 20,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 21,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 22,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 23,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  },
+  {
+    "id": 24,
+    "speakerImg": "media/img/speakers/2.jpg",
+    "speakerName": "",
+    "speakerCompany": "",
+    "speakerPosition": "",
+    "time": "16:30",
+    "theme": "",
+    "biography": ""
+  }
+
+]

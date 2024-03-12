@@ -1,0 +1,301 @@
+<form id='wpsForm' role="form" style="margin-left: 15px; margin-right: 15px;">
+    <div class="row-fluid">
+        <label class="span4 side-right" for="selAuthMode"><span data-trans="ssid_title">SSID</span>
+        <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+    </label>
+        <div class="span8">
+            <select id="multiSSID" class="valid form-control">
+            </select>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <label class="span4 side-right" for="txtUserName"><span data-trans="wps">WPS</span>
+        <i class="colorRed">&nbsp;</i>
+    </label>
+        <div class="span8">
+            <input type="radio" name="wpsMode" id="pinMode" value="PIN">
+            <label for="pinMode" data-trans="wps_pin">PIN</label>
+            <input type="text" name="txtPin" id="txtPin" class="required margin-left-5  form-control error" maxlength="9" disabled>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <label class="span4 side-right"></label>
+        <div class="span8">
+            <input type="radio" name="wpsMode" id="pbcMode" value="PBC" checked="checked">
+            <label for="pbcMode" data-trans="wps_pbc">PBC</label>
+        </div>
+    </div>
+    <div class="settings-line btn-wrap" style="float:right;">
+        <input type="submit" class="btn-1" value="apply" id="btnApply" data-trans="apply">
+    </div>
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('#wpsForm').validate({
+            submitHandler: function() {
+                _wpsSave();
+            },
+            rules: {
+                txtPin: {
+                    "wps_pin_validator": true
+                }
+            }
+        });
+
+        $(':radio[name="wpsMode"]').bind('click', function() {
+            $('#btnApply').removeAttr('disabled');
+            var pinMode = $('#pinMode').attr('checked');
+            $('#txtPin').attr('disabled', !(pinMode == true || pinMode == 'checked'));
+        });
+
+        _wpsGetWpsInfo(function(info) {
+            var options = drawMulSSIDOption(info);
+            $.each(options, function(index, item) {
+                if (item) {
+                    document.getElementById('multiSSID').options.add(item);
+                }
+            });
+
+            var wpsSSID = getCurrentWpsSsid(info);
+            $('#multiSSID').find('option[value="' + wpsSSID + '"]').attr('selected', true);
+
+            if (info.wpsFlag != '0') {
+                $(':radio[name="wpsMode"][value="' + info.wpsType + '"]').attr('checked', true);
+                $('#btnApply').removeAttr('disabled');
+                if (info.wpsType.toLowerCase() == 'pin') {
+                    $('#txtPin').attr('disabled', false);
+                }
+            }
+        });
+
+        jQuery.validator.addMethod("wps_pin_validator", function(value, element, param) {
+            return this.optional(element) || /^\d{4}$/.test(value) || /^\d{8}$/.test(value) || /^\d{4}[ -]\d{4}$/.test(value);
+        });
+
+        $('#containerSettings').translate();
+    });
+
+    /**
+     * 获取wps相关信息
+     * @method getWpsInfo
+     */
+    function drawMulSSIDOption(info) {
+        var opts = [];
+        opts.push(new Option(info.ssid, "SSID1"));
+        if (info.ssidEnable == "1") {
+            opts.push(new Option(info.multiSSID, "SSID2"));
+        }
+        return opts;
+    }
+    /**
+     * 获取当前开启wps的ssid
+     * @param info
+     * @returns {string}
+     */
+    function getCurrentWpsSsid(info) {
+        if (info.ssid == info.multiSSID) {
+            if (info.wifi_wps_index == '2') {
+                return "SSID2";
+            } else {
+                return "SSID1";
+            }
+        } else {
+            return info.wpsSSID == info.multiSSID ? "SSID2" : "SSID1";
+        }
+    }
+
+    function _wpsGetWpsInfo(callback) {
+        $.getJSON("/goform/goform_get_cmd_process", {
+            isTest: 'false',
+            cmd: encodeURI("wifi_wps_index,WscModeOption,AuthMode,wifi_cur_state,EncrypType,wps_mode,WPS_SSID,m_ssid_enable,SSID1,m_SSID,m_EncrypType,m_AuthMode,wifi_sta_connection"),
+            multi_data: 1,
+            "_": new Date().getTime()
+        }, function(data) {
+            var result = {};
+            result.wpsFlag = data.WscModeOption;
+            result.authMode = data.AuthMode;
+            result.wpsType = data.wps_mode;
+            result.radioFlag = data.wifi_cur_state == "1" ? "1" : "0";
+            result.encrypType = data.EncrypType;
+            result.wpsSSID = data.WPS_SSID;
+            result.ssidEnable = data.m_ssid_enable;
+            result.ssid = data.SSID1;
+            result.multiSSID = data.m_SSID;
+            result.m_encrypType = data.m_EncrypType;
+            result.wifi_wps_index = data.wifi_wps_index;
+            result.AuthMode = data.AuthMode;
+            result.m_AuthMode = data.m_AuthMode;
+            result.ap_station_enable = data.wifi_sta_connection;
+            if (callback) {
+                callback(result);
+            }
+        });
+    }
+
+    function _wpsSave() {
+        _wpsGetWpsInfo(function(info) {
+            if (info.radioFlag == '0') {
+                showAlert('wps_wifi_off');
+                return;
+            }
+
+            if (info.wpsFlag == '1') {
+                showAlert('wps_on_info');
+                return true;
+            }
+
+            var _wpsSSID = getCurrentWpsSsid(info);
+            if (_wpsSSID == "SSID1") {
+                var checkResult = (info.AuthMode == "OPEN" && info.encrypType == "WEP") ||
+                    (info.AuthMode == "SHARED" && info.encrypType == "WEP") ||
+                    (info.AuthMode == "WPAPSK" && info.encrypType == "TKIP") ||
+                    (info.AuthMode == "WPAPSK" && info.encrypType == "AES") ||
+                    (info.AuthMode == "WPAPSK" && info.encrypType == "TKIPCCMP") ||
+                    (info.AuthMode == "WPA2PSK" && info.encrypType == "TKIP") ||
+                    (info.AuthMode == "WPAPSKWPA2PSK" && info.encrypType == "TKIP");
+                if (checkResult) {
+                    showAlert('wps_auth_open');
+                    return;
+                }
+            } else {
+                var checkMResult = (info.m_AuthMode == "OPEN" && info.m_encrypType == "WEP") ||
+                    (info.m_AuthMode == "SHARED" && info.m_encrypType == "WEP") ||
+                    (info.m_AuthMode == "WPAPSK" && info.m_encrypType == "TKIP") ||
+                    (info.m_AuthMode == "WPAPSK" && info.m_encrypType == "AES") ||
+                    (info.m_AuthMode == "WPAPSK" && info.m_encrypType == "TKIPCCMP") ||
+                    (info.m_AuthMode == "WPA2PSK" && info.m_encrypType == "TKIP") ||
+                    (info.m_AuthMode == "WPAPSKWPA2PSK" && info.m_encrypType == "TKIP");
+                if (checkMResult) {
+                    showAlert('wps_auth_open');
+                    return;
+                }
+            }
+
+            var wpsSSID;
+            var wpsIndex;
+            if (_wpsSSID == "SSID1") {
+                wpsSSID = info.ssid;
+                wpsIndex = 1;
+            } else {
+                wpsSSID = info.multiSSID;
+                wpsIndex = 2;
+            }
+
+            getWifiBasic(function(basic) {
+                if (wpsSSID == basic.SSID && wpsIndex == 1) {
+                    if (basic.broadcast == '1') {
+                        showAlert('wps_ssid_broadcast_disable');
+                        return;
+                    }
+                } else if (wpsSSID == basic.m_SSID && wpsIndex == 2) {
+                    if (basic.m_broadcast == '1') {
+                        showAlert('wps_ssid_broadcast_disable');
+                        return;
+                    }
+                }
+
+                showLoading('waiting');
+                var params = {};
+                var pinMode = $('#pinMode').attr('checked');
+                params.wpsType = (pinMode == true || pinMode == 'checked') ? 'PIN' : 'PBC';
+                params.wpsPin = change9bitPIN($('#txtPin').val());
+                params.wpsSSID = wpsSSID;
+                params.wpsIndex = wpsIndex;
+                openWps(params);
+            });
+        });
+    }
+
+    function openWps(params) {
+        var requestParams = {};
+        requestParams.isTest = false;
+        requestParams.goformId = "WIFI_WPS_SET";
+        requestParams.WPS_SSID = params.wpsSSID;
+        requestParams.wps_mode = params.wpsType;
+        requestParams.wifi_wps_index = params.wpsIndex;
+        if (requestParams.wps_mode == 'PIN') {
+            requestParams.wps_pin = params.wpsPin;
+        }
+        $.post('/goform/goform_set_cmd_process', requestParams, function(data) {
+            hideLoading();
+            if (typeof(data) == 'string') {
+                data = JSON.parse(data);
+            }
+
+            if (data.result == "success") {
+                $('#txtPin').val('');
+                showAlert('success_info');
+            } else {
+                showAlert('error_info');
+            }
+        });
+    }
+
+    function change9bitPIN(value) {
+        if (value.length == 9) {
+            return value.substring(0, 4) + value.substring(5);
+        } else {
+            return value;
+        }
+    }
+
+    /**
+     * 获取基本的wifi信息
+     * @method getWifiBasic
+     * @return {Object} wifi JSON 对象 
+     */
+    function getWifiBasic(callback) {
+        var requestParams = {};
+        requestParams.isTest = false;
+        var wpapsk = "WPAPSK1_encode,m_WPAPSK1_encode,";
+        requestParams.cmd = "m_ssid_enable,wifi_cur_state,NoForwarding,m_NoForwarding," + wpapsk + "MAX_Station_num," +
+            "SSID1,AuthMode,HideSSID,MAX_Access_num,show_qrcode_flag,EncrypType,Key1Str1,Key2Str1,Key3Str1,Key4Str1,DefaultKeyID," +
+            "m_SSID,m_AuthMode,m_HideSSID,m_MAX_Access_num,m_EncrypType,m_show_qrcode_flag,m_DefaultKeyID,m_Key1Str1,m_Key2Str1,m_Key3Str1,m_Key4Str1,rotationFlag,wifi_sta_connection";
+        requestParams.multi_data = 1;
+
+        $.getJSON("/goform/goform_get_cmd_process", requestParams, function(data) {
+            var result = {
+                wifi_enable: data.wifi_cur_state == "1" ? "1" : "0",
+                multi_ssid_enable: data.m_ssid_enable,
+                MAX_Station_num: $.isNumeric(data.MAX_Station_num) ? data.MAX_Station_num : config.MAX_STATION_NUMBER,
+                //ssid 1
+                AuthMode: data.AuthMode,
+                SSID: data.SSID1,
+                broadcast: data.HideSSID,
+                apIsolation: data.NoForwarding,
+                passPhrase: $.base64.decode(data.WPAPSK1_encode),
+                MAX_Access_num: data.MAX_Access_num,
+                cipher: data.EncrypType == "TKIP" ? "0" : data.EncrypType == "AES" ? 1 : 2,
+                encryptType: data.EncrypType,
+                show_qrcode_flag: data.show_qrcode_flag == "1" ? true : false,
+                keyID: data.DefaultKeyID,
+                Key1Str1: data.Key1Str1,
+                Key2Str1: data.Key2Str1,
+                Key3Str1: data.Key3Str1,
+                Key4Str1: data.Key4Str1,
+                //ssid 2
+                m_SSID: data.m_SSID,
+                m_broadcast: data.m_HideSSID,
+                m_apIsolation: data.m_NoForwarding,
+                m_MAX_Access_num: data.m_MAX_Access_num,
+                m_AuthMode: data.m_AuthMode,
+                m_passPhrase: $.base64.decode(data.m_WPAPSK1_encode),
+                m_cipher: data.m_EncrypType == "TKIP" ? "0" : data.m_EncrypType == "AES" ? 1 : 2,
+                m_show_qrcode_flag: data.m_show_qrcode_flag == "1" ? true : false,
+                m_encryptType: data.m_EncrypType,
+                m_keyID: data.m_DefaultKeyID,
+                m_Key1Str1: data.m_Key1Str1,
+                m_Key2Str1: data.m_Key2Str1,
+                m_Key3Str1: data.m_Key3Str1,
+                m_Key4Str1: data.m_Key4Str1,
+
+                rotationFlag: data.rotationFlag,
+                ap_station_enable: data.wifi_sta_connection
+            };
+            if (callback) {
+                callback(result);
+            }
+        });
+    }
+</script>

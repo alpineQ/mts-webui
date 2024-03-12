@@ -1,0 +1,171 @@
+<div class="form-body" id="settings_system_power">
+<!--hide wifi range settings until sw implements it-->
+<form id="wifiRangeForm" novalidate="novalidate" autocomplete="off">
+    <div class="form-title" style="display: none;" data-trans="wifi_range_settings">
+    Wi-Fi Performance Settings
+    </div>
+
+    <div class="content">
+    <div class="row-fluid">
+        <label class="span4 side-right"><span data-trans="wifi_performance">Wi-Fi Performance</span>
+            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+        </label>
+        <div class="span8_cus">
+            <input type="radio" name="rangeGroup" id="short_mode" value="short_mode" />
+            <label for="short_mode" data-trans="wifi_short_mode">Short Wi-Fi Range - Best battery life</label>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <label class="span4 side-right">
+            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+        </label>
+        <div class="span8">
+            <input type="radio" name="rangeGroup" id="medium_mode" value="medium_mode" />
+            <label for="medium_mode" data-trans="wifi_medium_mode">Medium Wi-Fi Range</label>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <label class="span4 side-right">
+            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+        </label>
+        <div class="span8">
+            <input type="radio" name="rangeGroup" id="long_mode" value="long_mode" />
+            <label for="long_mode" data-trans="wifi_long_mode">Long Wi-Fi Range</label>
+        </div>
+    </div>
+    </div>
+    <div class="form-buttons" style="padding-right:20px;">
+        <input id="btn_submit_range" type="submit" class="btn-1" value="Apply" data-trans="apply" />
+    </div>
+    <div class="form-note">
+    <div class="notes-title">&nbsp;</div>
+    <ul class="notes-content">
+        <li data-trans="range_sleep_time">Battery life varies with Wi-Fi range and sleep time.</li>
+        <li data-trans="wifi_range_note_range1">Wi-Fi Range:</li>
+        <li class="no-style">
+        <ul>
+            <li data-trans="wifi_range_note_short1">Short Wi-Fi Range: Increases battery life.</li>
+            <li data-trans="wifi_range_note_medium1">Medium Wi-Fi Range: Intermediate battery life and Wi-Fi range.</li>
+            <li data-trans="wifi_range_note_long1">
+            Long Wi-Fi Range: Extend coverage of mobile hotspot and still
+            connect to your Wi-Fi network, which will decrease battery life.
+            </li>
+        </ul>
+        </li>
+    </ul>
+    </div>
+</form>
+<form id="sleepModeForm" novalidate="novalidate" autocomplete="off">
+    <div class="form-title" style="display: none;" data-trans="wifi_sleep_setting">Wi-Fi Sleep Settings</div>
+    <div class="content">
+    <div class="row-fluid">
+        <label class="span4 side-right" for="mode"><span data-trans="tsw_timer_off">Sleep Time</span>
+        <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+        </label>
+        <div class="span8">
+        <select transid="sleep_mode" id="sleep_mode">
+            <option value="0" data-trans="sleep_mode_-1">Never Sleep</option>
+            <option value="5" data-trans="sleep_mode_5">5 Minutes</option>
+            <option value="10" data-trans="sleep_mode_10">10 Minutes</option>
+            <option value="20" data-trans="sleep_mode_20">20 Minutes</option>
+            <option value="30" data-trans="sleep_mode_30">30 Minutes</option>
+            <option value="60" data-trans="sleep_mode_60">1 Hour</option>
+            <option value="120" data-trans="sleep_mode_120">2 Hours</option>
+        </select>
+        </div>
+    </div>
+    </div>
+    <div class="form-buttons" style="padding-right:20px;">
+        <input id="btn_submit_sleep" type="button" data-trans="apply" class="btn-1" value="Apply" />
+    </div>
+    <div class="form-note">
+    <div class="notes-title">&nbsp;</div>
+    <ul class="notes-content">
+        <li data-trans="wifi_sleep_note_info1">
+        Sleep Time: When there's no Wi-Fi connection in specific time, Wi-Fi
+        will be unavailable, and the system will turn to sleep mode for
+        power-saving.
+        </li>
+    </ul>
+    </div>
+</form>
+</div>
+<script>
+    window.LTELanguageInitPart('#settings_system_power')
+    function load_mark() {
+        function load_setting() {
+            var info = window._service.getSleepMode();
+            var wifiRangeInfo = window._service.getWifiRange();
+            var range = wifiRangeInfo.wifiRangeMode
+            var sleep_mode = info.sleepMode
+            $('input[name=rangeGroup][value=' + range + ']').attr('checked', true)
+            $('#sleep_mode').val(sleep_mode)
+        }
+    
+        $('#btn_submit_range').click(function(event) {
+            event.preventDefault()
+            showLoading('waiting');
+            window._service.getWpsInfo({}, function (info) {
+                if (info.radioFlag == '0') {
+                    hideLoading()
+                    showAlert('wps_wifi_off');
+                } else if (info.wpsFlag == '1') {
+                    hideLoading()
+                    showAlert('wps_on_info');
+                } else {
+                    showConfirm('wifi_sleep_confirm', function () {
+                        setWifiRangeAct();
+                    });
+                    
+                }
+            });
+        })
+
+        var setWifiRangeAct = function() {
+            var params = {};
+            params.wifiRangeMode = $('input[name=rangeGroup]:checked').val()
+            window._service.setWifiRange(params, function(result) {
+                hideLoading()
+                if (result.result == "success") {
+                    showInfo("success_info")
+                } else {
+                    showAlert("error_info")
+                }
+            });
+        };
+    
+        $('#btn_submit_sleep').click(function(event) {
+            event.preventDefault()
+            showLoading('waiting');
+            window._service.getWpsInfo({}, function (info) {
+                if (info.radioFlag == '0') {
+                    hideLoading()
+                    showAlert('wps_wifi_off');
+                } else if (info.wpsFlag == '1') {
+                    hideLoading()
+                    showAlert('wps_on_info');
+                } else {
+                    setSleepModeAct();
+                }
+            });
+            
+        })
+
+        var setSleepModeAct = function() {
+            var params = {};
+            params.sleepMode = $('#sleep_mode').val();
+            window._service.setSleepMode(params, function(result) {
+                hideLoading()
+                if (result.result == "success") {
+                    showInfo("success_info")
+                } else {
+                    showAlert("error_info")
+                }
+            });
+        };
+    
+        load_setting()
+    }
+    load_mark()
+</script>
+      

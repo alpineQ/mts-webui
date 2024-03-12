@@ -1,0 +1,77 @@
+<div class="settings-block" id="setting-security-dmz">
+    <div class="settings-line">
+        <div class="label" data-trans="dmz_setting">DMZ Settings</div>
+        <div class="b-radio_wrap">
+            <input id="access_1" class="b-radio" type="radio" name="rangeGroup" value="1">
+            <label for="access_1" data-trans="enable">enable</label>
+        </div>
+        <div class="b-radio_wrap">
+            <input id="access_2" class="b-radio" type="radio" name="rangeGroup" value="0">
+            <label for="access_2" data-trans="disable">disable</label>
+        </div>
+    </div>
+    <div class="input-wrap" id="setting_ipAddress">
+        <label for="txtIpAddress" class="label" ><span data-trans="ip_address">ip_address</span><span style="color:red"></span></label>
+        <input id="txtIpAddress" name="txtIpAddress" type="text">
+        <label id="err_txtIpAddress" for="txtIpAddress" generated="true" class="error" ></label>
+    </div>
+    <div class="settings-line btn-wrap">
+        <a class="btn" onclick="dmz_setDmzSetting()" style="color: #fff;" data-trans="apply">apply</a>
+    </div>
+</div>
+
+<script>
+window.LTELanguageInitPart('#setting-security-dmz')
+
+function dmz_setDmzSetting(){
+    var range = $('input[name=rangeGroup]:checked').val()
+    var ipAddress =$('#txtIpAddress').val()
+    if(ipAddress=='192.168.1.1'){
+    	showInfo('dmz_info')
+    	return;
+    }
+    if(range==1){
+        var isIp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/i.test(ipAddress);
+        var result = false;
+        if(isIp) {
+            var iparr = ipAddress.split(".");
+            result =  checkRange(iparr[0], 1, 255) && checkRange(iparr[1], 0, 255) && checkRange(iparr[2], 0, 255) && checkRange(iparr[3], 1, 254);
+        }
+        if(!result){
+            $('#err_txtIpAddress').html($.i18n.prop('ipv4'))
+            return
+        }
+    }
+    var params = {};
+    params.dmzSetting = range;
+    params.ipAddress = ipAddress;
+    window._service.setDmzSetting(params, function(result) {
+        if (result.result == "success") {
+            showInfo('success_info_dmz')
+        } else {
+            showAlert('error_info')
+        }
+    });
+}
+
+function load_init(){
+    var info = window._service.getDmzSetting()
+    $('input[name=rangeGroup][value=' + info.dmzSetting + ']').attr('checked', true)
+    $('#txtIpAddress').val(info.ipAddress)
+    if(info.dmzSetting==1){
+        $('#setting_ipAddress').show()
+    }else{
+        $('#setting_ipAddress').hide()
+    }
+
+    $('input[name=rangeGroup]').die().live('change', function() {
+        var range = $('input[name=rangeGroup]:checked').val()
+        if(range==1){
+            $('#setting_ipAddress').show()
+        }else{
+            $('#setting_ipAddress').hide()
+        }
+    })
+}
+load_init()
+</script>

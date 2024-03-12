@@ -1,0 +1,55 @@
+<section id="payment-page" class="payment-page">
+  <div class="container">
+    <div class="payment-wrapper">
+      <div class="input-wrap">
+        <label for="phone-number" data-trans="pay_phoneLabel">Enter the phone number </br>to top-up</label>
+         <div class="inner" style="float:inherit;width:45px;margin-right: -5px;background: #D3D3D3;">
+          <input readonly style="padding:0px; background: #D3D3D3;text-align: center;" value="+7" type="text" />
+        </div>
+        <div class="inner" style="float:inherit;width: 215px;">
+          <input id="phone-number" data-bind="value:phone,valueUpdate: 'keypress'" type="text", data-placeholder="pay_number_place" />
+        </div>
+      </div>
+      <div class="input-wrap">
+        <label for="sum" data-trans="pay_amountLabel">Enter the amount in RUB</label>
+        <div class="inner" style="float:inherit">
+          <input id="sum" data-bind="value:amount,valueUpdate: 'keypress'" type="text" data-placeholder="pay_amount_place"/>
+        </div>
+      </div>
+      <a id="btnPwdApply" data-trans="pay_pay" class="btn" style="margin-left:420px;">Pay</a>
+      <div class="content">
+          <h2 data-trans="pay_otherPayMsg">You can also top-up your balance in the <br>following way:</h2>
+          <div class="info-block">
+              <a href="http://www.mts.ru/bankovskiye_uslugi/autopayment/usluga_avtoplatezh?utm_source=MTS&utm_medium=Autopayment_WEB_UI&utm_campaign=Autopayment_092017" target="_blank" class="block">
+                  <div class="icons auto-pay" style="background: url(../img/main-sprite2.png) no-repeat scroll -1px -980px;">
+                  </div>
+                  <p data-trans="pay_schedulePay">Schedule automatic payment</p>
+              </a>
+              <a href="http://oplata.mts.ru/?utm_source=MTS&utm_medium=Oplata_WEB_UI&utm_campaign=Oplata_092017" target="_blank" class="block">
+                  <div class="icons card-pay" style="background: url(../img/main-sprite2.png) no-repeat scroll -60px -980px;">
+                  </div>
+                  <p data-trans="pay_creditPay">Credit card</p>
+              </a>
+              <a href="http://www.mts.ru/mob_connect/services/opportunity/promised_payment?utm_source=MTS&utm_medium=Promised_payment_WEB_UI&utm_campaign=Promised_payment_092017" target="_blank" class="block">
+                  <div class="icons promis-pay" style="background: url(../img/main-sprite2.png) no-repeat scroll -93px -980px;">
+                  </div>
+                  <p data-trans="pay_deferredPay">Deferred payment</p>
+              </a>
+          </div>
+      </div>
+        </div>
+    </div>
+</section>
+<script>
+    window.LTELanguageInitPart('#payment-page')
+
+  function load_init(){
+    $("#btnPwdApply").die().click(function () {
+        var number = $("#phone-number").val();
+        var amount = $("#sum").val();
+        // window.open("https://pay.mts.ru/webportal/payments/3565/Moskva?phone=" + number + "&amount=" + amount + "&channel=6")
+        window.open("https://payment.mts.ru/?PaymentForm=1150&bt=UK&number="+ number +"&amount="+amount+"&source=mts")
+    })
+  }
+  load_init()
+</script>

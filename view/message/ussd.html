@@ -1,0 +1,227 @@
+<section class="message-page ussd-page" id="ussd-page">
+    <div class="container cleafix">
+        <aside class="message-wrap" style="height:700px;">
+            <ul class="menu message-menu">
+                <li class="list sms" onclick="ussd_sms()">
+                    <label data-trans="contact_SMS" style="cursor: pointer;">SMS</label>
+                    <span class="icon">
+            <div class="message-left-menu-sms"></div>
+          </span>
+          <ul class="sub-sms-list" style="display:none">
+                        <li class="sub-list inbox">
+                            <span class="icon">
+                <div class="sms-menu-receive"></div>
+              </span>
+                            <span data-trans="contact_Received">Received</span>
+                        </li>
+                        <li class="sub-list outbox">
+                            <span class="icon">
+                <div class="sms-menu-sent"></div>
+              </span>
+                            <span data-trans="contact_Sent">Sent</span>
+                        </li>
+                        <li class="sub-list draft">
+                            <span class="icon">
+                <div class="sms-menu-draft"></div>
+              </span>
+                            <span data-trans="contact_Draft">Draft</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class="list ussd active" onclick="goRouter('ussd')">
+                    <span class="icon">
+            <div class="message-left-menu-ussd"></div>
+          </span>
+                    <label data-trans="contact_USSD">USSD</label>
+                </li>
+                <li class="list notebook" onclick="goRouter('contacts')">
+                    <span class="icon">
+                        <div class="message-left-menu-notebook" style="margin-top: -5px;"></div>
+          </span>
+                    <label data-trans="contact_Contactlist" style="cursor: pointer;">Contactlist</label>
+                </li>
+            </ul>
+        </aside>
+
+        <div class="ussd-wrapper clearfix">
+            <div class="ussd-input-wrap" style="margin-right:0;height:700px;">
+                <div class="inpup-block">
+                    <h5 style="text-align: center;"><label data-trans="ussd_thecommand">Enter the command</label></h5>
+                    <input style="text-align:left;"type="text" id="USSD_send" data-placeholder="ussd_thecommand"/>
+                    <input type="text" id="USSD_reply" style="display: none;" />
+                </div>
+                <div class="input-btns-wrap">
+                    <div class="input-btn" onclick="enterNumber(1)">1</div>
+                    <div class="input-btn" onclick="enterNumber(2)">2</div>
+                    <div class="input-btn" onclick="enterNumber(3)">3</div>
+                    <div class="input-btn" onclick="enterNumber(4)">4</div>
+                    <div class="input-btn" onclick="enterNumber(5)">5</div>
+                    <div class="input-btn" onclick="enterNumber(6)">6</div>
+                    <div class="input-btn" onclick="enterNumber(7)">7</div>
+                    <div class="input-btn" onclick="enterNumber(8)">8</div>
+                    <div class="input-btn" onclick="enterNumber(9)">9</div>
+                    <div class="input-btn" onclick="enterNumber('*')">*</div>
+                    <div class="input-btn" onclick="enterNumber(0)">0</div>
+                    <div class="input-btn" onclick="enterNumber('#')">#</div>
+                </div>
+                <a class="btn" data-trans="ussd_send" id="btn_ussd_send" onclick="sendToNet()">Send</a>
+                <a class="btn" data-trans="ussd_reply" id="btn_ussd_reply" onclick="replyToNet()">Replay</a>
+                <a class="btn" data-trans="ussd_cancel" id="btn_ussd_cancel" onclick="cancelUSSD()">Cancel</a>
+                <div class="note" data-trans="ussd_Keyboard" style="text-align: center;">* Keyboard can be used</div>
+                <div class="output-data">
+                    <h5 data-trans="ussd_reply" style="text-align: center;">Reply</h5>
+                    <div class="output-content" id="USSD_Content" style="text-align: left;overflow: auto;"></div>
+                </div>
+            </div>
+            <div class="ussd-commands clearfix" style="height:700px;">
+                <h2 class="commands-heading" data-trans="ussd_Usefulcommands">Useful codes</h2>
+                <p class="commands" data-trans="ussd_balanceCheck" style="cursor: pointer;" onclick="ussd_code_link('*100#')">*100# — balance check</p>
+                <p class="commands" data-trans="ussd_checkTheBalance" style="cursor: pointer;" onclick="ussd_code_link('*111*59#')">*111*59# — check the balance</p>
+                <p class="commands" data-trans="ussd_showMyNumber" style="cursor: pointer;" onclick="ussd_code_link('*111*0887#')">*111*0887# — show my number</p>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    window.LTELanguageInitPart('#ussd-page')
+
+    var need_reply_input = false
+
+    function enterNumber(number) {
+        if (!need_reply_input) {
+            if ($('#USSD_send').val() != '') {
+                $('#USSD_send').val($('#USSD_send').val() + '' + number)
+            } else {
+                $('#USSD_send').val(number)
+            }
+        } else {
+            if ($('#USSD_reply').val() != '') {
+                $('#USSD_reply').val($('#USSD_reply').val() + '' + number)
+            } else {
+                $('#USSD_reply').val(number)
+            }
+        }
+    }
+
+    function startWith(str, str2) {
+        return str.indexOf(str2) == 0
+    }
+
+    function endWith(str, str2) {
+        var lastIndex = str.lastIndexOf(str2)
+        if (lastIndex >= 0) {
+            return str.substring(lastIndex) == str2
+        }
+        return false
+    }
+
+    function ussd_code_link(code) {
+        $('#USSD_send').val(code)
+    }
+
+    function resetUSSD() {
+        $('#USSD_send').val('')
+        $('#USSD_reply').val('')
+
+        if (need_reply_input) {
+            $('#USSD_send').hide()
+            $('#btn_ussd_send').hide()
+            $('#USSD_reply').show()
+            $('#btn_ussd_reply').show()
+        } else {
+            $('#USSD_send').show()
+            $('#btn_ussd_send').show()
+            $('#USSD_reply').hide()
+            $('#btn_ussd_reply').hide()
+        }
+    }
+
+    function sendToNet() {
+        var command = $('#USSD_send').val()
+        if ('string' != typeof command || '' == command) {
+            showAlert('UssdErrorInput')
+            return
+        }
+       
+
+        showLoading('ussd_waitResponse')
+
+        var params = {
+            goformId: "USSD_PROCESS",
+            USSD_operator: "ussd_send",
+            USSD_send_number: command,
+        };
+
+        getUSSDResponse(params, function(flag, result) {
+            hideLoading()
+            if (flag) {
+                var result = decodeMessage(result.ussd_data, true)
+                for(var i=0;i<=10;i++){
+                    var str = i+">"
+                    result=result.replace(str,'<br>'+str)
+                }
+                $("#USSD_Content").html(result);
+                need_reply_input = result.ussd_action == 1
+                resetUSSD()
+            } else {
+                showAlert(result)
+            }
+        })
+    }
+
+    function replyToNet() {
+        var command = $('#USSD_reply').val()
+        if ('' === command) {
+            showAlert('ussd_error_input')
+            return
+        }
+        showLoading()
+        var params = {
+            goformId: "USSD_PROCESS",
+            USSD_operator: "ussd_reply",
+            USSD_reply_number: command,
+        };
+
+        getUSSDResponse(params, function(flag, result) {
+            if (flag) {
+                $("#USSD_Content").html(decodeMessage(result.ussd_data, true));
+                need_reply_input = result.ussd_action == 1
+                resetUSSD()
+            } else {
+                showAlert(result)
+            }
+            hideLoading()
+        })
+    }
+
+    function cancelUSSD() {
+        $("#USSD_Content").html('')
+        USSDReplyCancel(function(result) {
+            if (result) {
+                need_reply_input = false
+                resetUSSD();
+            } else {
+                showAlert("ussd_fail");
+            }
+        });
+    }
+
+    function ussd_sms(){
+        $('#sms_page_tab').val(0)
+        goRouter('sms')
+    }
+
+    function load_init() {
+        need_reply_input = false
+        resetUSSD()
+        cancelUSSD()
+
+        // $('.sub-list').die().live('click', function() {
+        //     var index = $(this).index()
+        //     $('#sms_page_tab').val(index)
+        //     goRouter('sms')
+        // })
+    }
+
+    load_init()
+</script>

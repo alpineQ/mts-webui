@@ -1,0 +1,39 @@
+<div class="settings-block" id="setting-security-upnp">
+    <div class="settings-line">
+        <div class="label" data-trans="upnp_setting">UPnP Settings</div>
+        <div class="b-radio_wrap">
+            <input id="access_1" class="b-radio" type="radio" name="rangeGroup" value="1">
+            <label for="access_1" data-trans="enable">enable</label>
+        </div>
+        <div class="b-radio_wrap">
+            <input id="access_2" class="b-radio" type="radio" name="rangeGroup" value="0">
+            <label for="access_2" data-trans="disable">disable</label>
+        </div>
+    </div>
+    <div class="settings-line btn-wrap">
+        <a class="btn" onclick="upnp_setUpnpSetting()" style="color: #fff;" data-trans="apply">apply</a>
+    </div>
+</div>
+
+<script>
+window.LTELanguageInitPart('#setting-security-upnp')
+
+function upnp_setUpnpSetting(){
+    var range = $('input[name=rangeGroup]:checked').val()
+    var params = {};
+    params.upnpSetting = range;
+    window._service.setUpnpSetting(params, function(result) {
+        if (result.result == "success") {
+            showInfo('success_info')
+        } else {
+            showAlert('error_info')
+        }
+    });
+}
+
+function load_init(){
+    var info = window._service.getUpnpSetting()
+    $('input[name=rangeGroup][value=' + info.upnpSetting + ']').attr('checked', true)
+}
+load_init()
+</script>

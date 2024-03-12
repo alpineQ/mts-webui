@@ -1,0 +1,662 @@
+<div class="form-body" id="setting-security-filter">
+  <form id="filterBasicForm" novalidate="novalidate" autocomplete="off">
+    <div class="form-title" style="display: none;" data-trans="port_filter">Port Filtering</div>
+    <div class="content">
+      <div class="row-fluid">
+        <label class="span4 side-right"><span data-trans="port_filter_enabled">MAC/IP/Port Filtering</span>
+          <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+        </label>
+        <label class="span8 side-left">
+          <span
+            id="switch-port-filter"
+            style="cursor: pointer"
+            class="bg-switch-enable"
+          ></span>
+          <span class="switch_note" data-trans="enable">Enable</span>
+        </label>
+      </div>
+      <div class="row-fluid row-default-policy" style="display: none">
+        <label class="span4 side-right"><span data-trans="default_policy">Default Policy</span>
+          <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+        </label>
+        <div class="span8">
+          <input type="radio" name="defaultPolicyGrp" id="defaultPolicyAccept" value="0" />
+          <label for="defaultPolicyAccept" data-trans="accepted">Accepted</label>
+          <input type="radio" name="defaultPolicyGrp" id="defaultPolicyDrop" value="1" />
+          <label for="defaultPolicyDrop" data-trans="dropped">Dropped</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-buttons" style="padding-right:20px;">
+      <input type="button" class="btn-1" data-trans="apply" id="btn-filter-switch" value="Apply" onclick="filter_setPortFilterBasic()"/>
+    </div>
+    <div class="form-note">
+      <div class="notes-title">&nbsp;</div>
+      <ul class="notes-content">
+        <li data-trans="default_policy_note">
+          You can set firewall policies to protect your network from viruses,
+          worms and malicious activities on the Internet.
+        </li>
+        <li data-trans="default_policy_note_filter">Only when filtering is enabled, the filter policy is available.</li>
+      </ul>
+    </div>
+  </form>
+  <div id="filterBasicDiv" style="display: none">
+    <form id="filterContentForm" novalidate="novalidate" autocomplete="off">
+      <div class="form-title" style="display: none;" data-trans="port_filter_setting">
+        MAC/IP/Port Filtering Settings
+      </div>
+      <div class="content">
+        <div class="row-fluid">
+          <label class="span4 side-right" ><span data-trans="filter_ip_setting">IP Settings</span>
+            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+          </label>
+          <div class="span8">
+            <input type="radio" name="ipTypeGrp" id="filterIpv4" value="IPv4" checked />
+            <label for="filterIpv4" data-trans="filter_ipv4">IPv4</label>
+            <input type="radio" name="ipTypeGrp" id="filterIpv6" value="IPv6" />
+            <label for="filterIpv6" data-trans="filter_ipv6">IPv6</label>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <label class="span4 side-right" for="txtMacAddress" data-trans="mac_address"><span>MAC Address</span>
+            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+          </label>
+          <div class="span8">
+            <input type="text" name="txtMacAddress" id="txtMacAddress" maxlength="17"  class="valid" />
+            <label id="macExamLabel" data-trans="macExam">(e.g., 00:1E:90:FF:FF:FF)</label>
+          </div>
+        </div>
+        <div id="Ipv4-settings">
+          <div class="row-fluid">
+            <label class="span4 side-right" for="txtSourceIpAddress" data-trans="source_ip_address"><span>Source IP Address</span>
+              <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+            </label>
+            <div class="span8">
+              <input type="text" name="txtSourceIpAddress" id="txtSourceIpAddress"  maxlength="15" class="valid" />
+            </div>
+          </div>
+          <div class="row-fluid">
+            <label class="span4 side-right" for="txtDestIpAddress" ><span data-trans="dest_ip_address">Dest. IP Address</span>
+              <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+            </label>
+            <div class="span8">
+              <input type="text" name="txtDestIpAddress" id="txtDestIpAddress"  maxlength="15" class="valid" />
+            </div>
+          </div>
+        </div>
+        <div id="Ipv6-settings" style="display: none;">
+          <div class="row-fluid">
+            <label class="span4 side-right" for="txtSourceIpv6Address" ><span data-trans="source_ipv6_address">Source Ipv6 Address</span>
+              <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+            </label>
+            <div class="span8">
+              <input type="text" name="txtSourceIpv6Address" id="txtSourceIpv6Address" />
+            </div>
+          </div>
+          <div class="row-fluid">
+            <label class="span4 side-right" for="txtDestIpv6Address" ><span data-trans="dest_ipv6_address">Dest. Ipv6 Address</span>
+              <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+            </label>
+            <div class="span8">
+              <input  type="text" name="txtDestIpv6Address" id="txtDestIpv6Address"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <label class="span4 side-right" for="protocol" ><span data-trans="protocol">Protocol</span>
+            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+          </label>
+          <div class="span8">
+            <select id="protocol" transid="protocol">
+              <option value="ALL" data-trans="protocol_None">ALL</option>
+              <option value="TCP" data-trans="protocol_TCP">TCP</option>
+              <option value="UDP" data-trans="protocol_UDP">UDP</option>
+              <option value="ICMP" data-trans="protocol_ICMP">ICMP</option>
+            </select>
+          </div>
+        </div>
+        <!--根据protocal显示或隐藏-->
+        <div id="portRangeArea" style="display: none;">
+          <div class="row-fluid">
+            <label class="span4 side-right" for="txtSourcePortStart" ><span data-trans="source_port_range">Source Port Range</span>
+              <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+              <input id="txtSourcePortStart" name="txtSourcePortStart" type="text" class="required rangeInput" maxlength="5" value="1" />
+              -
+              <input  id="txtSourcePortEnd" name="txtSourcePortEnd" type="text" class="required rangeInput" maxlength="5" value="65535" />
+              <label id="sourceRangeLabel">(1~65535)</label>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <label class="span4 side-right" for="txtDestPortStart"><span data-trans="dest_port_range">Dest. Port Range</span>
+              <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+              <input id="txtDestPortStart" name="txtDestPortStart" type="text" class="required rangeInput" maxlength="5" value="1" />
+              -
+              <input id="txtDestPortEnd" name="txtDestPortEnd" type="text" class="required rangeInput" maxlength="5" value="65535" />
+              <label id="destRangeLabel">(1~65535)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-fluid">
+          <label class="span4 side-right" ><span data-trans="port_filter_action">Action</span>
+            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+          </label>
+          <div class="span8">
+            <input  type="radio"  name="portFilterActionGrp" id="portFilterAccept" value="Accept" />
+            <label for="portFilterAccept" data-trans="filter_accept">Accept</label>
+            <input type="radio" name="portFilterActionGrp" id="portFilterDrop" value="Drop" />
+            <label for="portFilterDrop" data-trans="filter_drop">Drop</label>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <label class="span4 side-right" for="txtComment" ><span data-trans="comment">Comment</span>
+            <i class="colorRed">&nbsp;</i>
+          </label>
+          <div class="span8">
+            <input type="text" name="txtComment" id="txtComment" class="required valid" maxlength="21" />
+          </div>
+        </div>
+      </div>
+      <div class="form-buttons" style="padding-right:20px;">
+        <input type="button" class="btn-1 " data-trans="apply"  id="btn-basic-apply" value="Apply" onclick="filter_setPortFilter()" />
+      </div>
+      <div class="form-note">
+        <div class="notes-title">&nbsp;</div>
+        <ul class="notes-content">
+          <li data-trans="port_filter_note_mac_address">MAC Address: Set MAC address to be filtered.</li>
+          <li data-trans="port_filter_note_source_ip_address">Source IP Address: Set source IP address to be filtered.</li>
+          <li data-trans="port_filter_note_dest_ip_address">Dest IP Address: Set dest IP address to be filtered.</li>
+          <li data-trans="port_filter_note_protocol">Protocol: Set protocol to be used for filtering.</li>
+          <li data-trans="port_filter_note_source_port_range">Source Port Range: Set source port numbers to be filtered.</li>
+          <li data-trans="port_filter_note_dest_port_range">Dest Port Range: Set dest port numbers to be filtered.</li>
+          <li data-trans="port_filter_note_action">Action: Set to handle the packet if it matches with the rule.</li>
+          <li data-trans="port_filter_note_comment">
+            Comment: Enter comment for filter settings. It contains 0-9 a-z A-Z
+            ! # ( ) + - . / % = ? @ ^ _ { | } ~ .
+          </li>
+          <li data-trans="port_filter_note_info">
+            The filter policies are matched one by one with the rules. And if
+            met this provision, it won't continue to match the rules listed
+            below.
+          </li>
+          <li data-trans="rule_max_note_v4v6">The maximum of rules for Ipv4 and Ipv6 is 10 respectively.</li>
+          <li style="display: none;" data-trans="rule_max_note">The maximum number of rules is 10.</li>
+        </ul>
+      </div>
+    </form>
+    <form id="portFilterListForm" novalidate="novalidate" autocomplete="off">
+      <div class="form-title" style="height: 63px; display: none;" data-trans="port_filter_list">
+        Current MAC/IP/Port filtering rules in system
+      </div>
+      <div class="content">
+        <div>
+          <div id="portFilters" class="fixTableScroll">
+            <div class="ko-grid-container">
+              <div class="ko-grid-menu" style="display: none;">
+                <div class="ko-grid-option">
+                  <img id="ko_grid_layout" class="cursor-pointer" src="../../../img/card.png" />
+                </div>
+                <div class="clean"></div>
+              </div>
+              <table cellspacing="0" cellspadding="0" class="ko-grid colorHoverTable " style="width: 1300px;">
+                <thead>
+                  <tr class="" style="background-size: auto 100%;">
+                    <th width="4%">
+                      <p id="pblist-checkall" target="pblist" class="checkbox checkboxToggle" >
+                        <input type="checkbox" id="ko_grid_checkAll" />
+                      </p>
+                    </th>
+                    <th nowrap="nowrap" width="7%" data-trans="mac_address">MAC Address</th>
+                    <th nowrap="nowrap" width="5%" data-trans="ip_type">IP Type</th>
+                    <th nowrap="nowrap" width="12%" data-trans="source_ip_address">Source IP Address</th>
+                    <th nowrap="nowrap" width="13%" data-trans="dest_ip_address">Dest. IP Address</th>
+                    <th nowrap="nowrap" width="7%" data-trans="protocol">Protocol</th>
+                    <th nowrap="nowrap" width="17%" data-trans="source_port_range">Source Port Range</th>
+                    <th nowrap="nowrap" width="18%" data-trans="dest_port_range">Dest. Port Range</th>
+                    <th nowrap="nowrap" width="6%" data-trans="port_filter_action">Action</th>
+                    <th nowrap="nowrap" width="15%" data-trans="comment">Comment</th>
+                  </tr>
+                </thead>
+                <tbody id="pblist"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <input type="button" class="btn-1 btn-del-item" disabled="" data-trans="delete" value="Delete" onclick="filter_deleteFilterRules()"/>
+      </div>
+
+      <div class="form-note">
+        <div class="notes-title">&nbsp;</div>
+        <ul class="notes-content">
+          <li data-trans="filter_drop_note">Others would be dropped.</li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+window.LTELanguageInitPart('#setting-security-filter')
+var filter_objPort = {
+  ipArr: ['', 'IPv4', 'IPv6'],
+  protoType: ['ALL', 'TCP', 'UDP', 'ICMP'],
+  actionArr: ['', 'Accept', 'Drop'],
+  switch: 0,
+  data: [],
+  setData: {
+    sourceip: '',
+    destip: '',
+    sourceipv6: '',
+    destipv6: '',
+    sourceport0: '',
+    sourceport1: '',
+    destport0: '',
+    destport1: ''
+  },
+  validate: true
+}
+
+function filter_displayPortDom(isShow) {
+  if (isShow) {
+    $('.row-default-policy,#filterBasicDiv').show()
+  } else {
+    $('.row-default-policy,#filterBasicDiv').hide()
+  }
+}
+
+// 添加验证规则
+function filter_addValidator(){
+  jQuery.validator.addMethod(
+    'validfilter',
+    function(value, element) {
+      var res = 0
+      if (filter_objPort.setData.srcAddr != '' || filter_objPort.setData.destAddr != '')
+        res += 1
+      if (filter_objPort.setData.mac != '') res += 1
+      if (
+        filter_objPort.setData.protocol == 'TCP' ||
+        filter_objPort.setData.protocol == 'UDP'
+      )
+        res += 1
+
+      return res > 0
+    },
+    $.i18n.prop('filter_optional')
+  )
+  jQuery.validator.addMethod(
+    'ipv4check',
+    function(value, element) {
+      return (
+        this.optional(element) ||
+        value == '' ||
+        (isIP(value) && value != '255.255.255.255' && value != '0.0.0.0')
+      )
+    },
+    $.i18n.prop('ipv4')
+  )
+  jQuery.validator.addMethod(
+    'ipv6check',
+    function(value, element) {
+      return this.optional(element) || value == '' || isIPV6(value)
+    },
+    $.i18n.prop('ipv6')
+  )
+
+  jQuery.validator.addMethod(
+    'maccheck',
+    function(value, element) {
+      return (
+        this.optional(element) ||
+        value == '' ||
+        (mac_check(value) && value != 'FC-DE-56-FF-01-06')
+      )
+    },
+    $.i18n.prop('mac_check')
+  )
+
+  jQuery.validator.addMethod(
+    'portcheck',
+    function(value, element) {
+      return value >= 1 && value <= 65535
+    },
+    $.i18n.prop('range',1,65535)
+  )
+
+  jQuery.validator.addMethod(
+    'portrange0',
+    function(value, element) {
+      if ($('#txtSourcePortStart').val() >= $('#txtSourcePortEnd').val())
+        return false
+      else return true
+    },
+    $.i18n.prop('portCompare')
+  )
+
+  jQuery.validator.addMethod(
+    'portrange1',
+    function(value, element) {
+      if ($('#txtDestPortStart').val() >= $('#txtDestPortEnd').val())
+        return false
+      else return true
+    },
+    $.i18n.prop('portCompare')
+  )
+}
+
+// 内容校验
+function filter_validateFun() {
+  filter_objPort.validate = $('#filterContentForm')
+    .validate({
+      errorPlacement: function(error, element) {
+        error.appendTo(element.parent())
+      },
+      rules: {
+        txtMacAddress: {
+          validfilter: true,
+          maccheck: true
+        },
+        txtSourceIpAddress: {
+          ipv4check: true
+        },
+        txtDestIpAddress: {
+          ipv4check: true
+        },
+        txtSourceIpv6Address: {
+          ipv6check: true
+        },
+        txtDestIpv6Address: {
+          ipv6check: true
+        },
+        txtSourcePortStart: {
+          portcheck: true,
+          portrange0: true
+        },
+        txtSourcePortEnd: {
+          portcheck: true
+        },
+        txtDestPortStart: {
+          portcheck: true,
+          portrange1: true
+        },
+        txtDestPortEnd: {
+          portcheck: true
+        },
+        txtComment: {
+          required: true
+        }
+      },
+      messages: {
+        txtComment: {
+          required: 'Required'
+        }
+      }
+    })
+    .form()
+  return filter_objPort.validate
+}
+
+// 获取端口过滤信息
+function filter_getPortFilter() {
+  var _html = []
+  var info = window._service.getPortFilter();
+  setSwitch('switch-port-filter', info.portFilterEnable == 1)// MAC/IP/Port Filtering设置
+  $('input[name=defaultPolicyGrp]').eq(info.defaultPolicy).prop('checked', true)// Default Policy设置
+  filter_displayPortDom(info.portFilterEnable == 1)
+
+  $('input[name=portFilterActionGrp]').eq(Math.abs(info.defaultPolicy - 1)).prop('checked', true)// Action
+  filter_objPort.data = []
+  $.each(info.portFilterRules,function(index,_item){
+    _html.push(
+      '\<tr class="even">\
+          <td class="ko-grid-center">\
+            <p class="checkbox filter-item-chk" manualcontrol="true" id="chk__' +_item.index +'">\
+            <input type="checkbox" target="pblist-checkall" value="' +_item.index +'"></p>\
+          </td>\
+          <td class="ko-grid-center">' +_item.macAddress +'</td>\
+          <td class="ko-grid-center">' +_item.ipType +'</td>\
+          <td class="ko-grid-center">' +_item.sourceIpAddress +'</td>\
+          <td class="ko-grid-center">' +_item.destIpAddress +'</td>\
+          <td class="ko-grid-center">' + _item.protocol +'</td>\
+          <td class="ko-grid-center">' +_item.sourcePortRange +'</td>\
+          <td class="ko-grid-center">' +_item.destPortRange +'</td>\
+          <td class="ko-grid-center">' +_item.action +'</td>\
+          <td class="ko-grid-center">' +_item.comment +'</td>\
+        </tr>'
+    )
+    filter_objPort.data.push(_item.ipType+","+_item.macAddress+","+_item.sourceIpAddress+","+_item.destIpAddress+","+_item.protocol+","+_item.sourcePortRange+","+_item.destPortRange+","+_item.action+","+_item.comment)
+  })
+
+  $('#pblist').html(_html.join(''))
+
+  $('#txtMacAddress').val('')
+  $('input[name=ipTypeGrp]').eq(0).prop('checked')
+  $('#txtSourceIpAddress').val('')
+  $('#txtDestIpAddress').val('')
+  $('#txtSourceIpv6Address').val('')
+  $('#txtDestIpv6Address').val('')
+  $('#protocol').eq(0).prop('checked')
+  $('#txtSourcePortStart').val(1)
+  $('#txtSourcePortEnd').val(65535)
+  $('#txtDestPortStart').val(1)
+  $('#txtDestPortEnd').val(65535)
+  $('input[name=portFilterActionGrp]').eq(0).prop('checked')
+  $('#txtComment').val('')
+  if ($('.checkbox_selected[id!="pblist-checkall"]').length > 0)
+    $('.btn-del-item').removeAttr('disabled')
+  else $('.btn-del-item').attr('disabled', true)
+  var checkbox = $('#pblist-checkall').find("input:checkbox");
+  checkbox.removeAttr("checked");
+  checkCheckbox(checkbox);
+}
+
+// 提交端口过滤基本信息
+function filter_setPortFilterBasic(){
+  showLoading();
+  var params = {};
+  params.portFilterEnable = getSwitch('switch-port-filter') ? 1 : 0;
+  params.defaultPolicy = $('input[name="defaultPolicyGrp"]:checked').val();
+  window._service.setPortFilterBasic(params, function(result){
+    hideLoading()
+    if (result.result == "success") {
+        showInfo('success_info')
+    } else {
+      showAlert('error_info')
+    }
+  });
+}
+
+// 设置端口过滤信息
+function filter_setPortFilter(){
+  var postData = '', compareData = ''
+  filter_objPort.setData.mac = $('#txtMacAddress').val()
+  if (filter_objPort.setData.mac != '' && filter_objPort.setData.mac.length == 12) {
+    filter_objPort.setData.mac = filter_objPort.setData.mac.replace(/(.{2})/g, '$1-')
+    filter_objPort.setData.mac = filter_objPort.setData.mac.substr(0, 17)
+  }
+  filter_objPort.setData.ipset = $('input[name=ipTypeGrp]:checked').val()
+  if (filter_objPort.setData.ipset == 'IPv4') {
+    filter_objPort.setData.sourceip = $('#txtSourceIpAddress').val()
+    filter_objPort.setData.destip = $('#txtDestIpAddress').val()
+
+    filter_objPort.setData.srcAddr = filter_objPort.setData.sourceip
+    filter_objPort.setData.destAddr = filter_objPort.setData.destip
+  } else {
+    filter_objPort.setData.sourceipv6 = $('#txtSourceIpv6Address').val()
+    filter_objPort.setData.destipv6 = $('#txtDestIpv6Address').val()
+
+    filter_objPort.setData.srcAddr = filter_objPort.setData.sourceipv6
+    filter_objPort.setData.destAddr = filter_objPort.setData.destipv6
+  }
+
+  filter_objPort.setData.protocol = $('#protocol').val()
+  if (
+    filter_objPort.setData.protocol == 'TCP' ||
+    filter_objPort.setData.protocol == 'UDP'
+  ) {
+    filter_objPort.setData.sourceport0 = $('#txtSourcePortStart').val()
+    filter_objPort.setData.sourceport1 = $('#txtSourcePortEnd').val()
+    filter_objPort.setData.destport0 = $('#txtDestPortStart').val()
+    filter_objPort.setData.destport1 = $('#txtDestPortEnd').val()
+  }
+
+  filter_objPort.setData.action = $('input[name=portFilterActionGrp]:checked').val()
+  filter_objPort.setData.comment = $('#txtComment').val()
+
+  if (!filter_validateFun()) return false
+
+  var params = {};
+  params.macAddress = esc(filter_objPort.setData.mac)
+  params.destIpAddress = esc(filter_objPort.setData.destAddr)
+  params.sourceIpAddress = esc(filter_objPort.setData.srcAddr)
+  params.destPortStart = esc(filter_objPort.setData.destport0)
+  params.destPortEnd = esc(filter_objPort.setData.destport1)
+  params.sourcePortStart = esc(filter_objPort.setData.sourceport0)
+  params.sourcePortEnd = esc(filter_objPort.setData.sourceport1)
+  params.action = filter_objPort.setData.action;
+  params.protocol = filter_objPort.setData.protocol;
+  params.comment = esc(filter_objPort.setData.comment)
+  params.ipType = filter_objPort.setData.ipset
+
+  var compareData=params.ipType+","+params.macAddress+","+params.sourceIpAddress+","+params.destIpAddress+","+params.protocol+","+(isNull(params.sourcePortStart)?"":(params.sourcePortStart+" - "+params.sourcePortEnd))+","+(isNull(params.destPortStart)?"":(params.destPortStart+" - "+params.destPortEnd))+","+params.action+","+params.comment
+  var ipv4times = 0,
+    ipv6times = 0
+  for (var i = 0; i < filter_objPort.data.length; i++) {
+    if (compareData == filter_objPort.data[i]) {
+      showAlert('rule_exist')
+      return
+    }
+    if (filter_objPort.data[i].substr(0, 4) == 'IPv4') ipv4times++
+    if (filter_objPort.data[i].substr(0, 4) == 'IPv6') ipv6times++
+  }
+
+  if (ipv4times >= 10&&filter_objPort.setData.ipset=='IPv4') {
+    showAlert('rules_max_v4v6','Ipv4',10)
+    return
+  }
+
+  if (ipv6times >= 10&&filter_objPort.setData.ipset=='IPv6') {
+    showAlert('rules_max_v4v6','Ipv6',10)
+    return
+  }
+  showLoading('saving')
+  params.ipType = filter_objPort.setData.ipset.toLowerCase()
+  params.protocol=params.protocol=="ALL"?"None":params.protocol
+  window._service.setPortFilter(params, function(result){
+    hideLoading()
+    if (result.result == "success") {
+      showInfo('success_info',function(){
+        filter_getPortFilter()
+      })
+    } else {
+      showAlert('error_info')
+    }
+  });
+}
+
+// 删除端口过滤信息
+function filter_deleteFilterRules(){
+  var id = 0,ids = []
+  $('.checkbox_selected[id!="pblist-checkall"]').each(function() {
+    try {
+      id = $(this).find('input').val()
+      ids.push(id)
+    } catch (e) {}
+  })
+  if(ids.length == 0) {
+      showAlert("no_data_selected");
+      return;
+  }
+
+  showConfirm('',"confirm_data_effect", function () {
+    showLoading('deleting');
+    var params = {};
+    params.indexs = ids;
+    window._service.deleteFilterRules(params, function(result){
+      hideLoading()
+      if (result.result == "success") {
+        showInfo('success_info',function(){
+          filter_getPortFilter()
+        })
+      } else {
+        showAlert('error_info')
+      }
+    });
+  });
+}
+
+// 初始化
+function load_init(){
+  filter_getPortFilter()
+
+  $('#switch-port-filter').click(function() {
+    filter_displayPortDom(switchClick('switch-port-filter'))
+  })
+
+  $('input[name="defaultPolicyGrp"]').click(function() {
+    $('input[name=portFilterActionGrp]')
+      .eq(Math.abs($('input[name="defaultPolicyGrp"]:checked').val() - 1))
+      .prop('checked', true)
+  })
+
+  $('input[name="ipTypeGrp"]').click(function() {
+    if ($('input[name="ipTypeGrp"]:checked').val() == 'IPv4') {
+      $('#Ipv4-settings').show()
+      $('#Ipv6-settings').hide()
+    } else {
+      $('#Ipv4-settings').hide()
+      $('#Ipv6-settings').show()
+    }
+  })
+
+  $('#protocol').click(function() {
+    if ($(this).val() == 'TCP' || $(this).val() == 'UDP') {
+      $('#portRangeArea').show()
+    } else {
+      $('#portRangeArea').hide()
+    }
+  })
+
+  $('#pblist-checkall').click(function() {
+    var checkbox = $(this).find("input:checkbox");
+    if (checkbox.attr("checked")) {
+        checkbox.removeAttr("checked");
+    } else {
+        checkbox.attr("checked", "checked");
+    }
+    checkCheckbox(checkbox);
+    setTimeout(function() {
+      if ($('.checkbox_selected[id!="pblist-checkall"]').length > 0)
+        $('.btn-del-item').removeAttr('disabled')
+      else $('.btn-del-item').attr('disabled', true)
+    }, 100)
+  })
+
+  $('.filter-item-chk').die().live('click', function() {
+    checkboxHandle($(this).attr('id'))
+    setTimeout(function() {
+      if ($('.checkbox_selected[id!="pblist-checkall"]').length > 0)
+        $('.btn-del-item').removeAttr('disabled')
+      else $('.btn-del-item').attr('disabled', true)
+      if (
+        $('.checkbox_selected[id!="pblist-checkall"]').length ==
+        $('#pblist tr').length
+      )
+        setCheckbox('pblist-checkall', true)
+      else setCheckbox('pblist-checkall', false)
+    }, 100)
+  })
+
+  filter_addValidator()
+}
+load_init()
+
+</script>

@@ -1,0 +1,64 @@
+<link rel="stylesheet" href="/css/cus.css" />
+    <link rel="stylesheet" href="css/main.css" />
+<script src="https://lk.ssl.mts.ru/scripts/lkframeshare.js"></script>
+<section class="page-content" style="padding:15px 0 55px;">
+    <div class="container clearfix">
+        <div>
+            <div id="yandexLogo" style="float: left" class="logo__image_bg_en"></div>
+            <form id="browerForm" class="search2 suggest2-form suggest2-form__node suggest2-counter i-bem suggest2-counter_js_inited suggest2-form_js_inited" action="https://yandex.ru/search/" target="_blank">
+                <div class="search2__input">
+                    <span class="input suggest2-form__input input_size_ws-head input_theme_websearch input_search2-clear-hide_yes input_ahead_yes input_autofocus_capture input_keyboard_yes input_clear_yes i-bem input_js_inited">
+                        <input class="input__control input__input" tabindex="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list" aria-label="Request" id="txtYandex" maxlength="400" name="text">
+                        <input name="clid" type="hidden" value="2288582"/>
+                        <span id="clearImg" class="input__clear input__clear_visibility_visible hide">&nbsp;</span>
+                    </span>
+                </div>
+                <div class="search2__button">
+                    <button class="button suggest2-form__button button_theme_websearch button_size_ws-head i-bem button_js_inited" data-bind="" style="margin-bottom: 3px;" tabindex="-1" role="button" type="submit">
+                        <span class="button__text" data-trans="search"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="clear"></div>
+        <aside style="margin-top:9px;">
+            <div style="height:424px;overflow:hidden">
+               <!-- <iframe width="296" height="460" frameborder="0" scrolling="no" style="overflow:hidden;margin-top:-36px;" src="https://static.ssl.mts.ru/mts_rf/images/lk_banner/index.html" frameborder="0"></iframe>
+            </div>
+        </aside>
+        <div class="content" style="width:630px;">
+            <div class="blocks-wrap" style="height:215px;margin-bottom:0px">
+                <iframe width="100%" height="100%" frameborder="0" scrolling="no" style="overflow:hidden" src="http://banners.adfox.ru/160701/mts/588107/place2.html" frameborder="0"></iframe>
+            </div>
+            <div class="blocks-wrap" style="height:215px;margin-bottom:0px">
+                <iframe width="100%" height="100%" frameborder="0" scrolling="no" style="overflow:hidden" src="http://banners.adfox.ru/160701/mts/588107/place1.html" frameborder="0"></iframe> -->
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $(function() {
+        $('#clearImg').bind('click', function() {
+            $('#txtYandex').val('');
+        });
+
+        if ($('#selLanguage').val() == 'ru') {
+            $('#yandexLogo').css({
+                'background': 'url(../img/brower_ru.png) no-repeat 100%'
+            });
+        }
+    });
+
+    function _baseLanguageChange(lang) {
+        var backImg = '';
+        if (lang == 'ru') {
+            backImg = 'url(../img/brower_ru.png) no-repeat 100%';
+        } else {
+            backImg = 'url(../img/brower_en.png) no-repeat 100%';
+        }
+
+        $('#yandexLogo').css({
+            'background': backImg
+        });
+    }
+</script>

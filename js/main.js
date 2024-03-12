@@ -1,0 +1,1 @@
+$(document).ready(function(){var b=$("#phone-number");b.mask("+7(000)000-00-00");function c(){var d=$(this);if(d.hasClass("active")){d.removeClass("active")}else{d.addClass("active")}}var a=$(".network-mts");a.on("click",c);$(".scroll-wrap").mCustomScrollbar({axis:"y",theme:"dark"})});

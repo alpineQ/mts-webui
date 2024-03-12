@@ -1,0 +1,605 @@
+﻿<section id="statistic" class="statistic">
+    <div class="container">
+        <table class="top-table">
+            <tr>
+                <td class="left-side">
+                    <h4 data-trans="traffic_statistics">Statistics</h4>
+                </td>
+                <td>
+                    <h4 data-trans="speed">Speed</h4>
+                </td>
+            </tr>
+            <tr>
+                <td class="left-side center">
+                    <div class="inl-b current-network">
+                        <div class="icon"></div>
+                        <div class="text">
+                            <h5 id="current_time"></h5>
+                            <p data-trans="statis_currSession">Current session</p>
+                        </div>
+                    </div>
+                    <div class="inl-b get-post">
+                        <div class="icon"></div>
+                        <div class="text">
+                            <h5 id="received_sent"></h5>
+                            <p data-trans="statis_ReceiveSent">Received/sent</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="right-side">
+                    <div class="inl-b down">
+                        <div class="text">
+                            <h5>
+                                <div class="icon"></div>
+                                <label id="download_speed"></label>
+                            </h5>
+                            <p data-trans="statis_DownSpeed">Download speed</p>
+                        </div>
+                    </div>
+                    <div class="inl-b send">
+                        <div class="text">
+                            <h5>
+                                <div class="icon"></div>
+                                <label id="upload_speed"></label>
+                            </h5>
+                            <p data-trans="statis_UploadSpeed">Upload speed</p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <table class="main-table">
+           
+           
+           
+                    <!-- <img src="../media/img/statistic/graph.svg" alt="" /> -->
+                    <div class="hide" id="currentHourSpeed" style="width: 900px;height:320px;"></div>
+              
+            <tr>
+                <td class="inner">
+                    <div class="w50">
+                        <h4 data-trans="statis_CurrSpeed">Current speed</h4>
+                    </div>
+                    <div class="w50">
+                        <h4 data-trans="statis_MaxSpeed">Maximum speed</h4>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="inner">
+                    <div class="w50 speed-wrap">
+                        <div class="speed-content">
+                            <h5 data-trans="statis_Downlink">Downlink</h5>
+                            <!-- <p data-trans="statis_downlink">(downlink)</p> -->
+                            <!-- <img src="../media/img/statistic/graph_speed.svg" alt="" /> -->
+                            <div id="downlinkChart" style="width: 210px;height:210px;"></div>
+                        </div>
+                        <div class="speed-content">
+                            <h5 data-trans="statis_Uplink">Uplink</h5>
+                            <!-- <p data-trans="statis_uplink">(uplink)</p> -->
+                            <!-- <img src="../media/img/statistic/graph_speed.svg" alt="" /> -->
+                            <div id="uplinkChart" style="width: 210px;height:210px;"></div>
+                        </div>
+                    </div>
+                    <div class="w50 speed-wrap">
+                        <div class="speed-content">
+                            <h5 data-trans="statis_Download">Download</h5>
+                            <div id="maxDownloadChart" style="width: 210px;height:210px;"></div>
+                        </div>
+                        <div class="speed-content">
+                            <h5 data-trans="statis_Upload">Upload</h5>
+                            <div id="maxUploadChart" style="width: 210px;height:210px;"></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-info">
+                    <h4><span data-trans="statis_Session">Session time: </span><span id="sesson_time"></span></h4>
+                    <h4><span data-trans="statis_All">All traffic: </span><span id="all_traffic"></span></h4>
+                </td>
+            </tr>
+        </table>
+
+        <h4 style="text-align: left;font-size: 18px;padding-top:15px;" data-trans="wifi_users"></h4>
+        <div class="row-fluid">
+            <div id="divStation" class="span12">
+                <div class="ko-grid-container">
+                    <div class="ko-grid-menu" style="display: none;">
+                        <div class="ko-grid-option">
+                            <img id="ko_grid_layout" class="cursor-pointer" src="img/card.png"> </div>
+                        <div class="clean"></div>
+                    </div>
+                    <table cellspacing="0" cellspadding="0" class="ko-grid colorHoverTable ">
+                        <thead>
+                            <tr class="">
+                                <th nowrap="nowrap" width="5%" data-trans="station_number"></th>
+                                <th nowrap="nowrap" width="20%" data-trans="host_name"></th>
+                                <th nowrap="nowrap" width="20%" data-trans="mac_address"></th>
+                                <th nowrap="nowrap" width="18%" data-trans="ip_ip"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="userlist">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    window.LTELanguageInitPart('#statistic')
+
+    function load_init() {
+        var hover_chart = false,
+            volumeData = {
+                showTotal: false, //显示类型
+                tipsName: '',
+                axisUnit: '',
+                xAxisTypel: null, //横坐标类型
+                tempXdata: [],
+                tempYdata: []
+            }
+      
+        var chart = echarts.init(document.getElementById('currentHourSpeed'))
+        var downlinkChart = echarts.init(document.getElementById('downlinkChart'))
+        
+        var uplinkChart = echarts.init(document.getElementById('uplinkChart'))
+        var maxDownloadChart = echarts.init(document.getElementById('maxDownloadChart'))
+        var maxUploadChart = echarts.init(document.getElementById('maxUploadChart'))
+        var downlinkOption = createGauge()
+        var uplinkOption = createGauge()
+        var lineOption = createLineChart()
+
+        // var maxdownlinkOption = createGauge()
+        // var maxuplinkOption = createGauge()
+
+        addInterval(function() {
+            refreshTs()
+            getVolumeData()
+            getCurrentWifiUser();
+        }, 1000);
+
+        $('document').ready(function() {
+            $('input[name=modeGroup]').click(function() {
+                if ($('input[name=modeGroup]:checked').val() == 'Total')
+                    volumeData.showTotal = true
+                else volumeData.showTotal = false
+            })
+        })
+
+        function createGauge() {
+            var option = {
+                series: [{
+                    name: 'Speed',
+                    type: 'gauge',
+                    startAngle: 215,
+                    endAngle: -35,
+                    min: 0,
+                    max: 150,
+                    splitNumber: 6, // 分成6份
+                    splitLine: {
+                        show: false,
+                        length: -24,
+                        lineStyle: {
+                            color: '#BFBFBF'
+                        }
+                    }, // 分隔线
+                    axisTick: {
+                        show: true,
+                        splitNumber: 1,
+                        length: 23,
+                        lineStyle: {
+                            color: '#BFBFBF'
+                        }
+                    },
+                    detail: {
+                        show: true,
+                        backgroundColor: '#445FF0',
+                        borderColor: '#cccFFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            width: 23, // 扇形宽度
+                            color: [
+                                [0 / 150, '#E22A26'],
+                                [1, '#DEDEDD']
+                            ]
+                        }
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#A2A2A2',
+                            fontSize: 11
+                        }
+                    },
+                    pointer: {
+                        width: 4
+                    },
+                    detail: {
+                        formatter: function(value) {
+                        	
+                            var speed = value * 1048576
+                            if (speed < 1024) {
+                                return speed.toFixed(2) + $.i18n.prop('B') + $.i18n.prop('speed_sec')
+                            } else if (speed >= 1024 && speed < 1048576) {
+                                return (speed / 1024).toFixed(2) + $.i18n.prop('KB') + $.i18n.prop('speed_sec')
+                            } else if (speed >= 1048576 && speed < 1073741824) {
+                                return (speed / 1048576).toFixed(2) + $.i18n.prop('MB') + $.i18n.prop('speed_sec')
+                            } else {
+                                return (speed / 1073741824).toFixed(2) +  $.i18n.prop('GB') + $.i18n.prop('speed_sec')
+                            }
+                        },
+                        offsetCenter: [0, '85%'], // 文字偏移
+                        textStyle: {
+                            color: '#E43425',
+                            fontSize: 16
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#BABABA'
+                        }
+                    },
+                    data: [{
+                        value: 0,
+                        name: ''
+                    }]
+                }]
+            }
+            return option
+        }
+
+        function createGaugeVolu() {
+            var option = {
+                unit: 'MB',
+                series: [{
+                    name: 'Speed',
+                    type: 'gauge',
+                    startAngle: 215,
+                    endAngle: -35,
+                    min: 0,
+                    max: 1024,
+                    splitNumber: 6, // 分成6份
+                    splitLine: {
+                        show: false,
+                        length: -24,
+                        lineStyle: {
+                            color: '#BFBFBF'
+                        }
+                    }, // 分隔线
+                    axisTick: {
+                        show: true,
+                        splitNumber: 1,
+                        length: 23,
+                        lineStyle: {
+                            color: '#BFBFBF'
+                        }
+                    },
+                    detail: {
+                        show: true,
+                        backgroundColor: '#445FF0',
+                        borderColor: '#cccFFF'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            width: 23, // 扇形宽度
+                            color: [
+                                [0 / 1024, '#E22A26'],
+                                [1, '#DEDEDD']
+                            ]
+                        }
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#A2A2A2',
+                            fontSize: 11
+                        },
+                        color: 'yellow',
+                        formatter: function(value) {
+                            if (option.unit == 'MB') {
+                                return parseInt(value)
+                            } else {
+                                return value.toFixed(0)
+                            }
+                        }
+                    },
+                    pointer: {
+                        width: 4
+                    },
+                    detail: {
+                        formatter: function(value) {
+                            return value.toFixed(2) + option.unit
+                        },
+                        offsetCenter: [0, '85%'], // 文字偏移
+                        textStyle: {
+                            color: '#E43425',
+                            fontSize: 16
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#BABABA'
+                        }
+                    },
+                    data: [{
+                        value: 0,
+                        name: ''
+                    }]
+                }]
+            }
+            return option
+        }
+
+        function createLineChart() {
+            option = {
+                title: {
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params, ticket, callback) {
+                        if (!params[0].value) return ''
+                        return (
+                            volumeData.tipsName + ': ' + params[0].value + $.i18n.prop(volumeData.axisUnit)
+                        )
+                    }
+                },
+                legend: {
+                    data: []
+                },
+                toolbox: {
+                    show: false,
+                    feature: {
+                        mark: {
+                            show: true
+                        },
+                        dataView: {
+                            show: true,
+                            readOnly: false
+                        },
+                        magicType: {
+                            show: true,
+                            type: ['line', 'bar', 'stack', 'tiled']
+                        },
+                        restore: {
+                            show: true
+                        },
+                        saveAsImage: {
+                            show: true
+                        }
+                    }
+                },
+                calculable: false,
+                grid: {
+                    borderColor: '#000',
+                    borderWidth: 1
+                },
+                axis: {
+                    splitArea: {}
+                },
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: true,
+                    data: [],
+                    splitLine: {
+                        show: true
+                    }
+                }],
+                yAxis: [{
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} MB'
+                    },
+                    splitLine: {
+                        show: false
+                    }
+                }],
+                series: [{
+                    name: 'volume',
+                    type: 'line',
+                    smooth: false,
+                    symbol: 'emptyCircle',
+                    symbolSize: 10,
+                    itemStyle: {
+                        normal: {
+                            areaStyle: {
+                                color: '#ffc9c0',
+                                type: 'default'
+                            },
+                            lineStyle: {
+                                width: 2,
+                                color: '#fa3c3c',
+                                shadowColor: '#0f0'
+                            }
+                        }
+                    },
+                    data: []
+                }]
+            }
+            return option
+        }
+
+        function updateTrafficVolumnGauge(option, trafficVolumn, iddiv) {
+            if (trafficVolumn < 1073741824) {
+                // 当范围在1GB以内时，单位为MB，最小刻度为0MB，最大刻度为1024MB
+                option.unit = $.i18n.prop('MB') ;
+                option.series[0].min = 0
+                option.series[0].max = 1024
+
+                // 设置流量
+                option.series[0].data[0].value = trafficVolumn / 1048576 // 将数据转换为MB
+                option.series[0].axisLine.lineStyle.color[0] = [
+                    option.series[0].data[0].value / 1024,
+                    'red'
+                ]
+            } else {
+                // 当范围大于1GB时，单位为GB
+                option.unit = $.i18n.prop('GB')  //'GB';
+
+                var trafficVolumnGB = trafficVolumn / 1073741824 // 以GB为单位的值
+
+                // 设置范围，每个范围都是6GB，例如1GB~7GB,7GB~13GB
+                option.series[0].min =
+                    Math.floor((parseInt(trafficVolumnGB) - 1) / 6) * 6 + 1
+                option.series[0].max = option.series[0].min + 6
+
+                // 设置流量
+                option.series[0].data[0].value = trafficVolumnGB
+                option.series[0].axisLine.lineStyle.color[0] = [
+                    (trafficVolumnGB - option.series[0].min) / 6,
+                    'red'
+                ]
+            }
+
+            // 更新
+            iddiv.setOption(option, true)
+        }
+
+        function updateVolumnDataChart(data) {
+            if (volumeData.showTotal) {
+                volumeData.data = data.total_volume
+                volumeData.tipsName = $.i18n.prop('statis_Totalvolume')
+            } else {
+                volumeData.data = data.curr_volume
+                volumeData.tipsName = $.i18n.prop('statis_Currvolume')
+            }
+            //0;0830,4294967295;0900;
+            //1;310718,4294967295;010918,4294967295;
+            //< one day; time, volumn; time, volumn...
+            //> one day; date, volumn; date, volumn...
+
+            volumeData.xAxisType = null
+            volumeData.tempXdata = []
+            volumeData.tempYdata = []
+            volumeData.axisUnit = 'MB'
+            $.each(volumeData.data.split(';'), function(index, item) {
+                if (index == 0) {
+                    if (item == 0) volumeData.xAxisType = 'TIME'
+                        // < one day， show time
+                    else volumeData.xAxisType = 'DAY'
+                    return true
+                }
+
+                if (item == '') return true
+
+                if (volumeData.xAxisType == 'TIME') {
+                	
+                    volumeData.tempXdata.push(
+                        item.substr(0, 4).replace(/(\d{2})/g, '$1:').substr(0, 5)
+                    )
+                    volumeData.tempYdata.push(item.substr(5))
+                    if (item.substr(5) > 1024 * 1024 * 1024) volumeData.axisUnit = 'GB' //一旦有一个数据大于1024MG. 整个数组都按GB处理
+                } else {
+                    volumeData.tempXdata.push(
+                        item.substr(0, 6).replace(/(\d{2})/g, '$1-').substr(0, 8)
+                    )
+                    volumeData.tempYdata.push(item.substr(7))
+                    if (item.substr(7) > 1024 * 1024 * 1024) volumeData.axisUnit = 'GB'
+                }
+            })
+
+            lineOption.xAxis[0].data = volumeData.tempXdata
+            lineOption.series[0].data = volumeData.tempYdata.map(function(item, index, arr) {
+                if (volumeData.axisUnit == 'MB')
+                    return (item / (1024 * 1024)).toFixed(2)
+                else return (item / (1024 * 1024 * 1024)).toFixed(3)
+            })
+            lineOption.yAxis[0].axisLabel = {
+                formatter: '{value} ' + $.i18n.prop(volumeData.axisUnit)
+            }
+            chart.setOption(lineOption)
+        }
+
+        function refreshTs() {
+            $('#current_time').html(transSecond2Time(ts.realtime_time))
+            $('#received_sent').html(getDisplayVolume2(ts.monthly_tx_bytes) + "/" + getDisplayVolume2(ts.monthly_rx_bytes))
+            $('#download_speed').html(getDisplayVolume2(ts.realtime_rx_thrpt) + $.i18n.prop('speed_sec'))
+            $('#upload_speed').html(getDisplayVolume2(ts.realtime_tx_thrpt) + $.i18n.prop('speed_sec'))
+            $('#sesson_time').html(transSecond2Time(ts.monthly_time))
+            $('#all_traffic').html(getDisplayVolume2(ts.monthly_tx_bytes + ts.monthly_rx_bytes))
+
+            var data = new Object()
+            data.realtime_tx_thrpt = ts.realtime_tx_thrpt
+            data.realtime_rx_thrpt = ts.realtime_rx_thrpt
+            data.max_tx_thrpt = (ts.monthly_tx_bytes)
+            data.max_rx_thrpt = (ts.monthly_rx_bytes)
+
+            // Gauge1 (Download Speed)
+            downlinkOption.series[0].data[0].value = data.realtime_rx_thrpt / (1024 * 1024)
+            downlinkOption.series[0].axisLine.lineStyle.color[0] = [
+                downlinkOption.series[0].data[0].value / 150,
+                'red'
+            ]
+            downlinkChart.setOption(downlinkOption, true)
+
+            // Gauge2 (Upload Speed)
+            uplinkOption.series[0].data[0].value = data.realtime_tx_thrpt / (1024 * 1024)
+            uplinkOption.series[0].axisLine.lineStyle.color[0] = [
+                uplinkOption.series[0].data[0].value / 150,
+                'red'
+            ]
+            uplinkChart.setOption(uplinkOption, true)
+
+            // // Max Download
+            // maxdownlinkOption.series[0].data[0].value = data.max_tx_thrpt / (1024 * 1024)
+            // maxdownlinkOption.series[0].axisLine.lineStyle.color[0] = [
+            //     maxdownlinkOption.series[0].data[0].value / 150,
+            //     'red'
+            // ]
+            // maxDownloadChart.setOption(maxdownlinkOption, true)
+
+
+            // // Max Upload
+            // maxuplinkOption.series[0].data[0].value = data.max_rx_thrpt / (1024 * 1024)
+            // maxuplinkOption.series[0].axisLine.lineStyle.color[0] = [
+            //     maxuplinkOption.series[0].data[0].value / 150,
+            //     'red'
+            // ]
+            // maxUploadChart.setOption(maxuplinkOption, true)
+            
+            updateTrafficVolumnGauge(
+                createGaugeVolu(),
+                parseInt(data.max_tx_thrpt, 10),
+                maxDownloadChart
+            )
+            updateTrafficVolumnGauge(
+                createGaugeVolu(),
+                parseInt(data.max_rx_thrpt, 10),
+                maxUploadChart
+            )
+        }
+
+        function getVolumeData() {
+            getTrafficSatistics(function(flag, data) {
+            	
+                if (flag) {
+                    updateVolumnDataChart(data)
+                }
+            })
+        }
+
+        function getCurrentWifiUser() {
+            $.get('goform/goform_get_cmd_process?isTest=false&cmd=active_station_list&_=' + new Date().getTime(), {}, function(data) {
+                if (typeof(data) == 'string') {
+                    data = $.parseJSON(data);
+                }
+
+                var currentWifiUser = '';
+                _.map(data.station_list, function(ele, idx) {
+                    currentWifiUser += '<tr>';
+                    currentWifiUser += '<td class="even">' + (idx + 1) + '</td>';
+                    currentWifiUser += '<td class="ko-grid-center">' + ele.hostname + '</td>';
+                    currentWifiUser += '<td class="ko-grid-center">' + ele.mac_addr + '</td>';
+                    currentWifiUser += '<td class="ko-grid-center">' + ele.ip_addr + '</td>';
+                    currentWifiUser += '</tr>';
+                });
+                $('#userlist').html(currentWifiUser);
+            });
+        }
+    }
+
+    load_init()
+</script>

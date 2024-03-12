@@ -1,0 +1,400 @@
+<form autocomplete="off">
+    <div class="form-body" style="margin-left: 15px; margin-right: 15px;">
+        <div class="form-title" style="display: none;" data-trans="net_select">Network Selection</div>
+        <div class="content">
+            <div class="row-fluid">
+                <label class="span4 side-right"><span data-trans="net_select">Network Selection</span>
+                    <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                </label>
+                <div class="span8">
+                    <input type="radio" name="selectGroup" id="auto_select" value="auto_select" data-bind="checked: selectMode, enable: enableFlag" checked="checked">
+                    <label for="auto_select" data-trans="auto_select">Automatic</label>
+                    <select data-transid="auto_select_type" transid="auto_select_type" data-bind="options: types, value: selectedType, optionsText: transOption('auto_select_type'), optionsValue: 'value', enable: enableFlag() && selectMode() == 'auto_select'"></select>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <label class="span4 side-right">
+                    <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                </label>
+                <div class="span8">
+                    <input type="radio" name="selectGroup" id="manual_select" data-bind="checked: selectMode, enable: enableFlag" value="manual_select">
+                    <label for="manual_select" data-trans="manual_select">Manual</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-buttons">
+            <input type="button" class="btn-1" data-bind='click: save, visible: selectMode() == "auto_select", enable: enableFlag, css: {disabled: !enableFlag()}' data-trans="apply" value="apply" disabled="">
+            <input type="button" class="btn-1" data-bind='click: search, visible: selectMode() != "auto_select", enable: enableFlag, css: {disabled: !enableFlag()}' data-trans="search" value="search" disabled="">
+        </div>
+
+        <div class="content network-list-content" data-bind='visible: networkList().length > 0 && selectMode() == "manual_select"' style="display: none;">
+            <div class="form-title" data-trans="network_list">Network List</div>
+            <div class="content">
+                <div class="ko-grid-container marginnone" style="overflow-y:auto">
+                    <table class="ko-grid colorHoverTable marginnone" cellspacing="0" cellpadding="0" id="network-list-table">
+                        <thead>
+                            <tr>
+                                <th data-trans="option">Option</th>
+                                <th data-trans="net_status" style="min-width: 102px;">Status</th>
+                                <th data-trans="network_provider">Operator</th>
+                                <th data-trans="mccmnc">MCCMNC</th>
+                                <th data-trans="networktype">Network Type</th>
+                                <th data-trans="subnet">Act</th>
+                            </tr>
+                        </thead>
+                        <!-- <tbody data-bind="foreach: networkList">
+                            <tr data-bind="css:{odd:$index()%2==1, even:$index()%2==0}">
+                                <td><input type="radio" name="networkGroup" data-bind='value: $root.networkValue($data), checked: $root.selectNetwork, attr: {id: $root.networkValue($data)}, enable: $root.enableFlag' />
+                                </td>
+                                <td data-bind='attr: {"data-trans": $root.networkStatusId($data)}, text: $root.networkStatus($data)'></td>
+                                <td data-bind='text: $root.operatorName($data)'></td>
+                                <td data-bind='text: $root.networkText($data)'></td>
+                                <td data-bind='attr: {"data-trans": $root.networkTypeId($data)}, text: $root.networkType($data)'></td>
+                            </tr>
+                        </tbody> -->
+                        <tbody id="searchNetworkList"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-buttons">
+                <input type="button" data-bind='click: register' class="btn-1" id="btn-select-register" data-trans="register">
+            </div>
+        </div>
+        <div class="form-note">
+            <div class="notes-title">&nbsp;</div>
+            <ul class="notes-content">
+                <li data-trans="diconneted_operate_note">To change current setting, please disconnect from network.</li>
+                <li data-trans="net_select_note_automatic">Automatic: The device will search available network automatically.</li>
+                <li data-trans="net_select_note_manual">Manual: The device will search available network manually.</li>
+            </ul>
+        </div>
+
+        <div style="color:red;">
+            <span data-trans="disconnectNetSelectionTip"></span>
+            <img style="width:60px;height:45px;" src="img/disconnectNet_en.png" id="disconnectNetTip" />)
+          <span data-trans="disconnectNetSelectionTip2"></span>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(function() {
+        var service = window._service;
+        var config = service.config;
+        var selectModes = _.map(config.AUTO_MODES, function(item) {
+            return new Option(item.name, item.value);
+        });
+
+        /**
+         * 选网功能view model
+         * @class NetSelectVM
+         */
+        function NetSelectVM() {
+            var self = this;
+            self.enableFlag = ko.observable(true);
+            self.types = ko.observableArray(selectModes);
+            self.selectedType = ko.observable();
+            self.selectMode = ko.observable();
+            self.networkList = ko.observableArray([]);
+            self.selectNetwork = ko.observable('');
+            self.networkStatus = function(data) {
+                return getNetworkStatus(data.nState);
+            };
+
+            self.networkStatusId = function(data) {
+                return getNetworkStatus(data.nState);
+            };
+
+            self.networkText = function(data) {
+                return data.strNumeric;
+            };
+
+            self.operatorName = function(data) {
+                return data.strShortName;
+            };
+
+            self.networkType = function(data) {           	 
+                var result = getNetworkType(data.nRat);
+                if (result == "auto") {
+                    result = $.i18n.prop("auto");
+                }
+                return result;
+            };
+
+            self.subnetworkType = function(data) {
+                var result = getSubNetworkType(data.nRat, data.SubAct);
+                return result;
+            };
+
+            self.networkTypeId = function(data) {
+                return getNetworkType(data.nRat);
+            };
+
+            self.subnetTypeId = function(data) {
+                return getSubNetworkType(data.nRat, data.SubAct);
+            };
+
+            self.networkValue = function(data) {
+                var result = [];
+                result.push(data.strNumeric); //strNumeric
+                result.push(data.nRat); //nRat
+                result.push(data.SubAct);
+                result.push(data.nState);
+                return result.join(',');
+            };
+
+            /**
+             * 自动选网时设置网络模�?
+             * @method save
+             */
+            self.save = function() {
+                showLoading();
+
+                //AutoSelect call SetBearerPreference
+                var params = {};
+                params.strBearerPreference = self.selectedType();
+        	if(params.strBearerPreference=='Only_LTE'){
+        		 params.lte_sub_type='3';
+        	}else if(params.strBearerPreference=='Only_TDD'){
+        		params.strBearerPreference='Only_LTE';
+        		 params.lte_sub_type='0';
+        	}else if(params.strBearerPreference=='Only_FDD'){
+        		params.strBearerPreference='Only_LTE';
+        		 params.lte_sub_type='1';
+        	}
+                service.setBearerPreference(params, function(result) {
+                    hideLoading();
+                    if (result.result == "success") {
+                        self.networkList([]);
+                        successOverlay();
+                    } else {
+                        errorOverlay();
+                    }
+                });
+            };
+
+            /**
+             * 手动搜网
+             * @method search
+             */
+            self.search = function() {
+                showLoading('searching_net');
+                service.scanForNetwork(function(result, networkList) {
+                    hideLoading();
+                    if (result) {
+                        self.networkList(networkList);
+                        for (var i = 0; i < networkList.length; i++) {
+                            var n = networkList[i];
+                            if (n.nState == '2') {
+                                self.selectNetwork(n.strNumeric + ',' + n.nRat + ',' + n.SubAct);
+                                // return;
+                            }
+                        }
+                        /*
+                            <tr data-bind="css:{odd:$index()%2==1, even:$index()%2==0}">
+                                <td><input type="radio" name="networkGroup" data-bind='value: $root.networkValue($data), checked: $root.selectNetwork, attr: {id: $root.networkValue($data)}, enable: $root.enableFlag' />
+                                </td>
+                                <td data-bind='attr: {"data-trans": $root.networkStatusId($data)}, text: $root.networkStatus($data)'></td>
+                                <td data-bind='text: $root.operatorName($data)'></td>
+                                <td data-bind='text: $root.networkText($data)'></td>
+                                <td data-bind='attr: {"data-trans": $root.networkTypeId($data)}, text: $root.networkType($data)'></td>
+                            </tr>
+                        */
+
+                        var searchStr = '';
+                        $.each(networkList, function(index, item) {
+                            searchStr += '<tr class="' + (index % 2 == 1 ? "odd" : "even") + '">';
+                            searchStr += '<td><input type="radio" name="networkGroup"  ' + (self.networkValue(item) == self.selectNetwork() ? "checked=true" : "") + '" value="' + self.networkValue(item) + '" id="' + self.networkValue(item) + '" enable="' + self.enableFlag() + '" /></td>';
+                            searchStr += '<td data-trans="' + self.networkStatusId(item) + '">' + self.networkStatus(item) + '</td>';
+                            searchStr += "<td>" + self.operatorName(item) + "</td>";
+                            searchStr += "<td>" + self.networkText(item) + "</td>";
+                            searchStr += "<td data-trans='" + self.networkTypeId(item) + "'>" + self.networkType(item) + "</td>";
+                            searchStr += "<td data-trans='" + self.subnetTypeId(item) + "'>" + self.subnetworkType(item) + "</td>";
+                            searchStr += '</tr>';
+                        });
+                        $('#searchNetworkList').html(searchStr);
+
+                        $('#' + self.selectNetwork()).attr('checked', true);
+                        $('#searchNetworkList').translate();
+                    } else {
+                        self.networkList([]);
+                    }
+                });
+            };
+
+            /**
+             * 注册选择的网�?
+             * @method register
+             */
+            self.register = function() {
+                var checkedObj = $("input[name='networkGroup']:checked");
+                if (!checkedObj || checkedObj.length == 0) {
+                    return;
+                }
+               
+
+                showLoading('registering_net');
+                var networkToSet = checkedObj.val().split(',');
+                if(networkToSet[3]==3){
+                	errorOverlay();
+                	return;
+                }
+                service.setNetwork(networkToSet[0], parseInt(networkToSet[1]), parseInt(networkToSet[2]),parseInt(networkToSet[3]),function(result) {
+                    hideLoading();
+                    if (result) {
+                        self.networkList([]);
+                        var autoType = getNetSelectInfo();
+                        if(autoType.net_select=='Only_LTE'){
+                        	if(autoType.lte_sub_type=='1'){
+                        		autoType.net_select='Only_FDD'
+                        	}
+                        	if(autoType.lte_sub_type=='0'){
+                        		autoType.net_select='Only_TDD'
+                        	}
+                        }
+                        self.selectedType(autoType.net_select);
+                        successOverlay();
+                    } else {
+                        errorOverlay();
+                    }
+                });
+            };
+
+            self.checkEnable = function() {
+                var status = service.getStatusInfo();
+                if (status.connectStatus == "ppp_connected" || status.connectStatus == "ppp_connecting") {
+                    self.enableFlag(false);
+                } else {
+                    self.enableFlag(true);
+                }
+            };
+
+            //init data
+            self.checkEnable();
+            var info = getNetSelectInfo();
+            if ("manual_select" == info.net_select_mode || "manual_select" == info.m_netselect_save) {
+                self.selectMode("manual_select");
+            } else {
+                self.selectMode("auto_select");
+            }
+             if(info.net_select=='Only_LTE'){
+                        	if(info.lte_sub_type=='1'){
+                        		info.net_select='Only_FDD'
+                        	}
+                        	if(info.lte_sub_type=='0'){
+                        		info.net_select='Only_TDD'
+                        	}
+                        }
+            self.selectedType(info.net_select);
+
+        }
+
+        /**
+         * 获取网络选择信息
+         * @method getNetSelectInfo
+         */
+        function getNetSelectInfo() {
+            return service.getNetSelectInfo();
+        }
+
+        /**
+         * 搜网结果中的状态转换为对应的语言�?
+         * @method getNetworkStatus
+         * @param {String} status
+         * @return {String}
+         */
+        function getNetworkStatus(status) {
+            if ("0" == status) {
+                return "unknown";
+            } else if ("1" == status) {
+                return "available";
+            } else if ("2" == status) {
+                return "current";
+            } else if ("3" == status) {
+                return "forbidden";
+            }
+        }
+
+        /**
+         * 网络类型转换
+         * @method getNetworkType
+         * @param {String} type
+         * @return {String}
+         */
+        function getNetworkType(type) {
+            if ("0" == type) {
+                return "2G";
+            } else if ("2" == type) {
+                return "3G";
+            } else if ("7" == type) {
+                return "4G";
+            } else {
+                return "auto";
+            }
+        }
+
+        /**
+         * 子网络类型转�?
+         * @method getSubNetworkType
+         * @param {String} type
+         * @return {String}
+         */
+        function getSubNetworkType(type, subtype) {
+            var type_3g = [2, 4, 5, 6, 8];
+            if ("0" == subtype) {
+                if ($.inArray(type, type_3g) != -1) {
+                    subtype = "TD-SCDMA";
+                } else if ("7" == type) {
+                    subtype = "TDD-LTE";
+                } else {
+                    subtype = "GSM";
+                }
+            } else if ("1" == subtype) {
+                if ($.inArray(type, type_3g) != -1) {
+                    subtype = "WCDMA";
+                } else if ("7" == type) {
+                    subtype = "FDD-LTE";
+                } else {
+                    subtype = "GSM";
+                }
+            } else {
+                subtype = "";
+            }
+            return subtype;
+        }
+
+        /**
+         * 初始化选网功能view model
+         * @method init
+         */
+        function init() {
+            var container = $('#containerSettings');
+            ko.cleanNode(container[0]);
+            var vm = new NetSelectVM();
+            ko.applyBindings(vm, container[0]);
+             
+            addInterval(vm.checkEnable, 1000);
+        }
+
+        init();
+        $('#containerSettings').translate();
+
+        // 获取当前设备设置的语言
+        $.get('goform/goform_get_cmd_process?isTest=false&cmd=Language&multi_data=1&_=' + new Date().getTime(), {}, function(data) {
+            var result = data;
+            if (typeof(data) == 'string') {
+                result = $.parseJSON(data);
+            }
+
+            _baseLanguageChange(result.Language);
+        });
+    });
+
+    function _baseLanguageChange(lang) {
+        if (lang == 'ru') {
+            $('#disconnectNetTip').attr('src', "img/disconnectNet_ru.png");
+        } else {
+            $('#disconnectNetTip').attr('src', "img/disconnectNet_en.png");
+        }
+    }
+</script>

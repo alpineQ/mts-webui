@@ -1,0 +1,1157 @@
+<section class="message-page sms-page" id="sms-page">
+    <div class="container cleafix">
+        <aside class="message-wrap">
+            <ul class="menu message-menu">
+                <li class="list sms active">
+                    <span data-trans="contact_SMS">SMS</span>
+                    <span class="icon">
+            <div class="message-left-menu-sms"></div>
+          </span>
+                    <ul class="sub-sms-list">
+                        <li class="sub-list inbox" onclick="sms_changePage(0)">
+                            <span class="icon">
+                <div class="sms-menu-receive"></div>
+              </span>
+                            <span data-trans="contact_Received">Received</span>
+                        </li>
+                        <li class="sub-list outbox" onclick="sms_changePage(1)">
+                            <span class="icon">
+                <div class="sms-menu-sent"></div>
+              </span>
+                            <span data-trans="contact_Sent">Sent</span>
+                        </li>
+                        <li class="sub-list draft" onclick="sms_changePage(2)">
+                            <span class="icon">
+                <div class="sms-menu-draft"></div>
+              </span>
+                            <span data-trans="contact_Draft">Draft</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class="list ussd " onclick="goRouter('ussd')">
+                    <span class="icon">
+            <div class="message-left-menu-ussd"></div>
+          </span>
+                    <span data-trans="contact_USSD" style="cursor: pointer;">USSD</span>
+                </li>
+                <li class="list notebook" onclick="goRouter('contacts')">
+                    <span class="icon">
+                        <div class="message-left-menu-notebook" style="margin-top: -5px;"></div>
+          </span>
+                    <span data-trans="contact_Contactlist" style="cursor: pointer;">Contact list</span>
+                </li>
+            </ul>
+        </aside>
+        <div class="messages-wrapper clearfix">
+            <div class="messages-container">
+                <div class="heading">
+                    <a class="btn">
+                        <span class="icon">
+              <div style="background: url(img/createsms.png) no-repeat;height:20px;margin-top: 2px;"></div>
+            </span><span data-trans="sms_CreateSMS" onclick="sms_createSMS()">Create SMS</span>
+                        <!-- <div style="position: absolute;width: 22px;height: 16px;background: url(img/createsms.png) no-repeat;top: 8px;left: 20px;"></div>
+            <div style="position: absolute;top: 0px;left: 50px;height: 30px;line-height: 30px;">Create SMS</div> -->
+                        <!-- <span data-trans="CreateSMS" onclick="sms_createSMS()">Create SMS</span> -->
+                    </a>
+                </div>
+                <div class="messages-count">
+                    <span data-trans="sms_smsTotal">You have message</span> <span class="msg-count" id="msg-count">0</span>
+                </div>
+                  <div style="border-top: #cecece solid 1px;">
+                    <div class="content-wrap" style="margin-left: 80px;">
+                        <input type="checkbox" id="select-all-sms">
+                        <label class="checkBoxLable" for="select-all-sms">
+                        	 <span class="contact-name" style="user-select: none" data-trans="contact_selectAll">Select All</span>
+                        </label>
+                        <a class="btn btn-gray" onclick="sms_batchDeleteSms()" data-trans="delete" id="add_contact" style="background-color:#ccc;margin-left:100px;margin-top:5px;height:30px;line-height:30px;">Delete</a>
+                    </div>
+                </div>
+               <!-- <img id="batch_delete" onclick="sms_batchDeleteSms()" src="img/deleteSms.png" style="float: right; cursor: pointer;margin-right:41px;display: none;">-->
+                <h5 id="tab-title" data-trans="sms_Received" style="margin-bottom:0px;">Received</h5>
+                <div class="scroll-wrap" style="height:80%">
+                    <div class="content-wrap">
+                        <ul id="smslist_container">
+                        </ul>
+                    </div>
+                </div>
+                
+              
+            </div>
+            <div class="message-view" style="overflow-x: hidden;" >
+                <h2 class="heading" id="message-title"></h2>
+
+                <div class="date-wrap">
+                    <span class="time" id="message-date"></span>
+                </div>
+                <div class="message-content" id="message-content" >
+
+                </div>
+               
+                <div class="sms-reply-btn-contain sms-show-hide" style="display:none;text-align: right;">
+                    <a class="btn btn-gray" data-trans="sms_Answer" id="sms_answer" style="margin-top:10px;" onclick="sms_createSMS(1)">Answer</a>
+                    <a class="btn btn-gray" data-trans="forward" id="sms_forward" style="margin-top:10px;" onclick="sms_createSMS(2)">Forward</a>
+                    <a class="btn btn-gray" data-trans="sms_Resend" id="sms_resend" style="margin-top:10px;" onclick="sms_createSMS(3)">Resend</a>
+                </div>
+            </div>
+            <div id="contactOverlay" class="popup-overlay"></div>
+            <div id="sendSMSContainer" class="base-popup select-user-popup" style="top:0;width:520px;" >
+                <div class="popup-wrap" id="sendMessage">
+                    <h4 class="p-heading" data-trans="contact_CreateMsg">Create a message</h4>
+                    <div class="input-wrap" style="text-align: left">
+                        <label for="phone-number-or-name" data-trans="contact_Whom">Whom</label>
+                        <div class="wrap">
+                            <!-- <input type="text" id="phone-number-or-name" placeholder="To"> -->
+                            <select id="chosenUserSelect" multiple="" class="chzn-select-deselect select-contact-chosen"></select>
+                            <div class="load-btn" id="btnshow" style="bottom: 4px;height:34px;" onclick="javascript:$('#select-user-wrap').show();$(this).hide();$('#btnback').show()"></div>
+                            <div class="load-btn" id="btnback" style="display: none;bottom: 4px;" onclick="javascript:$('#select-user-wrap').hide();$(this).hide();$('#btnshow').show()">
+                            	<label><img src="../../img/back.jpg" style="width: 42px;height: 36px;"></label>
+                            </div>
+                        </div>
+                        <div class="select-user-wrap" id="select-user-wrap" style="display: none;margin-top: -4px;">
+                            <!-- <input type="checkbox" id="select-all-dialog">
+                <label class="select-all-users" for="select-all-dialog">Выбрать всех</label> -->
+                            <div class="scroll-wrap">
+                                <div id="select-contact-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-wrap" style="margin-bottom: 0px;text-align: left">
+                        <label for="txtSmsContent" data-trans="contact_Message">Message</label>
+                        <textarea name="" maxlength="765" id="txtSmsContent" data-placeholder="sample_msg_text" placeholder="Sample message text"></textarea>
+                    </div>
+                    <div style="margin-bottom: 30px;">
+                        <span id="msgCount" class="paddingleft10">
+                <em id="inputcount">(0/765)</em>
+                <em id="inputItemCount">(1/5)</em>
+              </span>
+                        <span class="error-msg" id="select-contact-error" data-trans="contact_PleaseSelectContact" style="display: none;">Please select a contact.</span>
+                    </div>
+                  <div style="margin-left: 1%;">
+                    <div class="btn" id="btn_send_sms" onclick="sms_sendSMSAction()" data-trans="contact_Send">Send</div>
+                    <div class="btn" id="btn_draft_sms" onclick="sms_saveSMSAction()" data-trans="save">Save to draft</div>
+                    <div class="btn" id="btn_draft_sms" onclick="sms_closeSendSMS()" data-trans="cancel">Cancel</div>
+                  </div>
+                    <div class="close-btn send-sms-dialog-close" id="closeSendSMS" onclick="sms_closeSendSMS()">
+                        <!-- <svg viewBox="0 0 64 64">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="media/img/svg/sprite.svg#close"></use>
+            </svg> -->
+                    </div>
+                </div>
+            </div>
+            <div id="addContactContainer" class="base-popup create-message-popup" style="top:0">
+                <div class="popup-wrap">
+                  <h4 class="p-heading" data-trans="contact_Addcontact">Add Contact</h4>
+                  <div class="input-wrap" style="text-align: left">
+                    <label for="txtName" data-trans="contact_Name">Name</label>
+                    <input id="txtName" type="text" maxlength="46" style="height:40px !important;"/>
+                    <label id="err_txtName" for="txtName" generated="true" class="error" ></label>
+                  </div>
+                  <div class="input-wrap"style="text-align: left">
+                    <label for="txtMobile" data-trans="contact_Phonenumber">Phone number</label>
+                    <input id="txtMobile" type="text" maxlength="20" style="height:40px !important;"/>
+                    <label id="err_txtMobile" for="txtMobile" generated="true" class="error" ></label>
+                  </div>
+                  <div class="input-wrap" style="text-align: left" id="div_txtMobile" >
+                    <label for="txtMail" data-trans="contact_Email">E-mail</label>
+                    <input id="txtMail" type="email" maxlength="32" style="height:40px !important;"/>
+                    <label id="err_txtMail" for="txtMail" generated="true" class="error" ></label>
+                  </div>
+                  <div class="input-wrap" style="text-align: left">
+                    <label for="txtLocation" data-trans="location">Location</label>
+                    <select id="txtLocation" style="width:470px;height:40px;" onchange="sms_change_location('div_txtMobile','txtLocation')">
+                      <option value="1" data-trans="device" selected>Device</option>
+                      <option value="0" data-trans="sim">Sim Card</option>
+                    </select>
+                  </div>
+                  <a class="btn btn-gray" data-trans="add" id="save_contact" onclick="save_contact_to_ph()">Add</a>
+                  <div class="close-btn send-sms-dialog-close" id="closeAddContactToPh" onclick="closeAddContactToPh()">
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>  
+
+    window.LTELanguageInitPart('#sms-page')
+     var service = window._service
+    var config = window._service.config
+    var list_all_message = new Array()
+    var list_all_contact_sms = new Array()
+    var sms_currentMessage = {}
+    var sms_currentTab = -1 //0:Received 1:Sent 2:Draft
+    var sms_capacity = {
+            sms_nv_total: 0,
+            sms_nv_rev_total: 0,
+            sms_nv_send_total: 0,
+            sms_nv_draftbox_total: 0,
+        }
+        // 获取选中的消�?
+    function sms_getCheckSelect() {
+        var smsList = []
+        var checkedArray = $('#smslist_container input:checkbox:checked')
+        for (var i = 0; i < checkedArray.length; i++) {
+            var item = checkedArray[i]
+            smsList.push({
+                id: $(item).attr("msg-id"),
+                number: $(item).attr("msg-number")
+            })
+        }
+        return smsList
+    }
+
+    function sms_renderMessage() {
+       
+        var content = ""
+     
+        for (i = 0; i < list_all_message.length; i++) {
+            var item = list_all_message[i]
+            content +=
+                '<li class="msg_li">' +
+                '<input id="msg' + i + '" type="checkbox" msg-id="' + item.id + '" msg-number="' + item.number + '"/>' +
+                '<label class="msg-lable" for="msg' + i + '"></label>' +
+                '<label class="msg-lables" for="msg_' + i + '">' +
+                '<h3 class="msg-heading">' +
+                '<span class="msg-icon">'
+            var addContact=''
+            if (item.tag == 0 || item.tag == 1) { //收件�?
+                content += '<div class="' + (item.tag == '1' ? 'sms-menu-receive-active' : 'sms-content-receive') + '"></div>'
+                addContact='<img onclick="add_contact_to_pb(\'' +item.number+'\')" src="img/add_contact.png" style="float: right; cursor: pointer;">'
+            } else if (item.tag == 2) { //发件�?
+                content += '<div class="sms-content-sent"></div>'
+            } else { //草稿�?
+                content += '<div class="sms-content-draft"></div>'
+            }
+           
+            var smsFrom = list_all_contact_sms.find(function(value){  
+            	 if(getLastNumber(value.pbm_number, config.SMS_MATCH_LENGTH) == getLastNumber(item.number, config.SMS_MATCH_LENGTH)){
+    			  return true
+    			 
+    		}
+            	return false})
+            
+         
+            var fromName = smsFrom?smsFrom.pbm_name:item.number
+           
+            content += '</span>' +
+                '<span class="new-msg-icon" style="display:none">' +
+                // '<span class="new-msg-icon">' +
+                '<svg viewBox="0 0 20 14"">' +
+                '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../../media/img/svg/sprite.svg#sub4" ></use>' +
+                '</svg>' +
+                '</span><span class="phone-number" style="' + (item.tag == '1' ? 'font-weight:bold' : 'color:#939da4') + '" onclick="sms_showMessageDetail(' + item.id + ',\''+fromName+'\')">' + fromName + '</span>' +
+                addContact+
+                '</h3>' +
+                '<div class="date-wrap" onclick="sms_showMessageDetail(' + item.id + ',\''+fromName+'\')">' +
+                '<span class="date" ' + (item.tag == '1' ? 'style="color:#000;font-weight:bold"' : '') + '>' + item.date + ' </span>' +
+                '<!--<span class="time">1 минута</span>-->' +
+                '</div>' +
+                '<div class="msg-content" style="' + (item.tag == '1' ? 'font-weight:bold' : 'color:#939da4') + '" onclick="sms_showMessageDetail(' + item.id + ',\''+fromName+'\')">' + item.content + '</div>' +
+                '</label>' +
+                '</li>'
+        }
+       
+        $('#smslist_container').html(content)
+        $('#msg-count').html(list_all_message.length)
+
+        hideLoading()
+        $('#select-all-sms').prop('checked', false)
+        if (list_all_message.length != 0)
+            $('.checkBoxLable').show()
+        else
+            $('.checkBoxLable').hide()
+
+        $('#smslist_container').find(':input[type="checkbox"]').bind('click', function(item) {
+            if ($(this).attr('checked') == true || $(this).attr('checked') == 'checked') {
+                $('#add_contact').css({
+                    "background-color": "#e30611"
+                });
+                $("#batch_delete").show()
+            } else {
+                //如果是取消选中，则要看看当前有没有被选中的项
+                var checkedArray = $('#smslist_container input:checkbox:checked');
+                if (checkedArray.length == 0) {
+                    $('#add_contact').css({
+                        "background-color": "#ccc"
+                    });
+                    $("#batch_delete").hide()
+                }
+            }
+        });
+        $('#select-all-sms').die().live('click', function() {
+            var item = $(this)
+            if (item.is(':checked')) {
+                $('#smslist_container input[type="checkbox"]').prop('checked', true);
+                $('#add_contact').css({
+                    "background-color": "#e30611"
+                });
+            } else {
+                $('#smslist_container input[type="checkbox"]').prop('checked', false);
+                $('#add_contact').css({
+                    "background-color": "#ccc"
+                });
+            }
+        })
+    }
+
+    // 显示消息详情
+    function sms_showMessageDetail(id,fromName) {
+    	
+        var msgItem = list_all_message.filter(function(value) {
+        	
+            return value.id == id
+        })[0]
+      
+        if (msgItem && sms_currentMessage.id != msgItem.id) {
+        	
+            $('#message-title').html(fromName)
+            $('#message-date').html(msgItem.date)
+            $('#message-content').html(msgItem.content)
+            $('.sms-show-hide').show()
+            if (sms_currentTab == 2) {
+                $('#sms_answer').hide()
+                $('#sms_forward').hide()
+                $('#sms_resend').show();
+            } else {
+                $('#sms_answer').show();
+                $('#sms_forward').show();
+                $('#sms_resend').hide()
+            }
+            sms_currentMessage = msgItem
+
+            if (msgItem.tag == 1) {
+                var param = {
+                    goformId: 'SET_MSG_READ',
+                    msg_id: id + ";",
+                    tag: 0
+                }
+
+                setSmsRead(param, function(flag) {
+                    if (flag) {
+                        msgItem.tag = 0;
+
+                        var currentObj = $(":input[type='checkbox'][msg-id='" + id + "']").parent();
+                        currentObj.find('.sms-menu-receive-active').removeClass('sms-menu-receive-active').addClass('sms-content-receive');
+                        currentObj.find('.phone-number,.date,.msg-content').css({
+                            "color": "#939da4",
+                            "font-weight": "normal"
+                        });
+                    }
+                })
+            }
+        }
+
+        if (!msgItem) {
+            $('#message-title').html('')
+            $('#message-date').html('')
+            $('#message-content').html('')
+            $('.sms-show-hide').hide()
+            sms_currentMessage = {}
+        }
+
+        // if(sms_getCheckSelect().length==list_all_message.length){
+        //   $('#select-all-sms').prop('checked', true)
+        // }else{
+        //   $('#select-all-sms').prop('checked', false)
+        // }
+    }
+
+    // 批量删除消息
+    function sms_batchDeleteSms() {
+        var smsList = sms_getCheckSelect();
+        if (smsList.length == 0) {
+            // showAlert($.i18n.prop('no_data_selected'))
+            return
+        }
+        showConfirm('', 'confirm_data_delete', function() {
+            showLoading('deleting')
+            var param = {
+                goformId: 'DELETE_SMS',
+                msg_id: smsList.map(function(value) {
+                    return value.id
+                }).join(';')
+            }
+            deleteMessage(param, function(flag, data) {
+                hideLoading()
+                if (flag) {
+                    showInfo('deleteMsgSucess',function(){
+                        sms_changePage(sms_currentTab, true)
+                    })
+                } else {
+                    showAlert(data)
+                }
+            })
+        })
+    }
+    // 删除消息
+    function sms_deleteMessage() {
+        if (!sms_currentMessage) {
+            return
+        }
+        showConfirm('', 'confirm_data_delete', function() {
+            showLoading('deleting')
+            var param = {
+                goformId: 'DELETE_SMS',
+                msg_id: sms_currentMessage.id,
+            }
+            deleteMessage(param, function(flag, data) {
+                hideLoading()
+                if (flag) {
+                    showInfo('deleteMsgSucess',function(){
+                        sms_changePage(sms_currentTab, true)
+                    })
+                } else {
+                    showAlert(data)
+                }
+            })
+        })
+    }
+
+    function sms_changePage(flag, refresh) {
+     
+       if (sms_currentTab == flag && !refresh) {
+            return
+        }
+        showLoading('loading')
+        $('.sub-sms-list').children("li").css("color", "#89939a")
+        $('.sub-sms-list').children("li").eq(flag).css("color", "#eb1c24")
+        $('.sub-sms-list').children("li").removeClass("active")
+        $('.sub-sms-list').children("li").eq(flag).addClass("active")
+        if (flag == 0) {
+            $('#tab-title').html($.i18n.prop('sms_Received'))
+            $('#tab-title').attr('data-trans','sms_Received')
+            sms_ReceivedMessage()
+        } else if (flag == 1) {
+            $('#tab-title').html($.i18n.prop('sms_Sent'))
+            $('#tab-title').attr('data-trans','sms_Sent')
+            sms_getSentMessage()
+        } else {
+            $('#tab-title').html($.i18n.prop('sms_Draft'))
+            $('#tab-title').attr('data-trans','sms_Draft')
+            sms_DraftMessage()
+        }
+        sms_currentTab = flag
+        sms_showMessageDetail(0)
+    }
+    // 获取短消息容量信�?
+    function sms_getSmsCapability() {
+        var result = getSmsCapability()
+        if (result.flag) {
+            sms_capacity.sms_nv_total = parseInt(result.data.sms_nv_total, 10)
+            sms_capacity.sms_nv_rev_total = parseInt(result.data.sms_nv_rev_total, 10)
+            sms_capacity.sms_nv_send_total = parseInt(result.data.sms_nv_send_total, 10)
+            sms_capacity.sms_nv_draftbox_total = parseInt(result.data.sms_nv_draftbox_total, 10)
+        } else {
+            showAlert(result.data)
+            hideLoading()
+        }
+    }
+    // 获取消息
+    function sms_getMessage(param) {
+        sms_getSmsCapability()
+       /* if (sms_capacity.sms_nv_rev_total == 0) {       
+     hideLoading()                               
+     return                                      
+ }                                               */
+        getSMSMessages(param, function(flag, data) {
+        	
+            if (flag) {
+                list_all_message = []
+                $.each(data, function(index, item) {
+                    item.content = decodeMessage(escapeMessage(item.content));  
+                    item.date = transTime('20' + item.date);
+                    list_all_message.push(item)
+                })
+                sms_renderMessage()
+            } else {
+                hideLoading()
+                showAlert(result.data)
+            }
+        })
+    }
+    // 获取未读消息
+    function sms_getNewMessage() {
+        var param = {
+            cmd: 'sms_data_total',
+            page: 0,
+            data_per_page: sms_capacity.sms_nv_total,
+            mem_store: 1,
+            tags: 1,
+            order_by: 'order by id desc'
+        }
+        sms_getMessage(param)
+    }
+    // 获取已读消息
+    function sms_getReadMessage() {
+        var param = {
+            cmd: 'sms_data_total',
+            page: 0,
+            data_per_page: sms_capacity.sms_nv_total,
+            mem_store: 1,
+            tags: 0,
+            order_by: 'order by id desc'
+        }
+        sms_getMessage(param)
+    }
+    // 获取已发送消�?
+    function sms_getSentMessage() {
+        var param = {
+            cmd: 'sms_data_total',
+            page: 0,
+            data_per_page: sms_capacity.sms_nv_total,
+            mem_store: 1,
+            tags: 2,
+            order_by: 'order by id desc'
+        }
+        sms_getMessage(param)
+    }
+    // 获取收件箱消�?
+    function sms_ReceivedMessage() {
+        var param = {
+            cmd: 'sms_data_total',
+            page: 0,
+            data_per_page: sms_capacity.sms_nv_total,
+            mem_store: 1,
+            tags: 12,
+            order_by: 'order by id desc'
+        }
+        sms_getMessage(param)
+    }
+    // 获取草稿箱消�?
+    function sms_DraftMessage() {
+
+        var param = {
+            cmd: 'sms_data_total',
+            page: 0,
+            data_per_page: sms_capacity.sms_nv_total,
+            mem_store: 1,
+            tags: 11,
+            order_by: 'order by id desc'
+        }
+        sms_getMessage(param)
+  
+    }
+    /**************关闭修改窗口***************/
+    function sms_closeSendSMS() {
+        $('#contactOverlay').removeClass('active')
+        $('#sendSMSContainer').removeClass('active')
+
+        $('#chosenUserSelect').val('')
+        $('#txtSmsContent').val('')
+    }
+    $('#txtSmsContent', '#sendMessage').die().live('drop', function() {
+        var $this = $(this)
+            // $this.removeAttr("trans");
+        if ($this.val() == 'Please type message here') {
+            //$this.val('')
+        }
+        sms_updateChatInputWordLength()
+    }).live('focusin', function() {
+        $('#inputpanel .chatform').addClass('chatformfocus')
+        var $this = $(this)
+            // $this.removeAttr("trans");
+        if ($this.val() == 'Please type message here') {
+            //$this.val('')
+        }
+        sms_updateChatInputWordLength()
+    }).live('focusout', function() {
+        $('#inputpanel .chatform').removeClass('chatformfocus')
+        var $this = $(this)
+        if ($this.val() == '' || $this.val() == 'Please type message here') {
+            //$this.val('Please type message here') //.attr("trans", "chat_input_placehoder");
+        }
+        sms_updateChatInputWordLength()
+    }).live('keyup', function() {
+        sms_updateChatInputWordLength()
+    }).live('paste', function() {
+        window.setTimeout(function() {
+            sms_updateChatInputWordLength()
+        }, 0)
+    }).live('cut', function() {
+        window.setTimeout(function() {
+            sms_updateChatInputWordLength()
+        }, 0)
+    }).live('drop', function() {
+        window.setTimeout(function() {
+            sms_updateChatInputWordLength()
+        }, 0)
+    }).live('contextmenu', function() {
+        return false
+    })
+
+    function sms_updateChatInputWordLength() {
+        var msgInput = $('#txtSmsContent', '#sendMessage')
+        var msgInputDom = msgInput[0]
+        var strValue = msgInput.val()
+        var encodeType = getEncodeType(strValue)
+        var maxLength = encodeType.encodeType == 'UNICODE' ? 335 : 765
+        if (strValue.length + encodeType.extendLen > maxLength) {
+            var scrollTop = msgInputDom.scrollTop
+            var insertPos = getInsertPos(msgInputDom)
+            var moreLen = strValue.length + encodeType.extendLen - maxLength
+            var insertPart = strValue.substr(
+                insertPos - moreLen > 0 ? insertPos - moreLen : 0,
+                moreLen
+            )
+            var reversed = insertPart.split('').reverse()
+            var checkMore = 0
+            var cutNum = 0
+            for (var i = 0; i < reversed.length; i++) {
+                if (getEncodeType(reversed[i]).extendLen > 0) {
+                    checkMore += 2
+                } else {
+                    checkMore++
+                }
+                if (checkMore >= moreLen) {
+                    cutNum = i + 1
+                    break
+                }
+            }
+            var iInsertToStartLength = insertPos - cutNum
+
+            msgInputDom.value = strValue.substr(0, iInsertToStartLength) + strValue.substr(insertPos)
+            if (msgInputDom.value.length > maxLength) {
+                msgInputDom.value = msgInputDom.value.substr(0, maxLength)
+            }
+            setInsertPos(msgInputDom, iInsertToStartLength)
+            msgInputDom.scrollTop = scrollTop
+        }
+        var newValue = $(msgInputDom).val()
+        var newEncodeType = getEncodeType(newValue)
+        var newMaxLength = newEncodeType.encodeType == 'UNICODE' ? 335 : 765
+        if (newValue.length + newEncodeType.extendLen >= newMaxLength) {
+            $('#msgCount').addClass('colorRed')
+        } else {
+            $('#msgCount').removeClass('colorRed')
+        }
+        $("#msgCount").html(
+            '(' +
+            (newValue.length + newEncodeType.extendLen) +
+            '/' +
+            newMaxLength +
+            ')' +
+            '(' +
+            getSmsCount(newValue) +
+            '/5)'
+        )
+    }
+    // 获取选中的联系人
+    function sms_getNumberSelect(str) {
+        if (!str) {
+            str = '#contact_list input:checkbox:checked'
+        }
+        var counacts = []
+        var checkedArray = $(str)
+        for (var i = 0; i < checkedArray.length; i++) {
+            var item = checkedArray[i]
+            counacts.push({
+                pbm_id: $(item).attr("pbm_id"),
+                pbm_number: $(item).attr("pbm_number")
+            })
+        }
+        return counacts
+    }
+    // 发短�?
+    function sms_createSMS(flag) {
+        var selectedNumber = []
+        if (flag == 1) {
+            selectedNumber = [sms_currentMessage.number]
+        } else if (flag == 2) {
+            $("#txtSmsContent").val(sms_currentMessage.content)
+            sms_updateChatInputWordLength()
+        } else if (flag == 3) {
+            selectedNumber = [sms_currentMessage.number]
+            $("#txtSmsContent").val(sms_currentMessage.content)
+            sms_updateChatInputWordLength()
+        } else {
+            var smsList = sms_getCheckSelect();
+            $.each(smsList, function(index, item) {
+                if (selectedNumber.indexOf(item.number) < 0) {
+                    selectedNumber.push(item.number)
+                }
+            })
+        }
+
+        if (selectedNumber.length > 5) {
+            showAlert('limitedService')
+            return
+        }
+        if (selectedNumber.length == 0 && !list_all_contact_sms.length) {
+            showAlert('phonebookIsEmpty')
+            return
+        }
+
+        $('#contactOverlay').addClass('active')
+        $('#sendSMSContainer').addClass('active')
+        $('#select-user-wrap').hide()
+        var content = ''
+        var options = []
+        var tmp = []
+        for (var i = 0; i < list_all_contact_sms.length; i++) {
+            var item = list_all_contact_sms[i]
+           
+            if ($.inArray(item.pbm_number, tmp) == -1) {
+                options.push(new Option(item.pbm_name, item.pbm_number, false, true))
+                tmp.push(item.pbm_number)
+
+                var isCheck = selectedNumber.indexOf(item.pbm_number) >= 0
+                content +=
+                    '<input id="optioncont' + item.pbm_id + '" type="checkbox" pbm_id="' + item.pbm_id + '" pbm_number="' + item.pbm_number + '" ' + (isCheck ? "checked" : "") + ' >' +
+                    '<label class="contack-lable contact-label-select" for="optioncont' + item.pbm_id + '">' +
+                    '<span class="contact-name">' + item.pbm_name + '</span>' +
+                    '<span class="phone-number">' + item.pbm_number + '</span>' +
+                    '</label>'
+            }
+        }
+        for (var i = 0; i < selectedNumber.length; i++) {
+            var number = selectedNumber[i]
+            if ($.inArray(number, tmp) == -1) {
+                options.push(new Option(number, number, false, true))
+                tmp.push(number)
+            }
+        }
+        $('#select-contact-wrap').html(content)
+
+        $('#select-contact-wrap').find('input[type=checkbox]').die().live('change', function(e) {
+            var cons = sms_getNumberSelect('#select-contact-wrap input:checkbox:checked')
+            var selectCons = $('#chosenUserSelect').val()
+            if (cons.length > 5 || (selectCons && selectCons.length > 5)) {
+                showAlert('max_send_number')
+                $(this).prop("checked", false);
+            } else {
+                $('#chosenUserSelect').val(cons.map(function(value) {
+                    return value.pbm_number
+                }))
+                $('#chosenUserSelect').trigger('liszt:updated')
+            }
+        })
+        var opts = ''
+        $.each(options, function(i, e) {
+            opts += "<option value='" + e.value + "'>" + e.text + '</option>'
+        })
+        window.chosenPlaceholder = $.i18n.prop('select_some_options')
+        var select = $('#chosenUserSelect')
+        select.empty()
+        select.append(opts)
+        select.chosen({
+            max_selected_options: 5,
+            search_contains: true,
+            width: '430px'
+        }).change(function() {
+            var chosenList = $('#chosenUserSelect').val() || []
+            var selecteList = sms_getNumberSelect('#select-contact-wrap input:checkbox:checked')
+            for (var i = 0; i < selecteList.length; i++) {
+                if (chosenList.indexOf(selecteList[i].pbm_number) < 0) {
+                    $('#optioncont' + selecteList[i].pbm_id).prop("checked", false);
+                }
+            }
+        })
+        $('#chosenUserSelect').val(selectedNumber)
+        $('#chosenUserSelect').trigger('liszt:updated')
+    }
+
+    function sms_sendSMSAction() {
+        var numbers = $('#chosenUserSelect').val()
+        if (!numbers || numbers.length == 0) {
+            // $("#select-contact-error").show()
+            // var timer = addTimeout(function() {
+            //   $("#select-contact-error").hide()
+            //   window.clearTimeout(timer)
+            // }, 5000)
+            showAlert("sms_specifyAddress")
+            return
+        }
+
+        var sms_nv_total = parseInt(sms_capacity.sms_nv_total, 10)
+        var sms_nv_rev_total = parseInt(sms_capacity.sms_nv_rev_total, 10) + parseInt(sms_capacity.sms_nv_send_total, 10) + parseInt(sms_capacity.sms_nv_draftbox_total, 10)
+        if (sms_nv_rev_total >= sms_nv_total) {
+            showAlert('sms_capacity_is_full_for_send')
+            return false
+        }
+
+        if (numbers.length + sms_nv_rev_total > sms_nv_total) {
+            showAlert('sms_capacity_will_full_just', null, [sms_nv_total - sms_nv_rev_total])
+            return false
+        }
+
+        var inputVal = $('#txtSmsContent', '#sendMessage')
+        var content = inputVal.val()
+        var sentCount = 0
+        var failCount = 0
+        if (!content) {
+            content = ''
+        }
+        showLoading('sending')
+        var callback = function(data) {
+            sentCount++
+            if (sentCount == numbers.length) {
+                $('#chosenUserSelect').val('')
+                $('#txtSmsContent').val('')
+                hideLoading()
+                if (failCount == 0) {
+                    showTip("sms_dialog_tip",'sms_dialog_content', function() {
+                        sms_closeSendSMS()
+                        sms_changePage(1, true)
+                    })
+                } else {
+                    var msg =
+                        $.i18n.prop('sms_Sent') +
+                        $.i18n.prop('colon') +
+                        (sentCount - failCount) +
+                        '<br/>' +
+                        $.i18n.prop('sms_not_sent') +
+                        $.i18n.prop('colon') +
+                        failCount
+                    showAlert(msg, function() {
+                        sms_closeSendSMS()
+                        sms_changePage(1, true)
+                    })
+                }
+            } else {
+                sendSMSPart()
+            }
+        }
+        _phoneBookStopSMSSending = false
+        var sendSMSPart = function() {
+            if (_phoneBookStopSMSSending) {
+                hideLoading()
+                return
+            }
+            if (sentCount + 1 == numbers.length) {
+                //$('#loading #loading_container').html('')
+            }
+            var param = {
+                goformId: "SEND_SMS",
+                Number: numbers[sentCount],
+                sms_time: getCurrentTimeString(),
+                MessageBody: escapeMessage(encodeMessage(content)),
+                ID: -1,
+                encode_type: getEncodeType(content).encodeType
+            }
+            sendSMS(param, function(flag, data) {
+                if (!flag) {
+                    failCount++
+                }
+                callback(data)
+            })
+        }
+        sendSMSPart()
+    }
+
+    function sms_saveSMSAction() {
+        var numbers = $('#chosenUserSelect').val()
+        if (!numbers || numbers.length == 0) {
+            $("#select-contact-error").show()
+            var timer = addTimeout(function() {
+                $("#select-contact-error").hide()
+                window.clearTimeout(timer)
+            }, 5000)
+            return
+        }
+
+        var sms_nv_total = parseInt(sms_capacity.sms_nv_total, 10)
+        var sms_nv_rev_total = parseInt(sms_capacity.sms_nv_rev_total, 10) + parseInt(sms_capacity.sms_nv_send_total, 10) + parseInt(sms_capacity.sms_nv_draftbox_total, 10)
+        if (sms_nv_rev_total >= sms_nv_total) {
+            showAlert('sms_capacity_is_full_for_send')
+            return false
+        }
+
+        if (numbers.length + sms_nv_rev_total > sms_nv_total) {
+            showAlert('sms_capacity_is_full_for_send', null, [sms_nv_total - sms_nv_rev_total])
+            return false
+        }
+
+        var inputVal = $('#txtSmsContent', '#sendMessage')
+        var content = inputVal.val()
+        var sentCount = 0
+        var failCount = 0
+        if (!content) {
+            content = ''
+        }
+        showLoading('saving')
+        var param = {
+            goformId: "SAVE_SMS",
+            location: 1,
+            tags: 4,
+            SMSNumber: numbers.join(';'),
+            SMSMessage: escapeMessage(encodeMessage(content)),
+            Index: -1,
+            encode_type: getEncodeType(content).encodeType,
+            sms_time: getCurrentTimeString(),
+            draft_group_id: numbers.length > 1 ? new Date().getTime() : '',
+        }
+        saveSMS(param, function(flag, data) {
+            if (flag) {
+                hideLoading()
+                showInfo("success_info", function() {
+                    sms_closeSendSMS()
+                    sms_changePage(2, true)
+                })
+            } else {
+                showAlert(data)
+            }
+        })
+    }
+    // 获取电话本初始化信息
+    function sms_getPhoneBookReady() {
+        getPhoneBookReady(function(flag, result) {
+            if (flag) {
+                if (result.pbm_init_flag == 1) {
+                    setTimeout(sms_getPhoneBookReady, 1000)
+                } else {
+                    sms_getCapacity()
+                }
+            }
+        })
+    }
+    // 获取电话本容量信�?
+    function sms_getCapacity() {
+        var sim = window._service.getSIMPhoneBookCapacity()
+        var device = window._service.getDevicePhoneBookCapacity()
+            // getPhoneBookCapacity(function(flag, result) {
+            //     if (flag) {
+            //         sms_getPhonebook(result.pbm_dev_max_record_num)
+            //     }
+            // })
+        sms_getPhonebook(sim.simPbmUsedCapacity + device.pcPbmUsedCapacity)
+    }
+    // 获取电话本数�?
+    function sms_getPhonebook(count) {
+        if (count == 0) {
+            return
+        }
+        var param = {
+            cmd: 'pbm_data_total',
+            mem_store: 2,
+            page: 1,
+            data_per_page: count
+        }
+
+        getPhoneBooks(param, function(flag, data) {
+            if (flag) {
+                list_all_contact_sms = []
+                $.each(data, function(i) {
+                        list_all_contact_sms.push({
+                            pbm_id: data[i].pbm_id,
+                            pbm_number: data[i].pbm_number,
+                            pbm_name: decodeMessage(data[i].pbm_name),
+                            pbm_email: decodeMessage(data[i].pbm_email)
+                        })
+                    })
+                    // 按首字母排序
+                list_all_contact_sms.sort(function(a, b) {
+                    var res = null,
+                        charA = a.pbm_name,
+                        charB = b.pbm_name
+                    res = phSortAlgo(charA.charAt(), charB.charAt())
+                    while (res == 0) {
+                        //字符串首字母相同 接着比较第二个字笿直到两个字符串长度�? 返回0
+                        charA = charA.substr(1)
+                        charB = charB.substr(1)
+                        if (charA.length == 0 && charB.length != 0) return -1
+                        else if (charA.length != 0 && charB.length == 0) return 1
+                        else if (charA.length == 0 && charB.length == 0) return 0
+                        else res = phSortAlgo(charA.charAt(), charB.charAt())
+                    }
+                    return res
+                })
+            }
+        })
+    }
+
+    function add_contact_to_pb(phone){
+        $('#contactOverlay').addClass('active')
+        $('#addContactContainer').addClass('active')
+        $('#txtMobile').val(phone)
+    }
+    function closeAddContactToPh(){
+        $('#contactOverlay').removeClass('active')
+        $('#addContactContainer').removeClass('active')
+        $('#txtMobile').val('')
+        $('#txtLocation').val(1)
+    }
+    function sms_change_location(id,obj){
+        if($('#'+obj).val()==1){
+            $('#'+id).show()
+        }else{
+            $('#'+id).hide()
+        }
+    }
+    function isPhoneNumber(number) {
+        var reg1 = /^\+?\d+$/
+        return reg1.test(number)
+    }
+    function save_contact_to_ph(){
+        showErrorUnderTextbox('txtName', '')
+        showErrorUnderTextbox('txtMobile', '')
+        showErrorUnderTextbox('txtMail', '')
+        if (!sms_validatePB('txtName', 'txtMobile', 'txtMail')) {
+            return false
+        }
+        var location=parseInt($('#txtLocation').val())
+        var device = window._service.getDevicePhoneBookCapacity();
+		if(device.pcPbmUsedCapacity >= device.pcPbmTotalCapacity){
+			showAlert("device_full");
+			return false;
+		}
+        var simcard = window._service.getSIMPhoneBookCapacity();
+		if(simcard.simPbmUsedCapacity >= simcard.simPbmTotalCapacity){
+			showAlert("sim_full");
+			return false;
+		}
+        showLoading('saving')
+        var param={
+            index : -1,
+            location:location,
+            name:$('#txtName').val(),
+            mobile_phone_number:$.trim($('#txtMobile').val()),
+            mail:$.trim($('#txtMail').val()),
+            home_phone_number:'',
+            office_phone_number:'',
+            group:'common'
+        }
+        window._service.savePhoneBook(param, function(data){
+            hideLoading()
+            if(data && data.result == 'success'){
+                $('#txtName,#txtMobile,#txtMail').val("")
+                closeAddContactToPh()
+                showInfo('success_info')
+
+                setTimeout(function() {
+                    sms_getPhoneBookReady()
+                }, 500)
+            }else{
+                showAlert('error_info')
+            }
+        })
+
+    }
+    function sms_validatePB(name_id, number_id, mail) {
+        var len = sms_getStrLength($.trim($('#' + name_id).val()))
+        //Please input a valid name//Please input a valid phone number//Required//Please input a valid email
+        if (len == 0) {
+            showErrorUnderTextbox(name_id, $.i18n.prop('required'))
+            $('#' + name_id).focus()
+            return false
+        }
+        var location=parseInt($('#txtLocation').val())
+        var maxLength=location==1?46:22
+        if (len > 46) {
+        showErrorUnderTextbox(
+            name_id,
+            $.i18n.prop('max',maxLength)
+        )
+        $('#' + name_id).focus()
+            return false
+        }
+
+        if (!sms_validateName($('#' + name_id).val())) {
+        showErrorUnderTextbox(name_id, $.i18n.prop('siteName_check'))
+        $('#' + name_id).focus()
+        return false
+        }
+        len = sms_getStrLength($.trim($('#' + number_id).val()))
+        if (len == 0) {
+        showErrorUnderTextbox(number_id, $.i18n.prop('required'))
+        $('#' + number_id).focus()
+        return false
+        }
+        var maxLength=40
+        if (len > maxLength) {
+        showErrorUnderTextbox(
+            number_id,
+            $.i18n.prop('max',maxLength)
+        )
+        $('#' + number_id).focus()
+        return false
+        }
+
+        if (!sms_validateNumber($('#' + number_id).val())) {
+        showErrorUnderTextbox(number_id, $.i18n.prop('phonenumber_check'))
+        $('#' + number_id).focus()
+        return false
+        }
+
+        len = sms_getStrLength($.trim($('#' + mail).val()))
+        if (len > 32) {
+        showErrorUnderTextbox(
+            mail,
+            $.i18n.prop('max',32)
+        )
+        $('#' + mail).focus()
+        return false
+        }
+
+        if (!sms_validateEmail($('#' + mail).val())) {
+        showErrorUnderTextbox(mail, $.i18n.prop('email_check'))
+        $('#' + mail).focus()
+        return false
+        }
+        return true
+    }
+    function sms_checkcharwidth(str) {
+        var cArr = str.match(/[^\x00-\xff]/gi)
+        return cArr == null ? false : true
+    }
+    function sms_getStrLength(str) {
+        var cArr = str.match(/[^\x00-\xff]/gi)
+        return str.length + (cArr == null ? 0 : cArr.length)
+    }
+    function sms_validateName(value) {
+        value = $.trim(value)
+        if (sms_checkcharwidth(value)) {
+        return (
+            value.length && value.length <= 46 && !/[;{}\|\[\]~`\\]/.test(value)
+        )
+        } else {
+        return (
+            value.length && value.length <= 46 && !/[;{}\|\[\]~`\\]/.test(value)
+        )
+        }
+    }
+    function sms_validateNumber(value) {
+        value = $.trim(value)
+        return (
+        value.length &&
+        value.length < 21 &&
+        /^[\d#\*\+pe\?][\d#\*pe\?]{0,}$/.test(value)
+        )
+    }
+    function sms_validateEmail(value) {
+        if (value.length == 0) return true
+        value = $.trim(value)
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        return re.test(value)
+    }
+
+    function load_init() {
+        $('.scroll-wrap').mCustomScrollbar({
+            axis: 'y',
+            theme: 'dark'
+        })
+        showLoading('loading')
+        sms_getSmsCapability()
+        var index = $('#sms_page_tab').val() || 0
+        sms_getPhoneBookReady()
+        var count=0
+        addInterval(function(){
+            if(list_all_contact_sms.length>0){
+                sms_changePage(index)
+                clearIntervalTimer()
+            }else{
+                if(count==3){
+                    sms_changePage(index)
+                    clearIntervalTimer()
+                }else if(count>3){
+                    clearIntervalTimer()
+                }
+                count++ 
+            }
+        },500)
+    }
+
+    $(function() {
+        load_init();
+    });
+</script>

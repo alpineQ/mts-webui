@@ -1,0 +1,45 @@
+<form id="settings_system_reset" novalidate="novalidate" autocomplete="off" style="padding-top:20px;">
+    <div class="form-body">
+      <div class="form-title" style="display: none;" data-trans="restore_title">Reset Factory Settings</div>
+      <div class="note paddingleft15" data-trans="restore_button">Reset Factory Settings</div>
+      <div class="form-buttons" style="padding-right:20px;">
+        <input id="button_restore" type="submit" data-trans="restore" class="btn-1" value="Reset" />
+      </div>
+      <div class="form-note">
+        <div class="notes-title">&nbsp;</div>
+        <ul class="notes-content">
+          <li data-trans="restore_note_info">
+            Click Reset to reset all settings to defaults, and the device will
+            restart automatically.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </form>
+  <script>
+    window.LTELanguageInitPart('#settings_system_reset')
+    function load_mark(url) {
+      $('#button_restore').click(function(event) {
+        event.preventDefault()
+        showConfirm("",'confirm_restore_setting',function(){
+            showLoading('load_restore')
+            window._service.restoreFactorySettings({}, function (data) {
+                hideLoading()
+                if (data && data.result == "success") {
+                    showInfo("success_info")
+                } else {
+                    showAlert("error_info")
+                }
+            }, function (result) {
+                hideLoading
+                if (isErrorObject(result) && result.errorType == 'no_auth') {
+                    showAlert("error_info")
+                }
+            });
+        })
+        return false
+      })
+    }
+    load_mark()
+  </script>
+  

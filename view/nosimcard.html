@@ -1,0 +1,353 @@
+<section class="payment-page">
+    <div class="container" class="paddingnone widthauto fixContainerWidth" style="width: 930px; box-sizing: border-box; border: none; height: 370px; padding: 0px;">
+        <div class="row-fluid floatleft" id="div-connection">
+            <div id="disconFlagDiv" style="text-align: center; display: none;">
+                <div style="vertical-align: middle;margin-top: 200px;font-size: 18px;" data-trans="you_not_connected_network">You are not connected to the network</div>
+            </div>
+            <div id="conFlagDiv" style="display: none;">
+                <section class="page-content">
+                    <div class="clearfix" id="iframeDiv">
+                        <div>
+                            <div id="yandexLogo" style="float: left" class="logo__image_bg_en"></div>
+                            <form id="browerForm" class="search2 suggest2-form suggest2-form__node suggest2-counter i-bem suggest2-counter_js_inited suggest2-form_js_inited" action="https://yandex.ru/search/" target="_blank">
+                                <div class="search2__input">
+                                    <span class="input suggest2-form__input input_size_ws-head input_theme_websearch input_search2-clear-hide_yes input_ahead_yes input_autofocus_capture input_keyboard_yes input_clear_yes i-bem input_js_inited">
+                                        <span class="input__box">
+                                            <div class="input__ahead">
+                                                <span class="input__ahead-filler"></span>
+                                                <div class="input__ahead-hintholder"></div>
+                                            </div>
+                                            <input class="input__control input__input" tabindex="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="list" aria-label="Request" id="text" maxlength="400" name="text">
+                                            <input type="hidden" id="clid" name="clid" value="2288582">
+                                            <span id="clearImg" class="input__clear input__clear_visibility_visible hide">&nbsp;</span>
+                                            <div class="keyboard-loader input__keyboard-button i-bem b-opacity b-opacity-hold-ie keyboard-loader_lang_en keyboard-loader_js_inited" data-bem="{&quot;keyboard-loader&quot;:{&quot;name&quot;:&quot;keyboard-loader&quot;}}"></div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="search2__button">
+                                    <button class="button suggest2-form__button button_theme_websearch button_size_ws-head i-bem button_js_inited" data-bind="" style="margin-bottom: 3px;" tabindex="-1" role="button" type="button">
+                                        <span class="button__text" data-trans="search">Search</span>
+                                    </button>
+                                </div>
+                                <div class="i-bem popup suggest2 suggest2_theme_transparent suggest2_size_m suggest2_adaptive_yes suggest2_type_advanced suggest2_ahead_yes suggest2_footer_hide popup_adaptive_yes popup_animate_no popup_autoclosable_yes popup_theme_ffffff suggest2-detect_js_inited suggest2_js_inited popup_js_inited">
+                                    <div class="popup__under"></div>
+                                    <div class="popup__content"> </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="clearfix" style="width: 916px;margin: 0 auto;">
+                            <aside style="float: left;padding-top: 8px;">
+                                <iframe id="cusLoginIframe" width="296" height="419" frameborder="0" scrolling="no" style="border-bottom: 1px solid #ddd;"></iframe>
+                            </aside>
+                            <div class="content_cus" style="float: left">
+                                <div class="blocks-wrap" style="line-height: 0px;">
+                                    <iframe id="cus111" width="620" height="215" frameborder="0" scrolling="no"></iframe>
+                                </div>
+                                <div class="blocks-wrap" style="line-height: 0px;">
+                                    <iframe id="cus222" width="620" height="215" frameborder="0" scrolling="no"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="errFlagDiv">
+                <div class="row-fluid"> 
+                    <div class="span3 paddingtop20 paddingbottom20" style="display:none">
+                        <div class="row-fluid">
+                            <div class="side-center">
+                                <span class="fontBold font15" data-trans="wifi_access">Wi-Fi Access</span>
+                            </div>
+                            <div class="side-center">
+                                <img id="qrcode_ssid1" width="128" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-body span9">
+                        <div id="sim_err_1" class="span9" style="display: none;">
+                            <form id="frmNetworkLock" novalidate="novalidate" autocomplete="off">
+                                <div class="form-body">
+                                    <div class="form-title" style="display: none;" data-trans="no_sim_card_title">System Information</div>
+                                    <div class="content">
+                                        <div class="colorRed font18" data-trans="network_is_locked">The network is locked!</div>
+                                        <div>
+                                            <div data-trans="device_is_simcards">The device is designed to work with MTS SIM-cards. To work with the device please enter network unlock code or install MTS SIM-card.</div>
+                                            <div>
+                                                <span data-trans="network_locked_times_explain">Attempts left for unlock code input:</span>
+                                                <span id="remain_cnt">10</span>
+                                            </div>
+                                            <div class="row-fluid">
+                                                <label><span data-trans="network_locked_enter_explain">Please input unlock code:</span>
+                                                    <i class="colorRed">&nbsp;*</i>
+                                                </label>
+                                                <input type="text" class="required" maxlength="8" id="txtLockNumber" name="txtLockNumber">
+                                            </div>
+                                        </div>
+                                        <div style="display: none;" data-trans="network_locked_zero_times">This device is network locked. Please contact your service provider.</div>
+                                        <div class="unlock_code_tips colorRed" data-trans="unlock_code_check">Please input a valid unlock code. The code must be 0-9 and length must be 8.</div>
+                                    </div>
+                                    <div class="form-buttons">
+                                        <input id="btnNetUnlock" type="button" class="btn-1 " data-trans="ok" value="OK">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="sim_err_2" class="content" style="display: none;">
+                            <div class="colorRed font18" data-trans="no_sim_card_message">No SIM Card or SIM Card invalid!</div>
+                        </div>
+                        <form id="sim_err_3" novalidate="novalidate" autocomplete="off">
+                            <div class="form-body">
+                                <div class="content" style="text-align:left;">
+                                    <div class="row-fluid">
+                                        <div class=" span8">
+                                            <p data-trans="enter_pin">SIM card is locked, please input PIN to unlock.</p>
+
+                                            <p class="important-prompt">
+                                                <span data-trans="attempts_left">Attempts Left:</span>
+                                                <span id="pin_cnt"></span>
+                                            </p>
+
+                                            <p class="important-prompt" id="final_pin" style="display: none;" data-trans="last_enter_pin">Final attempt. If incorrect again, your SIM card will be locked!</p>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <label class="span2" for="txtPin"><span data-trans="pin">PIN</span>
+                                            <i class="colorRed">&nbsp;</i>
+                                        </label>
+
+                                        <div class="span8">
+                                            <input id="txtPin" autocomplete="off" name="txtPin" type="password" class="required" maxlength="8">
+                                        </div>
+                                    </div>
+                                    <div class="form-buttons" style="text-align:right">
+                                        <input id="btnPinApply" class="btn-1 " type="button" data-trans="apply" value="Apply">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form id="sim_err_4" novalidate="novalidate" style="display: none;" autocomplete="off">
+                            <div class="form-body">
+                                <div class="content">
+                                    <div class="prompt">
+                                        <p data-trans="enter_puk">SIM card is PIN-locked, please input PUK to unlock.</p>
+
+                                        <p class="important-prompt">
+                                            <span data-trans="attempts_left_puk">Attempts Left:</span>
+                                            <span id="puk_cnt">10</span>
+                                        </p>
+
+                                        <p class="important-prompt" id="final_puk" style="display: none;" data-trans="last_enter_puk">Final attempt. If incorrect again, your SIM card will be corrupted!</p>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <label class="span4 side-right" for="txtPuk"><span data-trans="puk">PUK</span>
+                                            <i class="colorRed">&nbsp;</i>
+                                        </label>
+
+                                        <div class="span8">
+                                            <input id="txtPuk" autocomplete="off" name="txtPuk" type="password" class="required" maxlength="8">
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <label class="span4 side-right" for="txtNewPin"><span data-trans="new_pin">New PIN</span>
+                                            <i class="colorRed">&nbsp;</i>
+                                        </label>
+
+                                        <div class="span8">
+                                            <input id="txtNewPin" autocomplete="off" name="txtNewPin" type="password" class="required" maxlength="8">
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <label class="span4 side-right" for="txtConfirmPin"><span data-trans="confirm_pin">Confirm New PIN</span>
+                                            <i class="colorRed">&nbsp;</i>
+                                        </label>
+
+                                        <div class="span8">
+                                            <input id="txtConfirmPin" autocomplete="off" name="txtConfirmPin" type="password" class="required" maxlength="8">
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="form-buttons">
+                                        <input id="btnPUKApply" class="btn-1 " type="button" data-trans="apply" value="Apply">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="sim_err_5" class="content" style="display: none;">
+                            <div class="colorRed font18" data-trans="no_sim_card_message">No SIM Card or SIM Card invalid!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-fluid" style="display:none">
+                    <div class="span2"></div>
+                    <div id="divStation" class="span8">
+                        <div class="form-title" style="display: none;" data-trans="device_information">Device Information</div>
+                        <div class="content">
+                            <div>
+                                <div class="ko-grid-container">
+                                    <div class="ko-grid-menu" style="display: none;">
+                                        <div class="ko-grid-option">
+                                            <img id="ko_grid_layout" class="cursor-pointer"> </div>
+                                        <div class="clean"></div>
+                                    </div>
+                                    <table cellspacing="0" cellspadding="0" class="ko-grid colorHoverTable ">
+                                        <thead>
+                                            <tr class="">
+                                                <th nowrap="nowrap" width="5%" data-trans="station_number">No.</th>
+                                                <th nowrap="nowrap" width="20%" data-trans="host_name">Host Name</th>
+                                                <th nowrap="nowrap" width="18%" data-trans="ip_ip">IP</th>
+                                                <th nowrap="nowrap" width="20%" data-trans="mac_address">MAC Address</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="userlist"><tr class=""><td class="even">1</td><td class="ko-grid-center">DESKTOP-KDC3KH4</td><td class="ko-grid-center">192.168.1.100</td><td class="ko-grid-center">AC-E0-10-36-E2-2B</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-note hide">
+                            <div class="notes-title">&nbsp;</div>
+                            <ul class="notes-content">
+                                <li data-trans="home_note">The table shows the information of connected wireless device(s).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+function load_mark() {
+    var self = this;
+    self.pageState = {NO_SIM:0, WAIT_PIN:1, WAIT_PUK:2, PUK_LOCKED:3, LOADING:4};
+    var info = window._service.getLoginData();
+    self.pinNumber = '';
+    self.pukNumber = '';
+    self.page = '';
+    refreshPage()
+    $('#btnPinApply').click(function(event) {
+        event.preventDefault()
+        if (!verifyPIN($('#txtPin').val())) {
+            showAlert('pin_check')
+            return
+        }
+
+        showLoading();
+        var pin = $('#txtPin').val()
+        window._service.enterPIN({PinNumber:pin}, function(data){
+            hideLoading();
+            if (!data.result) {
+                if(self.pinNumber == 2){
+                    showAlert("last_enter_pin", function () {
+                        refreshPage();
+                    });
+                }
+                else{
+                    showAlert("pin_error", function () {
+                        refreshPage();
+                    });
+                }
+                $('#txtPin').val('')
+            }
+            refreshPage();
+        })
+    })
+
+    $('#btnPUKApply').click(function(event) {
+        event.preventDefault()
+        var puk = $('#txtPuk').val()
+        if (!verifyPUK(puk)) {
+            showAlert('puk_check')
+            return
+        }
+
+        var new_pin = $('#txtNewPin').val()
+        var new_pin_confirm = $('#txtConfirmPin').val()
+        if (!verifyPIN(new_pin) || !verifyPIN(new_pin_confirm)) {
+            showAlert('pin_check')
+            return
+        }
+        if (new_pin != new_pin_confirm) {
+            showAlert('equalTo')
+            return
+        }
+        var params = {};
+        params.PinNumber = new_pin;
+        params.PUKNumber = puk;
+        showLoading("saving");
+        window._service.enterPUK(params, function(data){
+            if (!data.result) {
+                hideLoading();
+                if(self.pukNumber == 2){
+                    showAlert("last_enter_puk", function () {
+                        refreshPage();
+                    });
+                }
+                else{
+                    showAlert("puk_error", function () {
+                        refreshPage();
+                    });  
+                }
+                $('#txtPuk').val('');
+                $('#txtNewPin').val('');
+                $('#txtConfirmPin').val('');
+            }else{
+                refreshPage();
+            }
+        });
+    })
+    function refreshPage() {
+        var data = window._service.getLoginData();
+        var state = computePageState(data);
+        if (state == self.pageState.LOADING) {
+            addTimeout(refreshPage, 500);
+        } else {
+            self.page=state;
+            self.pinNumber=data.pinnumber;
+            self.pukNumber=data.puknumber;
+            $('#pin_cnt').html(self.pinNumber)
+            $('#puk_cnt').html(self.pukNumber)
+        }
+
+        for(i=1;i<6;i++){
+            $('#sim_err_'+i).hide();
+        }
+        if(state==self.pageState.NO_SIM){
+            $('#sim_err_2').show();
+        }else if(state==self.pageState.WAIT_PIN){
+            $('#sim_err_3').show();
+        }else if(state==self.pageState.WAIT_PUK){
+            $('#sim_err_4').show();
+        }else{
+            $('#sim_err_5').show();
+        }
+    }
+
+    /**
+     * 根据登录状态和SIM卡状态设置页面状态
+     * @method computePageState
+     */
+    function computePageState(data) {
+        var state = data.modem_main_state;
+        if (state == "modem_sim_undetected" || state == "modem_undetected" || state == "modem_sim_destroy") {
+            return self.pageState.NO_SIM;
+        } else if ($.inArray(state, window._service.config.TEMPORARY_MODEM_MAIN_STATE) != -1) {
+            return self.pageState.LOADING;
+        } else if (state == "modem_waitpin") {
+            return self.pageState.WAIT_PIN;
+        } else if ((state == "modem_waitpuk" || data.pinnumber == 0) && (data.puknumber != 0)) {
+            return self.pageState.WAIT_PUK;
+        } else if ((data.puknumber == 0 || state == "modem_sim_destroy") && state != "modem_sim_undetected" && state != "modem_undetected") {
+            return self.pageState.PUK_LOCKED;
+        } else {
+            location.reload();
+        }
+    }
+}
+
+load_mark()
+</script>

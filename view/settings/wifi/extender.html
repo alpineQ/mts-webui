@@ -1,0 +1,1186 @@
+<div class="form-body" style="padding:0 10px;">
+    <form id="frmAPStation" autocomplete="off">
+        <div id="set_extender">
+            <div class="form-title" style="display: none;" data-trans="wifi_extender">Wi-Fi Extender</div>
+            <div class="content">
+                <div class="row-fluid">
+                    <span class="span4 side-right">
+                        <label data-trans="wifi_extender">Wi-Fi Extender</label>
+                        <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                    </span>
+
+                    <label class="span8 side-left">
+                    <span id="wifiextender_switch" style="cursor: pointer" data-bind="click:function(){wifiExtenderSwitchChange();},attr:{'class':(ap_station_enable()=='1'?'bg-switch-enable':'bg-switch-disable')}"></span>
+                    <span id="wifiextender_switch_text" class="switch_note" data-bind="attr:{'data-trans': ap_station_enable()=='1'?'enable':'disable'}"></span>
+                </label>
+                </div>
+            </div>
+            <div class="content" data-bind="visible:ap_station_enable()=='1' && origin_ap_station_enable =='1'">
+                <div class="row-fluid">
+                    <span class="span4 side-right">
+                    <label data-trans="ConnectedSSID">Connected SSID</label>
+                    <i class="colorRed">&nbsp;*</i>
+                </span>
+                    <div class="span8">
+                        <input type="text" name="txtSSID" id="txtSSID" class="required  form-control" data-bind="value:ssid" maxlength="32" />
+                        <a id="to_search" data-trans="search" href="javascript:;" style="color:#0000ff;text-decoration:underline;" data-bind="click:searchHotspot">Search</a>
+                        <br>
+                        <label for="txtSSID" class="error"></label>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <span class="span4 side-right">
+                    <label data-trans="pass_phrase">Pass Phrase</label>
+                </span>
+                    <div class="span8">
+                        <input id='pwdWPAKey' name="pwdWPAKey" type="password" class="form-control" data-bind="value: password,visible:!showPassword()" minlength='8' maxlength='63' />
+                        <input id='txtWPAKey' name="txtWPAKey" type="text" class="form-control" data-bind="value: password,visible:showPassword()" minlength='8' maxlength='63' />
+                        <div class="margin-top-10">
+                            <p class="checkbox" data-bind="css:{'checkbox_selected': showPassword()}, click: showPasswordHandler" manualControl="true">
+                                <input id="showPassword" type="checkbox" data-bind="checked:showPassword" />
+                            </p>
+                            <label class="margintop5 lineheight25" for="showWPAPassword" data-trans="display_password"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <input type="submit" class="btn-1" value="Apply" id="btn-apply-mac" data-trans="apply">
+                </div>
+            </div>
+            <div class="form-buttons" data-bind="visible:!(ap_station_enable()=='1' && origin_ap_station_enable =='1')">
+                <input type="button" data-bind="click:apply, disable:isCableMode() == true && ap_station_enable()=='1'" data-trans="apply" class="btn-1" value="Apply">
+            </div>
+        </div>
+        <div id="search_extender" class="content hide">
+            <input id="extender_return" type="button" class="btn-1" value="Return" data-trans="Return">
+            <table id="survey_wifi_list" cellspacing="0" cellspadding="0" class="ko-grid colorHoverTable">
+                <thead>
+                    <tr class="">
+                        <th nowrap="nowrap" width="5%" data-trans="station_number">No.</th>
+                        <th nowrap="nowrap" width="25%" data-trans="name">Name</th>
+                        <th nowrap="nowrap" width="20%" data-trans="mac_mac">MAC</th>
+                        <th nowrap="nowrap" width="10%" data-trans="Channel">Channel</th>
+                        <th nowrap="nowrap" width="20%" data-trans="Security">Security</th>
+                        <th nowrap="nowrap" width="20%" data-trans="signal">Signal</th>
+                    </tr>
+                </thead>
+                <!-- <tbody data-bind="foreach:apSearchList">
+                    <tr data-bind="click:$root.selectedHot">
+                        <td class="even" data-bind="text:$index()+1"></td>
+                        <td class="ko-grid-center" data-bind="text:ssid"></td>
+                        <td class="ko-grid-center" data-bind="text:mac"></td>
+                        <td class="ko-grid-center" data-bind="text:channel"></td>
+                        <td class="ko-grid-center" data-bind="text:authMode_show"></td>
+                        <td class="ko-grid-center" data-bind="text:signal"></td>
+                    </tr>
+                </tbody> -->
+                <tbody id="searchResultList"></tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var vm = null;
+    $(function() {
+        var service = window._service;
+        var config = service.config;
+        var currentSelectHot = null;
+        var isWifi = false;
+        /**
+         * AP Station ViewModel
+         * @class apModel
+         */
+        function apModel() {
+            var self = this;
+            var ssid_ex = "";
+            self.hasMultiSSID = config.HAS_MULTI_SSID;
+            self.hasAPStation = config.AP_STATION_SUPPORT;
+            self.hasWifiSwitch = config.WIFI_SWITCH_SUPPORT;
+            self.hasWlanMacfilter = config.HAS_BLACK_AND_WHITE_FILTER;
+
+            var securityModes = _.map(config.AUTH_MODES_ALL, function(item) {
+                return new Option(item.name, item.value);
+            });
+            /**
+             * 当前页面标识  list列表页 add添加页面  edit编辑页面
+             * @object page
+             */
+            self.page = {
+                list: 1,
+                add: 2,
+                edit: 3
+            };
+            /**
+             * WiFi热点列表列的配置项
+             * @object gridColumn
+             */
+            var gridColumn = [{
+                columnType: "radio",
+                headerTextTrans: "option",
+                rowText: "profileName",
+                width: "10%"
+            }, {
+                headerTextTrans: "ssid_title",
+                rowText: "ssid",
+                width: "30%"
+            }, {
+                columnType: "image",
+                headerTextTrans: "signal",
+                rowText: "imgSignal",
+                width: "30%"
+            }, {
+                headerTextTrans: "security_mode",
+                rowText: "authMode_show",
+                width: "30%"
+            }];
+            /**
+             * 搜索到的WiFi热点列表列的配置项
+             * @object searchGridColumn
+             */
+            var searchGridColumn = [{
+                columnType: "radio",
+                rowText: "index",
+                width: "10%"
+            }, {
+                headerTextTrans: "ssid_title",
+                rowText: "ssid",
+                width: "30%"
+            }, {
+                columnType: "image",
+                headerTextTrans: "signal",
+                rowText: "imgSignal",
+                width: "30%"
+            }, {
+                headerTextTrans: "security_mode",
+                rowText: "authMode_show",
+                width: "30%"
+            }];
+
+            self.pageState = ko.observable(self.page.list);
+
+            var info = service.getAPStationBasic();
+            self.origin_ap_station_enable = info.ap_station_enable;
+            self.ap_station_enable = ko.observable(info.ap_station_enable);
+            self.apList = ko.observable([]);
+            if (self.origin_ap_station_enable == "1") {
+                var apList = service.getHotspotList();
+                self.apList(fixHotspotList(apList.hotspotList));
+            }
+
+            self.apSearchList = ko.observable([]);
+
+            self.connectButtonStatus = ko.observable("disable");
+            self.hasSelectFromUser = ko.observable();
+            self.showPassword = ko.observable(false);
+
+            self.isCableMode = ko.observable();
+
+            var infoBasic = service.getWifiBasic();
+            self.wifi_enable = ko.observable(infoBasic.wifi_enable);
+
+            self.isShowSSIDInfoDiv = ko.observable(false);
+            if (config.WIFI_SWITCH_SUPPORT) {
+                if (infoBasic.wifi_enable == "1") {
+                    self.isShowSSIDInfoDiv(true);
+                } else {
+                    self.isShowSSIDInfoDiv(false);
+                }
+            } else {
+                self.isShowSSIDInfoDiv(true); //如果不支持软开关，整个SSID信息块显示
+            }
+            self.multi_ssid_enable = ko.observable(infoBasic.multi_ssid_enable);
+
+            /**
+             * 密码显示事件
+             * @event showPasswordHandler
+             */
+            self.showPasswordHandler = function() {
+                $("#pwdWepKey").parent().find(".error").hide();
+                $("#pwdWPAKey").parent().find(".error").hide();
+                var checkbox = $("#showPassword:checked");
+                if (checkbox && checkbox.length == 0) {
+                    self.showPassword(true);
+                } else {
+                    self.showPassword(false);
+                }
+            };
+            /**
+             * 密码显示事件
+             * @event showWPAPasswordHandler
+             */
+            self.showWPAPasswordHandler = function() {
+                $("#pwdWepKey").parent().find(".error").hide();
+                $("#pwdWPAKey").parent().find(".error").hide();
+                if ($("#showWPAPassword").is(":checked")) {
+                    self.showPassword(true);
+                } else {
+                    self.showPassword(false);
+                }
+            };
+
+            /**
+             * 计算并设置按钮的状态
+             * @method computeButtonState
+             */
+            function computeButtonState() {
+                return;
+                var profileName = self.apGrid.radioSelectValue();
+                if (!profileName) {
+                    self.hasSelectFromUser(false);
+                    self.connectButtonStatus("disable");
+                    return;
+                }
+
+                var status = "";
+                var fromProvider = "";
+                for (var i = 0; i < self.apList().length; i++) {
+                    var item = self.apList()[i];
+                    if (item.profileName == profileName) {
+                        status = item.connectStatus;
+                        fromProvider = item.fromProvider;
+                        break;
+                    }
+                }
+
+                if (status == "1") {
+                    self.connectButtonStatus("hide");
+                    self.hasSelectFromUser(false);
+                } else {
+                    self.connectButtonStatus("show");
+                    self.hasSelectFromUser(fromProvider == "0");
+                }
+            }
+            /**
+             * 列表模板创建
+             * @object apGrid
+             */
+            // self.apGrid = new ko.simpleGrid.viewModel({
+            //     data: self.apList(),
+            //     idName: "profileName",
+            //     columns: gridColumn,
+            //     pageSize: 100,
+            //     tmplType: 'list',
+            //     primaryColumn: "fromProvider",
+            //     radioClickHandler: function() {
+            //         computeButtonState();
+            //     }
+            // });
+            /**
+             * 热点搜索结果列表模板创建
+             * @object apSearchGrid
+             */
+            self.apSearchGrid = new ko.simpleGrid.viewModel({
+                data: self.apSearchList(),
+                idName: "index",
+                columns: searchGridColumn,
+                pageSize: 100,
+                tmplType: 'list',
+                // radioClickHandler: function() {
+                //     var index = self.apSearchGrid.radioSelectValue();
+                //     var aplist = self.apSearchList();
+                //     for (var i = 0; i < aplist.length; i++) {
+                //         var item = aplist[i];
+                //         if (item.index == index) {
+                //             self.profileName("");
+                //             self.ssid(item.ssid);
+                //             ssid_ex = item.ssid;
+                //             self.signal(item.signal);
+                //             self.authMode(item.authMode);
+                //             self.password(item.password);
+                //             self.mac(item.mac);
+                //             if (item.authMode == "WPAPSK" || item.authMode == "WPA2PSK" || item.authMode == "WPAPSKWPA2PSK") {
+                //                 self.encryptType_WPA(item.encryptType);
+                //             } else {
+                //                 self.encryptType(item.encryptType);
+                //             }
+                //             self.keyID(item.keyID);
+                //             renderCustomElement($("#cipherGroup"));
+                //             break;
+                //         }
+                //     }
+                // }
+            });
+
+            // self.selectedHot = function(item) {
+            self.selectedHot = function(index) {
+                var item = self.apSearchList()[index];
+                $('#search_extender').hide();
+                $('#set_extender').show();
+
+
+                // var item = obj;
+                self.profileName("");
+                self.ssid(item.ssid);
+                ssid_ex = item.ssid;
+                self.signal(item.signal);
+                self.authMode(item.authMode);
+                self.password(item.password);
+                self.mac(item.mac);
+                if (item.authMode == "WPAPSK" || item.authMode == "WPA2PSK" || item.authMode == "WPAPSKWPA2PSK") {
+                    self.encryptType_WPA(item.encryptType);
+                } else {
+                    self.encryptType(item.encryptType);
+                }
+                self.keyID(item.keyID);
+
+                currentSelectHot = item;
+
+                // self.password("");
+            };
+
+            /**
+             * 计算并设置当前连接和按钮的状态
+             * @method computeConnectStatus
+             *
+             */
+            self.computeConnectStatus = function() {
+                computeButtonState();
+
+                var networkStatus = self.connectStatus();
+                if (networkStatus == "ppp_connected") {
+                    self.current_status_trans("ap_station_wan_connected");
+                    self.current_status_text($.i18n.prop("ap_station_wan_connected"));
+                    return;
+                }
+
+                var ssid = self.connectWifiSSID();
+                var wifiStatus = self.connectWifiStatus();
+                if (ssid && wifiStatus == "connect") {
+                    self.current_status_trans("ap_station_wlan_connected");
+                    self.current_status_text($.i18n.prop("ap_station_wlan_connected"));
+                    return;
+                }
+
+                self.current_status_trans("ap_station_no_connection");
+                self.current_status_text($.i18n.prop("ap_station_no_connection"));
+            };
+
+            var statusInfo = service.getStatusInfo();
+            self.networkType = ko.observable(statusInfo.networkType);
+            self.networkOperator = ko.observable(statusInfo.networkOperator);
+            self.connectStatus = ko.observable(statusInfo.connectStatus);
+            self.connectWifiStatus = ko.observable(statusInfo.connectWifiStatus);
+            self.connectWifiProfile = ko.observable(statusInfo.connectWifiProfile);
+            self.connectWifiSSID = ko.observable(statusInfo.connectWifiSSID);
+
+            self.current_status_trans = ko.observable("");
+            self.current_status_text = ko.observable("");
+            self.current_status = ko.computed(function() {
+                self.computeConnectStatus()
+            });
+
+            self.modes = securityModes;
+            self.profileName = ko.observable("");
+            self.ssid = ko.observable();
+            self.signal = ko.observable("0");
+            self.authMode = ko.observable();
+            self.password = ko.observable();
+            self.encryptType = ko.observable();
+            self.encryptType_WPA = ko.observable("TKIPCCMP");
+            self.keyID = ko.observable("0");
+            self.mac = ko.observable();
+
+            if (self.origin_ap_station_enable == "1") {
+                var apListTemp = self.apList();
+                if (apListTemp && apListTemp.length > 0) {
+                    self.ssid(apListTemp[0].ssid);
+                    self.password(apListTemp[0].password);
+                }
+            }
+
+            /**
+             * 打开添加页面
+             * @event openAddPage
+             */
+            self.openAddPage = function() {
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+                self.clear();
+                getSearchHotspot();
+            };
+
+            /**
+             * 打开基本设置页面
+             * @event openAddPage
+             */
+            self.openListPage = function() {
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+                self.clear();
+                self.pageState(self.page.list);
+                self.apGrid.data(self.apList());
+                self.computeConnectStatus();
+            };
+
+            /**
+             * 添加热点
+             * @event addHotspot
+             *
+             */
+            self.addHotspot = function() {
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+                if (self.pageState() == self.page.add && self.apList().length >= config.AP_STATION_LIST_LENGTH) {
+                    showAlert({
+                        msg: "ap_station_exceed_list_max",
+                        params: config.AP_STATION_LIST_LENGTH
+                    });
+                    return;
+                }
+
+                //如果有已链接的则先取消链接
+                showLoading('waiting');
+                var connectObj = self.apList().find(function(x) {
+                    return x.connectStatus == "1";
+                });
+                if (connectObj != null) {
+                    self.disconnectHotspot(function(data_disconnect) {
+                        if (!data_disconnect || data_disconnect.result != "success") {
+                            errorOverlay();
+                            return;
+                        }
+
+                        setTimeout(function() {
+                            self.deleteAllHotspot(function(data_delete) {
+                                if (!data_delete) {
+                                    errorOverlay();
+                                    return;
+                                }
+
+                                setTimeout(function() {
+                                    self.addHotspotExt();
+                                }, 2000);
+                            });
+                        }, 2000);
+                    });
+                    return;
+                }
+
+                self.deleteAllHotspot(function(data_delete) {
+                    if (!data_delete) {
+                        errorOverlay();
+                        return;
+                    }
+
+                    setTimeout(function() {
+                        self.addHotspotExt();
+                    }, 2000);
+                });
+            };
+
+            self.addHotspotExt = function() {
+                if (!self.apSearchList() || self.apSearchList().length == 0) {
+                    getSearchHotspot(true, function() {
+                        self.addHotspotExt2();
+                    });
+                } else {
+                    self.addHotspotExt2();
+                }
+            };
+            self.addHotspotExt2 = function() {
+                //根据输入框中的SSID值查找
+                currentSelectHot = self.apSearchList().find(function(x) {
+                    return x.ssid.toLowerCase() == $('#txtSSID').val().toLowerCase();
+                });
+                if (currentSelectHot == null) {
+                    currentSelectHot = {
+                        ssid: $('#txtSSID').val(),
+                        signal: "0",
+                        authMode: "OPEN",
+                        mac: ""
+                    };
+                    self.encryptType("NONE");
+                }
+                var para = {};
+                para.profileName = self.profileName();
+                para.ssid = currentSelectHot.ssid;
+                para.signal = currentSelectHot.signal;
+                para.authMode = currentSelectHot.authMode;
+                para.password = self.password();
+                if (para.authMode == "WPAPSK" || para.authMode == "WPA2PSK" || para.authMode == "WPAPSKWPA2PSK") {
+                    para.encryptType = self.encryptType_WPA();
+                } else if (para.authMode == "SHARED") {
+                    para.encryptType = "WEP";
+                } else {
+                    para.encryptType = self.encryptType();
+                }
+                para.keyID = "0";
+                para.mac = (currentSelectHot.mac == "" || currentSelectHot.ssid != ssid_ex) ? "0F:00:00:00:00:00" : currentSelectHot.mac;
+                para.apList = [];
+                service.saveHotspot(para, function(data) {
+                    self.callback(data, true);
+
+                    //保存成功后，后台链接，链接结果不反馈给用户
+                    self.connectHotspot();
+                });
+            };
+
+            /**
+             * 删除热点
+             * @event deleteHotspot
+             *
+             */
+            self.deleteHotspot = function(confirm, profileName, callbackExt) {
+                confirm = confirm || true;
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+
+                function _del() {
+                    var para = {};
+                    para.profileName = profileName;
+                    para.apList = self.apList();
+                    showLoading('waiting');
+                    service.deleteHotspot(para, function(data) {
+                        if (callbackExt) {
+                            callbackExt(data);
+                        } else {
+                            self.callback(data, true);
+                        }
+                    });
+                }
+
+                if (confirm) {
+                    showConfirm("confirm_data_delete", function() {
+                        _del();
+                    });
+                } else {
+                    _del();
+                }
+            };
+            self.deleteAllHotspot = function(callbackExt) {
+                var hotList = self.apList();
+                if (!hotList || hotList.length == 0) {
+                    callbackExt(true);
+                    return;
+                }
+
+                var para = {};
+                para.profileName = hotList[hotList.length - 1].profileName;
+                para.apList = self.apList();
+                service.deleteHotspot(para, function(data_delete) {
+                    if (!data_delete || data_delete.result != "success") {
+                        errorOverlay();
+                        callbackExt(false);
+                        return;
+                    }
+
+                    //删除成功后，self.apList()也要删除
+                    hotList.pop();
+                    self.deleteAllHotspot(callbackExt);
+                });
+            };
+
+            /**
+             * 打开编辑页面
+             * @event openEditPage
+             *
+             */
+            self.openEditPage = function() {
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+                var profileName = self.apGrid.radioSelectValue();
+                var aplist = self.apList();
+                for (var i = 0; i < aplist.length; i++) {
+                    var item = aplist[i];
+                    if (item.profileName == profileName) {
+                        self.profileName(profileName);
+                        self.ssid(item.ssid);
+                        self.signal(item.signal);
+                        self.authMode(item.authMode);
+                        self.password(item.password);
+                        self.mac(item.mac);
+                        if (item.authMode == "WPAPSK" || item.authMode == "WPA2PSK" || item.authMode == "WPAPSKWPA2PSK") {
+                            self.encryptType_WPA(item.encryptType);
+                        } else {
+                            self.encryptType(item.encryptType);
+                        }
+                        self.keyID(item.keyID);
+                    }
+                }
+                self.pageState(self.page.edit);
+            };
+
+            /**
+             * 连接热点
+             * @event connectHotspot
+             *
+             */
+            self.connectHotspot = function() {
+                var apList = service.getHotspotList().hotspotList;
+                if (!apList || apList.length == 0) {
+                    return;
+                }
+
+                /**
+                 * 将用户选中的那个profile放在运营商定制profile下面第一位
+                 */
+                function refreshApList(profile, aplist) {
+                    var apListPre = [];
+                    var apListLeft = [];
+                    for (var i = 0; i < aplist.length; i++) {
+                        if (aplist[i].fromProvider == "1") {
+                            apListPre.push(apList[i])
+                        } else {
+                            if (aplist[i].profileName == profile) {
+                                apListPre.push(apList[i]);
+                            } else {
+                                apListLeft.push(apList[i]);
+                            }
+                        }
+                    }
+                    var apListNew = apListPre.concat(apListLeft);
+                    service.saveHotspot({
+                        apList: apListNew
+                    }, function(data) {
+                        if (data && data.result == "success") {
+                            apList = apListNew;
+                            self.apList(fixHotspotList(apList));
+                        }
+                    });
+                }
+
+                function connect() {
+                    var i = 0;
+                    var para = {
+                        EX_SSID1: apList[i].ssid,
+                        EX_AuthMode: apList[i].authMode,
+                        EX_EncrypType: apList[i].encryptType,
+                        EX_DefaultKeyID: apList[i].keyID,
+                        EX_WEPKEY: apList[i].password,
+                        EX_WPAPSK1: apList[i].password,
+                        EX_wifi_profile: apList[i].profileName,
+                        EX_mac: apList[i].mac
+                    };
+                    var connectIndex = 0;
+                    var ssid = apList[i].ssid;
+                    self.connectWifiSSID(ssid);
+                    self.connectWifiStatus("connecting");
+                    self.connectButtonStatus("disable");
+
+                    service.connectHotspot(para, function(data) {
+                        if (data && data.result == "success") {
+                            self.connectButtonStatus("disable");
+                        } else if (data && data.result == "processing") {
+                            // showAlert("ap_station_processing");
+                        } else {
+                            // apList[connectIndex].connectStatus = "0";
+                            // self.connectButtonStatus("show");
+                            // self.connectWifiStatus("disconnect");
+                            // hideLoading();
+                            // errorOverlay();
+                        }
+                        var apList = service.getHotspotList();
+                        self.apList(fixHotspotList(apList.hotspotList));
+                        // self.connectWifiSSID(ssid);
+                        // self.connectWifiProfile(profileName);
+                        // self.apGrid.data([]);
+                        // self.apGrid.data(self.apList());
+                    });
+                }
+
+                // var status = service.getStatusInfo();
+                connect();
+                // if (status.connectStatus == "ppp_connecting" || status.connectStatus == "ppp_connected") {
+                //     showConfirm("ap_station_connect_change_alert", function() {
+                //         showLoading();
+                //         connect();
+                //     });
+                // } else {
+                //     connect();
+                // }
+            };
+
+            /**
+             * 断开连接
+             * @event 断开连接
+             *
+             */
+            self.disconnectHotspot = function(callbackExt) {
+                service.disconnectHotspot({}, function(data) {
+                    if (callbackExt) {
+                        callbackExt(data);
+                    } else {
+                        self.callback(data, true);
+                    }
+                })
+            };
+
+            /**
+             * 刷新搜到的热点列表
+             * @event searchHotspot
+             *
+             */
+            self.searchHotspot = function() {
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+                getSearchHotspot();
+            };
+
+            /**
+             * 获取搜到的热点列表
+             * @method getSearchHotspot
+             *
+             */
+            function getSearchHotspot(searchExt, callbackExt) {
+                var count = 0;
+
+                function search() {
+                    var result = service.getSearchHotspotList();
+                    if (result.scan_finish != "0") {
+                        if ("2" == result.scan_finish) {
+                            hideLoading();
+                            showAlert("ap_station_processing");
+                        } else {
+                            self.apSearchList(fixHotspotList(result.hotspotList));
+                            // self.apSearchList(result.hotspotList);
+                            var searchStr = '';
+                            $.each(result.hotspotList, function(index, item) {
+                                searchStr += '<tr onclick="vm.selectedHot(' + index + ')">';
+                                searchStr += '<td class="even">' + (index + 1) + '</td>';
+                                searchStr += '<td class="ko-grid-center">' + item.ssid + '</td>';
+                                searchStr += '<td class="ko-grid-center">' + item.mac + '</td>';
+                                searchStr += '<td class="ko-grid-center">' + item.channel + '</td>';
+                                searchStr += '<td class="ko-grid-center">' + $.i18n.prop("ap_station_security_mode_" + item.authMode) + '</td>';
+                                searchStr += '<td class="ko-grid-center">' + item.signal + '</td>';
+                                searchStr += '</tr>';
+                            });
+                            $('#searchResultList').html(searchStr);
+
+                            hideLoading();
+
+                            if (!searchExt) {
+                                $('#search_extender').show();
+                                $('#set_extender').hide();
+                            }
+                            if (callbackExt) {
+                                callbackExt();
+                            };
+                        }
+                    } else {
+                        if (count <= 60) {
+                            count = count + 1;
+                            addTimeout(search, 1000);
+                        } else {
+                            hideLoading();
+                            showAlert("ap_station_search_hotspot_fail");
+                        }
+                    }
+                }
+
+                if (!searchExt) {
+                    showLoading('Searching...');
+                }
+                service.searchHotspot({}, function(data) {
+                    if (data && data.result == "success") {
+                        if (self.pageState() != self.page.add) {
+                            self.pageState(self.page.add);
+                        }
+                        search();
+                    } else if (data && data.result == "processing") {
+                        hideLoading();
+                        showAlert("ap_station_processing");
+                    } else {
+                        if (self.pageState() != self.page.add) {
+                            self.pageState(self.page.add);
+                        }
+                        hideLoading();
+                        showAlert("ap_station_search_hotspot_fail");
+                    }
+                });
+            }
+
+            /**
+             * 清除编辑页面的信息
+             * @event clear
+             *
+             */
+            self.clear = function() {
+                self.apSearchGrid.clearRadioSelect();
+                self.profileName("");
+                self.ssid("");
+                self.signal("0");
+                self.authMode("OPEN");
+                self.password("");
+                self.encryptType("NONE");
+                self.encryptType_WPA("TKIPCCMP");
+                self.keyID("0");
+                self.mac("");
+            };
+
+            /**
+             * 设置AP station参数
+             * @event clear
+             *
+             */
+            self.apply = function() {
+                if (wifiClosedCheck()) {
+                    return;
+                }
+                if (wpsOnCheck()) {
+                    return;
+                }
+
+                function setBasic() {
+                    showLoading('waiting');
+                    var para = {};
+                    para.ap_station_enable = self.ap_station_enable();
+                    service.setAPStationBasic(para, function(data) {
+                        if (self.origin_ap_station_enable == self.ap_station_enable()) {
+                            self.callback(data, true);
+                        } else {
+                            self.callback2(data, true);
+                        }
+                    });
+                    service.refreshAPStationStatus();
+                }
+                if (config.HAS_MULTI_SSID) {
+                    var infoBasic = service.getWifiBasic();
+                    if (self.ap_station_enable() == "1" && infoBasic.multi_ssid_enable == "1") {
+                        showConfirm("ap_station_enable_confirm", setBasic);
+                    } else {
+                        setBasic();
+                    }
+                } else {
+                    setBasic();
+                }
+            };
+
+            /**
+             * 和服务器交互时的回调，wifi不重启的情况
+             * @event callback
+             *
+             */
+            self.callback = function(data, isInitPage) {
+                if (data) {
+                    if (isInitPage) {
+                        init();
+                        $("#apList").translate();
+                    }
+                    if (data.result == "success") {
+                        successOverlay();
+                    } else if (data.result == "spot_connecting" || data.result == "spot_connected") {
+                        showAlert("ap_station_update_fail");
+                    } else if (data.result == "processing") {
+                        showAlert("ap_station_processing");
+                    } else if (data.result == "exist") {
+                        showAlert("ap_station_exist");
+                    } else {
+                        errorOverlay();
+                    }
+                } else {
+                    errorOverlay();
+                }
+            }
+
+            /**
+             * 和服务器交互时的回调,wifi会重启的情况
+             * @event callback
+             *
+             */
+            self.callback2 = function(data, isInitPage) {
+                if (data) {
+                    if (isWifi) {
+                        setTimeout(function() {
+                            if (data.result == "success") {
+                                successOverlay();
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1000);
+                                clearTimer();
+                                clearValidateMsg();
+                                init();
+                            } else if (data.result == "spot_connecting" || data.result == "spot_connected") {
+                                showAlert("ap_station_update_fail");
+                            } else if (data.result == "processing") {
+                                showAlert("ap_station_processing");
+                            } else {
+                                errorOverlay();
+                            }
+                        }, 15000);
+                    } else {
+                        addInterval(function() {
+                            var info = service.getWifiBasic();
+                            if (info.wifi_enable == "1") {
+                                clearTimer();
+                                clearValidateMsg();
+                                init();
+                                $("#apList").translate();
+                                if (data.result == "success") {
+                                    successOverlay();
+                                } else if (data.result == "spot_connecting" || data.result == "spot_connected") {
+                                    showAlert("ap_station_update_fail");
+                                } else {
+                                    errorOverlay();
+                                }
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    errorOverlay();
+                }
+            };
+
+            /**
+             * 设置多SSID开关
+             *
+             * @event setMultiSSIDSwitch
+             */
+            self.setMultiSSIDSwitch = function() {
+                if (self.checkSettings("switch")) {
+                    return;
+                }
+
+                var setSwitch = function() {
+                    showLoading('waiting');
+                    var params = {};
+                    params.m_ssid_enable = self.multi_ssid_enable();
+                    if (config.WIFI_SWITCH_SUPPORT) {
+                        params.wifiEnabled = self.wifi_enable();
+                    }
+                    service.setWifiBasicMultiSSIDSwitch(params, function(result) {
+                        if (result.result == "success") {
+                            if (isWifi) {
+                                setTimeout(function() {
+                                    successOverlay();
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 1000);
+                                    clearTimer();
+                                    clearValidateMsg();
+                                    service.refreshAPStationStatus();
+                                    init();
+                                }, 15000);
+                            } else {
+                                addInterval(function() {
+                                    var info = service.getWifiBasic();
+                                    if (info.wifi_enable == self.wifi_enable()) {
+                                        successOverlay();
+                                        clearTimer();
+                                        clearValidateMsg();
+                                        service.refreshAPStationStatus();
+                                        init();
+                                    }
+                                }, 1000);
+                            }
+                        } else {
+                            errorOverlay();
+                        }
+                    });
+                };
+
+                var info = service.getStatusInfo();
+                if (config.HAS_MULTI_SSID && self.wifi_enable() == "1") {
+                    if (self.multi_ssid_enable() == "1" && config.AP_STATION_SUPPORT && self.origin_ap_station_enable == "1") {
+                        if (info.wifiStatus) {
+                            showConfirm("multi_ssid_enable_confirm2", function() {
+                                setSwitch();
+                            });
+                        } else {
+                            showConfirm("multi_ssid_enable_confirm", function() {
+                                setSwitch();
+                            });
+                        }
+                    } else {
+                        if (info.wifiStatus) {
+                            showConfirm("wifi_disconnect_confirm2", function() {
+                                setSwitch();
+                            });
+                        } else {
+                            setSwitch();
+                        }
+                    }
+                } else {
+                    setSwitch();
+                }
+            };
+
+            self.checkSettings = function(ssid) {
+                var status = service.getWpsInfo();
+                if (status.wpsFlag == '1') {
+                    showAlert('wps_on_info');
+                    return true;
+                }
+                if (config.HAS_MULTI_SSID && info.multi_ssid_enable == "1") {
+                    if ((ssid == "ssid1" && parseInt(self.selectedStation()) + parseInt(info.m_MAX_Access_num) > info.MAX_Station_num) ||
+                        (ssid == "ssid2" && parseInt(self.m_selectedStation()) + parseInt(info.MAX_Access_num) > info.MAX_Station_num)) {
+                        showAlert({
+                            msg: 'multi_ssid_max_access_number_alert',
+                            params: info.MAX_Station_num
+                        });
+                        return true;
+                    }
+                }
+
+                return false;
+            };
+
+            self.wifiExtenderSwitchChange = function() {
+                if (self.ap_station_enable() == '1') {
+                    self.ap_station_enable('0');
+                    $('#wifiextender_switch').removeClass().addClass('bg-switch-disable');
+                    $('#wifiextender_switch_text').html($.i18n.prop('disable'));
+                } else {
+                    self.ap_station_enable('1');
+                    $('#wifiextender_switch').removeClass().addClass('bg-switch-enable');
+                    $('#wifiextender_switch_text').html($.i18n.prop('enable'));
+
+                }
+            };
+        }
+
+        /**
+         * 处理热点列表内容，以便在表格显示
+         * @method callback
+         *
+         */
+        function fixHotspotList(list) {
+            var fixedList = [];
+            for (var i = 0; i < list.length; i++) {
+                list[i].index = i;
+                var imageUrl = "";
+                if (list[i].connectStatus == "1") {
+                    if (list[i].authMode.toLowerCase() == "open" && list[i].encryptType.toLowerCase() == "none") {
+                        imageUrl = "img/wifi_connected.png";
+                    } else {
+                        imageUrl = "img/wifi_lock_connected.png";
+                    }
+                } else {
+                    if (list[i].authMode.toLowerCase() == "open" && list[i].encryptType.toLowerCase() == "none") {
+                        imageUrl = "img/wifi_signal_" + list[i].signal + ".png";
+                    } else {
+                        imageUrl = "img/wifi_lock_signal_" + list[i].signal + ".png";
+                    }
+                }
+                list[i].imgSignal = imageUrl;
+                list[i].authMode_show = $.i18n.prop("ap_station_security_mode_" + list[i].authMode);
+            }
+            return list;
+        }
+
+        /**
+         * 检测wifi是否关闭，关闭时提示
+         * @method callback
+         *
+         */
+        function wifiClosedCheck() {
+            var info = service.getWpsInfo();
+            if (info.radioFlag == "0") {
+                showAlert('wps_wifi_off');
+                return true;
+            }
+        }
+
+        /**
+         * 检测WPS是否激活，激活时提示
+         * @method callback
+         *
+         */
+        function wpsOnCheck() {
+            var info = service.getWpsInfo();
+            if (info.wpsFlag == '1') {
+                showAlert('wps_on_info');
+                return true;
+            }
+        }
+
+        /**
+         * 设置页面的元素是否可用
+         * @method callback
+         *
+         */
+        function setPageDisabled(disablePage) {
+            if (disablePage) {
+                $('#frmAPStation :input').each(function() {
+                    $(this).attr("disabled", true);
+                });
+                clearValidateMsg();
+            } else {
+                $("#frmAPStation :input[id!='btnDelete'][id!='btnEdit'][id!='btnConnect']").each(function() {
+                    $(this).attr("disabled", false);
+                });
+            }
+        }
+
+        function bindEvents(vm) {
+            $("#showPassword").change(function() {
+                vm.showPasswordHandler();
+            });
+            $("#showWPAPassword").change(function() {
+                vm.showWPAPasswordHandler();
+            });
+        }
+
+        function checkConnectedDevice() {
+            service.getParams({
+                nv: 'user_ip_addr'
+            }, function(dataIp) {
+                service.getParams({
+                    nv: 'station_list'
+                }, function(dataList) {
+                    isWifi = isWifiConnected(dataIp.user_ip_addr, dataList.station_list);
+                });
+            });
+        }
+
+        /**
+         * 初始化ViewModel并进行绑定
+         * @method init
+         */
+        function init() {
+            var container = $('#containerSettings')[0];
+            ko.cleanNode(container);
+            vm = new apModel();
+            ko.applyBindings(vm, container);
+            bindEvents(vm);
+
+            $('#extender_return').bind('click', function() {
+                $('#search_extender').hide();
+                $('#set_extender').show();
+            });
+
+            $("#frmAPStation").validate({
+                submitHandler: function() {
+                    vm.addHotspot();
+                },
+                rules: {
+                    txtSSID: {
+                        required: true
+                    }
+                },
+                messages: {
+                    txtSSID: {
+                        required: $.i18n.prop('wifi_ssid_not_null')
+                    }
+                }
+            });
+        }
+
+        init();
+        $('#containerSettings').translate();
+    });
+</script>

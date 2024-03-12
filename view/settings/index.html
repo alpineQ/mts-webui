@@ -1,0 +1,142 @@
+<style>
+    .network-mts-wrap {
+        float: none;
+    }
+    
+    .input-wrap {
+        text-align: left;
+    }
+</style>
+<section class="settings-page" id="settings-page">
+    <div class="container cleafix">
+        <aside class="settings-wrap">
+            <ul class="menu message-menu" id="settings-menu">
+               <!-- <li class="list"><a href="#settings_quick" data-trans="QuickSetup">Quick Setup</a></li> -->
+                <li class="list">
+                    <a href="#settings_switched_dialup" data-trans="SwitchedConnection">Switched Connection</a>
+                    <ul class="sub-list-wrap" style="display:none">
+                        <li class="sub-list">
+                            <a href="#settings_switched_dialup" data-trans="dial_setting">Dial-up Settings</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_switched_network" data-trans="net_select">Network Selection</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_switched_apn" data-trans="apn_setting">APN</a>
+                        </li>
+                        <!-- <li class="sub-list">
+                            <a href="#settings_switched_dns">DNS Settings</a>
+                        </li> -->
+                   <!-- </ul>
+                </li>
+                <li class="list">
+                    <a href="#settings_wifi_basic" data-trans="settings_wireless">Wi-Fi Settings</a>
+                    <ul class="sub-list-wrap" style="display:none">
+                        <li class="sub-list">
+                            <a href="#settings_wifi_basic" data-trans="wifi_basic">Basic Settings</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_wifi_advanced" data-trans="advanced_settings">Advanced Settings</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_wifi_black" data-trans="black_list">Black List</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_wifi_wps" data-trans="wps">WPS</a>
+                        </li>
+                         <li class="sub-list">
+                            <a href="#settings_wifi_extender" data-trans="wifi_extender">Wi-Fi Extender</a> -->
+                        </li> 
+                    </ul>
+                </li>
+                <li class="list">
+                    <a href="#settings_security_filtering" data-trans="firewall">Firewall</a>
+                    <ul class="sub-list-wrap" style="display:none">
+                        <li class="sub-list">
+                            <a href="#settings_security_filtering" data-trans="port_filter">Port Filtering</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_security_mapping" data-trans="port_map">Port Mapping</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_security_upnp" data-trans="upnp">UPnP</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_security_dmz" data-trans="dmz">DMZ</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="list">
+                    <a href="#settings_system_account" data-trans="device_setting">Device setting</a>
+                    <ul class="sub-list-wrap" style="display:none">
+                        <li class="sub-list">
+                            <a href="#settings_system_account" data-trans="account_management">Account Management</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_system_pin" data-trans="pin_management">PIN Management</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_system_reset" data-trans="device_reset">Reset</a>
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_system_restart" data-trans="device_restart">Restart</a>
+                        </li>
+                       <!-- <li class="sub-list">
+                            <a href="#settings_system_power" data-trans="PowerSave">Power Save</a> -->
+                        </li>
+                        <li class="sub-list">
+                            <a href="#settings_system_smsSetting" data-trans="sms_setting">SMS Settings</a>
+                        </li>
+                       <!-- <li class="sub-list">
+                           <a href="#settings_firmware" data-trans="FirmwareUpdate">Firmware Update</a>
+                             对应参考机Update Management功能 -->
+                        </li>
+                    </ul>
+                </li>
+                <li class="list">
+                    <a href="#settings_system_router" data-trans="RouterSettings">Router Settings</a>
+                </li>
+                <li class="list">
+                    <a href="#settings_info" data-trans="device_information">Information</a>
+                </li>
+            </ul>
+        </aside>
+        <div class="notebook-wrapper">
+            <div class="notebook-contacts" style="overflow-y:auto">
+                <!-- <div id="containerSettings" class="paddingnone widthauto set_left_style" style="padding:50px 30px 0;border:none;"> -->
+                <div id="containerSettings">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(function() {
+        clearIntervalTimer()
+        var currentTopic = window.location.hash;
+        var match = window.findSettingsMenu(currentTopic);
+        if (match.length == 0) {
+            if (!window.location.hash.indexOf('http') == 0) {
+                window.location.hash = '#home'
+            }
+        } else {
+            if (window._noSIM == true && match[0].checkSIMStatus) {
+                $('#containerSettings').html('<div class="colorRed font18" style="padding: 20px; text-align: center">' + $.i18n.prop('no_sim_card_message') + '</div>');
+            } else {
+                var toUrl = match[0].path + '.html';
+                $('#containerSettings').load(toUrl)
+            }
+        }
+
+        var currentNode = $('a[href="' + currentTopic + '"]');
+        currentNode.parent().addClass('active');
+        var parentList = currentNode.parents('.list');
+        if (parentList.length != 0) {
+            $(parentList[0]).addClass('active');
+            $(parentList).find('.sub-list-wrap').show();
+        }
+
+        $('#settings-page').translate()
+    });
+</script>

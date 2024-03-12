@@ -1,0 +1,398 @@
+<div class="form-body" id="setting-security-mapping">
+    <form id="mapBasicForm" novalidate="novalidate" autocomplete="off">
+        <div class="form-title" style="display: none;" data-trans="port_map">Port Mapping</div>
+        <div class="content">
+        <div class="row-fluid">
+            <label class="span4 side-right"><span data-trans="port_map_setting">Port Mapping Settings</span>
+            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+            </label>
+            <label class="span8 side-left">
+            <span id="switch-mapp-filter" style="cursor: pointer" class="bg-switch-enable" ></span>
+            <span class="switch_note" data-trans="enable">Enable</span>
+            </label>
+        </div>
+        </div>
+        <div class="form-buttons"  style="padding-right:20px;">
+        <input type="button" id="btn-mapp-switch" class="btn-1 " data-trans="apply" value="Apply" />
+        </div>
+        <div class="form-note">
+        <div class="notes-title">&nbsp;</div>
+        <ul class="notes-content">
+            <li data-trans="port_map_note_info">
+            Configure a Port Mapping to enable external computers to access WWW,
+            FTP or other services provided by LAN.
+            </li>
+        </ul>
+        </div>
+    </form>
+    <div id="mapBasicDiv" style="display: none">
+        <form id="portMapForm" novalidate="novalidate" autocomplete="off">
+        <div class="form-title" style="display: none;" data-trans="port_map_setting">Port Mapping Settings</div>
+        <div class="content">
+            <div class="row-fluid">
+            <label class="span4 side-right" for="txtSourcePort" ><span data-trans="source_port">Src. Port</span>
+                <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+                <input type="text" name="txtSourcePort" id="txtSourcePort" class="required valid" maxlength="5" />
+                <label id="sourcePortExamLabel">(1~65000)</label>
+            </div>
+            </div>
+            <div class="row-fluid">
+            <label class="span4 side-right" for="txtDestIpAddress" ><span data-trans="dest_ip_address">Dest. IP Address</span>
+                <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+                <input type="text" name="txtDestIpAddress" id="txtDestIpAddress" class="required valid" maxlength="15" />
+                <label id="ipExamLabel" data-trans="ipExam">(e.g., 192.168.0.101)</label>
+            </div>
+            </div>
+            <div class="row-fluid">
+            <label class="span4 side-right" for="txtDestPort" ><span data-trans="dest_port">Dest. Port</span>
+                <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+                <input type="text" name="txtDestPort" id="txtDestPort" class="required valid" maxlength="5" />
+                <label id="destPortExamLabel">(1~65000)</label>
+            </div>
+            </div>
+            <div class="row-fluid">
+            <label class="span4 side-right" for="protocol" ><span data-trans="protocol">Protocol</span>
+                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+            </label>
+            <div class="span8">
+                <select id="protocol" transid="protocol" class="valid">
+                <option value="TCP&UDP" data-trans="protocol_TCP&UDP">TCP+UDP</option>
+                <option value="TCP" data-trans="protocol_TCP">TCP</option>
+                <option value="UDP" data-trans="protocol_UDP">UDP</option>
+                </select>
+            </div>
+            </div>
+            <div class="row-fluid">
+            <label class="span4 side-right" for="txtComment" ><span data-trans="comment">Comment</span>
+                <i class="colorRed">&nbsp;</i>
+            </label>
+            <div class="span8">
+                <input type="text" name="txtComment" id="txtComment" class="required valid" maxlength="21" />
+            </div>
+            </div>
+        </div>
+        <div class="form-buttons"  style="padding-right:20px;">
+            <input type="button" class="btn-1 " id="btn-basic-apply" data-trans="apply" value="Apply" />
+        </div>
+        <div class="form-note">
+            <div class="notes-title">&nbsp;</div>
+            <ul class="notes-content">
+            <li data-trans="port_map_note_port">
+                Src. Port/Dest Port: The port of the computer that provides
+                services.
+            </li>
+            <li data-trans="port_map_note_dest_ip_address">
+                Dest. IP Address: Specify a computer located at LAN to provide
+                services.
+            </li>
+            <li data-trans="port_map_note_protocol">Protocol: Protocols applied by services.</li>
+            <li data-trans="port_map_note_comment">
+                Comment: Type comment for Port Mapping rule. It contains 0-9 a-z A-Z
+                ! # ( ) + - . / % = ? @ ^ _ { | } ~ .
+            </li>
+            <li data-trans="rule_max_note">The maximum number of rules is 10.</li>
+            </ul>
+        </div>
+        </form>
+        <form id="portMapListForm" novalidate="novalidate" autocomplete="off">
+        <div class="form-title" style="display: none;" data-trans="port_map_list">
+            Current Port Mapping Rules in System
+        </div>
+        <div class="content">
+            <div>
+            <div id="portMaps" class="fixTableScroll">
+                <div class="ko-grid-container">
+                <div class="ko-grid-menu" style="display: none;">
+                    <div class="ko-grid-option">
+                    <img  id="ko_grid_layout" class="cursor-pointer" src="img/card.png" />
+                    </div>
+                    <div class="clean"></div>
+                </div>
+                <table cellspacing="0" cellspadding="0" class="ko-grid colorHoverTable " style="width:800px;">
+                    <thead>
+                    <tr style="background-size:auto 100%">
+                        <!-- ko if: columnType=='checkbox' -->
+                        <th width="8%">
+                       <!-- <p id="pblist-checkall" target="pblist" class="checkbox checkboxToggle" >
+                            <input type="checkbox" id="ko_grid_checkAll" />
+                        </p>-->
+                        </th>
+                        <th nowrap="nowrap" width="20%" data-trans="source_port">Src. Port</th>
+                        <th nowrap="nowrap" width="20%" data-trans="dest_ip_address">Dest. IP Address</th>
+                        <th nowrap="nowrap" width="20%" data-trans="dest_port">Dest. Port</th>
+                        <th nowrap="nowrap" width="12%" data-trans="protocol">Protocol</th>
+                        <th nowrap="nowrap" width="20%" data-trans="comment">Comment</th>
+                    </tr>
+                    </thead>
+                    <tbody id="pblist"></tbody>
+                </table>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="form-buttons">
+            <input type="button" class="btn-1 btn-del-item" disabled="" value="Delete" data-trans="delete"/>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+window.LTELanguageInitPart('#setting-security-mapping')
+function load_init(url) {
+    var objPort = {
+        protocol: ['TCP&UDP', 'TCP', 'UDP'],
+        switch: 0,
+        data: [],
+        setData: {
+            sourceip: '',
+            destip: '',
+            sourceipv6: '',
+            destipv6: '',
+            sourceport0: '',
+            sourceport1: '',
+            destport0: '',
+            destport1: ''
+        },
+        validate: true
+    }
+
+    loadSetting(true)
+
+    jQuery.validator.addMethod(
+        'portcheck',
+        function(value, element) {
+            return value >= 1 && value <= 65000
+        },
+        $.i18n.prop('range_except',1,65000)
+    )
+
+    jQuery.validator.addMethod(
+        'ipv4check',
+        function(value, element) {
+            return (
+            this.optional(element) ||
+            value == '' ||
+            (isIP(value) && value != '255.255.255.255' && value != '0.0.0.0')
+            )
+        },
+        $.i18n.prop('ipv4')
+    )
+
+    $(document).ready(function() {
+        $('#switch-mapp-filter').click(function() {
+            displayPortDom(switchClick('switch-mapp-filter'))
+        })
+
+        $('#btn-basic-apply').click(function() {
+            var postData = '',
+            compareData = ''
+            objPort.setData.srcport = $('#txtSourcePort').val()
+            objPort.setData.ipaddr = $('#txtDestIpAddress').val()
+            objPort.setData.destport = $('#txtDestPort').val()
+            objPort.setData.protocol = $('#protocol').val()
+            objPort.setData.comment = $('#txtComment').val()
+
+            objPort.validate = $('#portMapForm').validate({
+                errorPlacement: function(error, element) {
+                    error.appendTo(element.parent())
+                },
+                rules: {
+                    txtSourcePort: {
+                        required: true,
+                        portcheck: true
+                    },
+                    txtDestIpAddress: {
+                        required: true,
+                        ipv4check: true
+                    },
+                    txtDestPort: {
+                        required: true,
+                        portcheck: true
+                    },
+                    txtComment: {
+                        required: true
+                    }
+                    },
+                    messages: {
+                    txtSourcePort: {
+                        required: 'Required',
+                        maccheck: true
+                    },
+                    txtDestIpAddress: {
+                        required: 'Required'
+                    },
+                    txtDestPort: {
+                        required: 'Required'
+                    },
+                    txtComment: {
+                        required: 'Required'
+                    }
+                }
+            }).form()
+            if (!objPort.validate) return false
+
+            compareData =
+            objPort.setData.srcport +
+            ',' +
+            objPort.setData.ipaddr +
+            ',' +
+            objPort.setData.destport +
+            ',' +
+            objPort.setData.protocol.replace('&',"+") +
+            ',' +
+            objPort.setData.comment
+
+            for (var i = 0; i < objPort.data.length; i++) {
+                if (compareData == objPort.data[i]) {
+                    showInfo('rule_exist')
+                    return
+                }
+            }
+
+            if (objPort.data.length >= 10) {
+                showInfo($.i18n.prop('rules_max',10))
+                return
+            }
+
+            var params = {};
+            params.portMapEnable = getSwitch('switch-mapp-filter') ? 1 : 0;
+            params.sourcePort = esc(objPort.setData.srcport);
+            params.destIpAddress = esc(objPort.setData.ipaddr);
+            params.destPort = esc(objPort.setData.destport);
+            params.protocol = objPort.setData.protocol;
+            params.comment = esc(objPort.setData.comment);
+            window._service.setPortMap(params, function(result){
+                if (result.result == "success") {
+                    showInfo('success_info',function(){
+                        loadSetting(true)
+                    })
+                } else {
+                    showAlert('error_info')
+                }
+            });
+        })
+
+        $('#pblist-checkall').click(function() {
+            var checkbox = $(this).find("input:checkbox");
+            if (checkbox.attr("checked")) {
+                checkbox.removeAttr("checked");
+            } else {
+                checkbox.attr("checked", "checked");
+            }
+            checkCheckbox(checkbox);
+            setTimeout(function() {
+            if ($('.checkbox_selected[id!="pblist-checkall"]').length > 0)
+                $('.btn-del-item').removeAttr('disabled')
+            else $('.btn-del-item').attr('disabled', true)
+            }, 100)
+        })
+
+        $('#btn-mapp-switch').click(function() {
+            showLoading();
+            var params = {};
+            params.portMapEnable = getSwitch('switch-mapp-filter') ? 1 : 0;
+            window._service.enablePortMap(params, function(result){
+                hideLoading()
+                if (result.result == "success") {
+                    showInfo('success_info')
+                } else {
+                    showAlert('error_info')
+                }
+            });
+        })
+
+        $('.filter-item-chk').die().live('click', function() {
+            checkboxHandle($(this).attr('id'))
+            setTimeout(function() {
+                if ($('.checkbox_selected[id!="pblist-checkall"]').length > 0)
+                    $('.btn-del-item').removeAttr('disabled')
+                else $('.btn-del-item').attr('disabled', true)
+                if ($('.checkbox_selected[id!="pblist-checkall"]').length ==$('#pblist tr').length)
+                    setCheckbox('pblist-checkall', true)
+                else setCheckbox('pblist-checkall', false)
+            }, 100)
+        })
+
+        $('.btn-del-item').click(function() {
+            var id = 0,ids = []
+            $('.checkbox_selected[id!="pblist-checkall"]').each(function() {
+                try {
+                    id = $(this).find('input').val()
+                    ids.push(id)
+                } catch (e) {}
+            })
+            if(ids.length == 0) {
+                showAlert("no_data_selected");
+                return;
+            }
+            showConfirm('',"confirm_data_delete", function () {
+                showLoading('deleting');
+                var params = {};
+                params.indexs = ids;
+                window._service.deleteMapRules(params, function(result){
+                hideLoading()
+                if (result.result == "success") {
+                    showInfo('success_info',function(){
+                        loadSetting(true)
+                    })
+                } else {
+                    showAlert('error_info')
+                }
+                });
+            });
+        })
+    })
+
+    function loadSetting(init) {
+        var _html = []
+        var info = window._service.getPortMap();
+        displayPortDom(info.portMapEnable == 1)
+        setSwitch('switch-mapp-filter', info.portMapEnable == 1)
+        
+        objPort.data = []
+        $.each(info.portMapRules,function(index,_item){
+            _html.push(
+                '\<tr class="even">\
+                    <td class="ko-grid-center">\
+                        <p class="checkbox filter-item-chk" manualcontrol="true" id="chk__' +_item.index +'">\
+                        <input type="checkbox" target="pblist-checkall" value="' +_item.index +'"></p>\
+                    </td>\
+                    <td class="ko-grid-center">' +_item.sourcePort +'</td>\
+                    <td class="ko-grid-center">' +_item.destIpAddress +'</td>\
+                    <td class="ko-grid-center">' +_item.destPort +'</td>\
+                    <td class="ko-grid-center">' +_item.protocol +'</td>\
+                    <td class="ko-grid-center">' + _item.comment +'</td>\
+                </tr>'
+            )
+            objPort.data.push(_item.sourcePort+","+_item.destIpAddress+","+_item.destPort+","+_item.protocol+","+_item.comment)
+        })
+
+        $('#pblist').html(_html.join(''))
+        $('#txtSourcePort').val('')
+        $('#txtDestIpAddress').val('')
+        $('#txtDestPort').val('')
+        $('#protocol').val('TCP&UDP')
+        $('#txtComment').val('')
+
+        if ($('.checkbox_selected[id!="pblist-checkall"]').length > 0)
+            $('.btn-del-item').removeAttr('disabled')
+        else $('.btn-del-item').attr('disabled', true)
+    }
+
+    function displayPortDom(isShow) {
+        if (isShow) {
+            $('#mapBasicDiv').show()
+        } else {
+            $('#mapBasicDiv').hide()
+        }
+    }
+}
+load_init()
+</script>

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MTS</title>
+    <link rel="stylesheet" href="media/fonts/fonts.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/chosen.css" />
+    <link rel="stylesheet" href="css/common_mts.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="js/jquery.mCustomScrollbar.min.css">
+    <script src="js/jquery-1.8.2.min.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/service.js"></script>
+    <script src="js/config/language.js"></script>
+    <script src="js/config/menu.js"></script>
+    <script src="js/jquery.simplemodal-1.4.5.js"></script>
+    <script src="js/chosen.jquery.en.js"></script>
+    <script src="js/jquery.base64.js"></script>
+    <script src="/js/lib/knockout/knockout-3.4.2.js"></script>
+    <script src="/js/lib/knockout/knockout.simpleGrid.js"></script>
+    <script src="/js/config/service.js"></script>
+    <script src="/js/lib/underscore/underscore-min.js"></script>
+    <script src="/js/lib/jquery/translate.js"></script>
+    <script src="/js/lib/jquery/jquery.tmpl.min.js"></script>
+    <script src="/js/lib/base64.js"></script>
+    <script src="js/config/statusBar.js"></script>
+
+    <script type="text/javascript">
+        window.isCanPollingSMS = true //当执行短信的发送、保存、删除时 停止查询收件箱
+        //解决IE浏览器不支持Array.find方法 IE8及一下不支持filter/map方法
+        if (!Array.prototype.map) {
+            Array.prototype.map = function (callback) {
+                var result = []
+                for (i = 0; i < this.length; i++) {
+                    result.push(callback(this[i]))
+                }
+                return result
+            };
+        }
+        if (!Array.prototype.filter) {
+            Array.prototype.filter = function (callback) {
+                var result = []
+                for (i = 0; i < this.length; i++) {
+                    if (callback(this[i])) result.push(this[i])
+                }
+                return result
+            };
+        }
+        if (!Array.prototype.find) {
+            Array.prototype.find = function (callback) {
+                return callback && (this.filter(callback) || [])[0];
+            };
+        }
+
+        var _baseGlobalParam = {
+            BaseInfo: {},
+            ShowNoInternet: true,
+            UnReadMsgInterval: null,
+            ShowedSMSIds: []
+        };
+        var ts = {
+            monthly_tx_bytes: 0, //总的传输字节（单位：B）
+            monthly_rx_bytes: 0, //总的接收字节（单位：B） 
+            monthly_time: 0, //总的联网时间（单位：s）
+            realtime_tx_bytes: 0, //当前传输字节（单位：B）
+            realtime_rx_bytes: 0, //当前接收字节（单位：B） 
+            realtime_time: 0, //当前联网时间（单位：s） 
+            realtime_tx_thrpt: 0, //上行速率（单位：Byte/s）
+            realtime_rx_thrpt: 0, //下行速率（单位：Byte/s） 
+            max_tx_thrpt: 0, // 上行最大速度（单位：Byte/s）
+            max_rx_thrpt: 0, // 下行最大速度（单位：Byte/s）
+        }
+        $(function () {
+            // 获取当前设备设置的语言
+            $.get('goform/goform_get_cmd_process?isTest=false&cmd=Language&multi_data=1&_=' + new Date().getTime(), {}, function (data) {
+                var result = $.parseJSON(data);
+                var lang = window.CurrentLang;
+                if (result && result.Language && window.SupportLang[result.Language]) {
+                    lang = result.Language;
+                    $('#selLanguage').val(lang);
+                }
+                window.LTELanguageChange(lang);
+            });
+
+            if ('onhashchange' in window && (typeof document.documentMode === 'undefined' || document.documentMode == 8)) {
+                window.onhashchange = _baseHashCheck;
+                _baseHashCheck();
+            } else {
+                setInterval(_baseHashCheck, 1000)
+            }
+
+            // 定时获取基础数据
+            setInterval(function () {
+                refreshDeviceStatus();
+                _baseGetBaseInfo();
+            }, 1000);
+
+            // 连接网络、断开网络
+            $('#spanNetworkStatusImg').bind('click', function () {
+                if (_baseGlobalParam.BaseInfo == null) {
+                    return;
+                }
+
+                var showStatus = "connecting";
+                if ($('#spanNetworkStatusImg').attr('class').indexOf('bg-wrap-on') >= 0) {
+                    showStatus = "disconnecting";
+                }
+
+                showLoading(showStatus);
+                if (showStatus == 'connecting') {
+                    _baseChangeNetwork();
+                    return;
+                }
+
+                // 断开链接要验证是否链接wifi
+                window._service.getHotspotList({}, function (data) {
+                    var extSSID = false;
+                    for (var i = 0, len = data.hotspotList.length; i < len; i++) {
+                        if (data.hotspotList[i].connectStatus == "1") {
+                            extSSID = true;
+                            break;
+                        }
+                    }
+                    if (extSSID) {
+                        var para = {};
+                        para.ap_station_enable = '0';
+                        window._service.setAPStationBasic(para, function (data) {
+                            window.location.reload();
+                        });
+                        window._service.refreshAPStationStatus();
+                    } else {
+                        _baseChangeNetwork();
+                    }
+                });
+            });
+
+            window._status.init();
+            $('body').translate();
+
+            $('#first-menu').bind('click', function () {
+                if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+                    return
+                }
+                if ($(this).hasClass('unfold')) {
+                    $(this).removeClass('unfold')
+                } else {
+                    $(this).addClass('unfold')
+                }
+            })
+
+            if ((/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+                $("#main-top").addClass('mobile')
+                $("#main-top").removeClass('pc')
+            } else {
+                $("#main-top").addClass('pc')
+                $("#main-top").removeClass('mobile')
+            }
+        })
+
+        function _baseChangeNetwork() {
+            $.getJSON('/goform/goform_set_cmd_process', {
+                goformId: (_baseGlobalParam.BaseInfo.ppp_status == 'ppp_connected' ? 'DISCONNECT_NETWORK' : 'CONNECT_NETWORK')
+            }, function (data) {
+                if (!data || !data.result || data.result.toLowerCase() != 'success') {
+                    hideLoading();
+                    showAlert('failure');
+                    return;
+                }
+
+                // 当该接口返回 success 后，需要循环去查询网络状态（具体接口见“操作：读取联网状态”），直到网络状态值为 ppp_disconnected/ ppp_connected 为止。
+                var _timerLoadNetwork = setInterval(function () {
+                    if (_baseGlobalParam.BaseInfo.ppp_status == 'ppp_disconnected' || _baseGlobalParam.BaseInfo.ppp_status == 'ppp_connected') {
+                        hideLoading();
+                        clearInterval(_timerLoadNetwork);
+                    }
+                }, 1000);
+            });
+        }
+
+        var currentUrl = ''
+
+        function _baseHashCheck() {
+            if (window.location.hash === currentUrl && currentUrl != "") {
+                return
+            }
+
+            currentUrl = window.location.hash
+            var match = window.findMenu()
+            if (match.length == 0) {
+                if (!window.location.hash.indexOf('http') == 0) {
+                    window.location.hash = '#home'
+                }
+            } else {
+                _baseGotoContent(match[0])
+            }
+        }
+
+        function _baseGotoContent(menu) {
+            var toUrl = menu.path + '.html';
+            if (menu.checkSIMStatus) {
+                var info = window._service.getStatusInfo();
+                if (info.simStatus == undefined) {
+                     if($('#selLanguage').val() === 'ru'){
+                        showLoading('Ожидание ...');
+                        
+                    }else{
+                        showLoading('Waiting');
+                    }
+                    function checkSIM() {
+                        var data = window._service.getStatusInfo();
+
+                        if (data.simStatus == undefined || $.inArray(data.simStatus, window._service.config.TEMPORARY_MODEM_MAIN_STATE) != -1) {
+                            addTimeout(checkSIM, 500);
+                        } else {
+                            hideLoading();
+                            gotoPage(data.simStatus)
+                        }
+                    }
+                    checkSIM();
+                } else {
+                    gotoPage(info.simStatus)
+                }
+
+                function gotoPage(simStatus) {
+                    if (simStatus == "modem_sim_undetected" || simStatus == "modem_sim_destroy") {
+                        toUrl = "view/nosimcard" + '.html';
+                    } else if (simStatus == "modem_waitpin" || simStatus == "modem_waitpuk") {
+                        toUrl = "view/nosimcard" + '.html';
+                    } else if (simStatus == "modem_imsi_waitnck") {                    	
+                        toUrl = "view/network_lock.html";
+                    }
+
+                    $('#ifrContainer').load(toUrl, function () {
+                        $('#ifrContainer').translate();
+                    });
+                }
+                return
+            }
+
+            $('#ifrContainer').load(toUrl, function () {
+                $('#ifrContainer').translate();
+            });
+        }
+
+        function _baseGetBaseInfo() {
+            if (window.isCanPollingSMS == false) return
+
+            $.getJSON("/goform/goform_get_cmd_process", {
+                isTest: 'false',
+                cmd: encodeURI("loginfo,sta_count,mcc,mnc,manual_mcc_mnc,sms_unread_num,manual_forbidden_state,realtime_tx_thrpt,realtime_rx_thrpt,monthly_tx_bytes,monthly_rx_bytes,signalbar,network_type,ppp_status,modem_main_state,monthly_time,realtime_tx_bytes,realtime_rx_bytes,realtime_time,max_tx_thrpt,max_rx_thrpt,EX_SSID1,sta_ip_status,sub_network_type"), //,max_tx_thrpt,max_rx_thrpt
+                multi_data: 1,
+                sms_received_flag_flag: 0,
+                sts_received_flag_flag: 0,
+                "_": new Date().getTime()
+            }, function (data) {
+         
+            	if(data.mcc+data.mnc==data.manual_mcc_mnc){
+            		if(data.manual_forbidden_state=='3'){
+            		data.network_type='no service';
+            		data.signalbar='0';
+            	}
+            	}
+            	
+                if (data.loginfo != 'ok') {
+                    location.href = 'login.html';
+                    return;
+                }
+                _readTrafficSatistics(data)
+                _baseGlobalParam.BaseInfo = data;
+                if (data.ppp_status == 'ppp_connected') {
+                    $('#spanConnNetTitle').attr('data-trans', 'MTSNetwork');
+                    $('#spanNetworkStatusImg').removeClass('bg-wrap-off').addClass('bg-wrap-on');
+                    $('#spanNetworkStatusStr').attr('data-trans', 'connected');
+                } else if (data.ppp_status == 'ppp_disconnected') {
+                    // data.realtime_rx_thrpt = 0;
+                    // data.realtime_tx_thrpt = 0;
+
+                    _baseDisConnectedStatusInfo();
+                } else {
+                    $('#spanConnNetTitle').attr('data-trans', 'MTSNetwork');
+                    $('#spanNetworkStatusStr').attr('data-trans', 'disconnected');
+                }
+
+                $('#spanClientCount').html((parseInt(data.sta_count) || 0));
+                $('#spanRecSent').html(getDisplayVolume2(data.monthly_tx_bytes) + "/" + getDisplayVolume2(data.monthly_rx_bytes));
+                $('#spanDownlink').html(getDisplayVolume2(data.realtime_rx_thrpt) + $.i18n.prop('speed_sec'));
+                //  /с
+                $('#spanUplink').html(getDisplayVolume2(data.realtime_tx_thrpt) + $.i18n.prop('speed_sec'));
+                var info = window._service.getStatusInfo();
+                var simStatus=info.simStatus
+                if(simStatus == "modem_imsi_waitnck"){
+                	data.signalbar = 0;
+                	 $('#spanNetworkType').attr('data-trans', 'network_type_no_service');
+                }else{
+                	  $('#spanNetworkType').html(convertSignalStr(data));
+                }
+              
+                
+                if (data.network_type.toLowerCase() == 'limited service' || data.network_type.toLowerCase() == 'no service') {
+                    data.signalbar = 0;
+                    if (_baseGlobalParam.ShowNoInternet) {
+                        _baseOpenNoInternet('you_not_connected_network');
+                    } else {
+                        $('#no-connection-popup').hide();
+                        if (window.location.hash == '#home') {
+                            $('#ifrContainer').html('<div style="text-align: center;margin-top: 50px;color: red;" id="tempContainer"><span data-trans="you_not_connected_network"></span></div>');
+                        }
+                    }
+                } else {
+                    $('#no-connection-popup').hide();
+                }
+
+                $('.signal').removeClass().addClass('signal signal' + data.signalbar);
+
+                var state = data.modem_main_state.toLowerCase();
+                if (state == "modem_sim_undetected" || state == "modem_undetected" || state == "modem_sim_destroy") {
+                    window._noSIM = true;
+                    if (_baseGlobalParam.ShowNoInternet) {
+                        _baseOpenNoInternet('no_sim_card_message');
+                    } else {
+                        $('#no-connection-popup').hide();
+                        if (window.location.hash == '#home') {
+                            $('#ifrContainer').html('<div style="text-align: center;margin-top: 50px;color: red;" id="tempContainer"><span data-trans="no_sim_card_message"></span></div>');
+                        }
+                    }
+                } else {
+                    $('#no-connection-popup').hide();
+                }
+
+                // 短信闪烁
+                var unReadNum = (parseInt(data.sms_unread_num) || 0);
+
+                $('#spanSMSUnReadCount').html(unReadNum);
+                if (unReadNum > 0 && _baseGlobalParam.UnReadMsgInterval == null) {
+                    _baseGlobalParam.UnReadMsgInterval = setInterval(function () {
+                        var msg = $('.message-header');
+                        if (msg[0].style.display.toLowerCase() == 'none') {
+                            msg.show();
+                        } else {
+                            msg.hide();
+                        }
+                    }, 500);
+                }
+                if (unReadNum == 0 && _baseGlobalParam.UnReadMsgInterval != null) {
+                    clearInterval(_baseGlobalParam.UnReadMsgInterval);
+                    _baseGlobalParam.UnReadMsgInterval = null;
+                    $('.message-header').show();
+                }
+                if (unReadNum == 0) {
+                    _baseGetSMSMessages();
+                }
+
+                $('.main-header,#tempContainer').translate();
+            }).error(function () { });
+        }
+
+        function _baseGetSMSMessages() {
+            // if(window.isCanPollingSMS==false)return
+            // console.log("轮询短信"+new Date().getTime())
+            var param = {
+                cmd: 'sms_data_total',
+                page: 0,
+                data_per_page: 100,
+                mem_store: 1,
+                tags: 1,
+                order_by: 'order by id desc'
+            }
+            getSMSMessages(param, function (flag, data) {
+
+                if (flag) {
+                    $.each(data, function (index, item) {
+                        var smsId = 'UnReadSMS_' + item.id;
+
+                        if (_baseGlobalParam.ShowedSMSIds.indexOf(smsId) == -1) {
+                            var list_all_message =
+                                '<div class="bubbleItem" id="' + smsId + '">' +
+                                '   <h3>' +
+                                '       <span data-trans="contact_Message"></span>' + item.number +
+                                '       <a href="javascript:void(0);" data-targetid="' + smsId + '" class="bubbleCloseBtn" onclick="_baseCloseBubbleSMS(\'' + smsId + '\');"></a>' +
+                                '   </h3>' +
+                                '   <div class="bubbleContainer">' +
+                                '       <div class="bubbleContent">' + decodeMessage(escapeMessage(item.content)) + '</div>' +
+                                '       <div class="bubbleDatetime">' + transTime('20' + item.date) + '</div>' +
+                                '   </div>' +
+                                '</div>';
+                            setTimeout(function () {
+                                $('#' + smsId).remove();
+                            }, 1000 * 30);
+                            $('#buttom-bubble').append(list_all_message);
+                            _baseGlobalParam.ShowedSMSIds.push(smsId);
+                        }
+                    });
+
+                    $('#buttom-bubble').translate();
+                }
+            })
+        }
+
+        function _baseCloseBubbleSMS(id) {
+            $('#' + id).remove();
+        }
+
+        function _baseLogout() {
+            showConfirm('confirm_logout', '', function () {
+                $.post('/goform/goform_set_cmd_process', {
+                    goformId: 'LOGOUT'
+                }, function () {
+                    location.href = "login.html";
+                });
+            });
+        }
+
+        function _readTrafficSatistics(data) {
+            ts.monthly_tx_bytes = parseInt(data.monthly_tx_bytes);
+            ts.monthly_rx_bytes = parseInt(data.monthly_rx_bytes);
+            ts.monthly_time = data.monthly_time;
+            ts.realtime_tx_bytes = parseInt(data.realtime_tx_bytes);
+            ts.realtime_rx_bytes = parseInt(data.realtime_rx_bytes);
+            ts.realtime_time = data.realtime_time;
+            ts.realtime_tx_thrpt = parseInt(data.realtime_tx_thrpt);
+            ts.realtime_rx_thrpt = parseInt(data.realtime_rx_thrpt);
+            ts.max_tx_thrpt = parseInt(data.max_tx_thrpt) || 10533;
+            ts.max_rx_thrpt = parseInt(data.max_rx_thrpt) || 23858;
+        }
+
+        function _baseOpenNoInternet(msg) {
+            if (msg) msg = $.i18n.prop('msg')
+            // 显示No internet connection也要验证是否有链接到wifi上
+            var hasConnectWifi = false;
+            var apList = window._service.getHotspotList().hotspotList;
+            if (apList && apList.length > 0) {
+                var connectDevice = apList.find(function (x) {
+                    return x.connectStatus == "1";
+                });
+                if (connectDevice != null) {
+                    hasConnectWifi = true;
+                }
+            }
+
+            if (!hasConnectWifi) {
+                $('#no-connection-popup').show();
+                $('#noInternetMsg').html(msg);
+            }
+        }
+
+        function _baseCloseNoInternet() {
+            $('.no-connection-popup').hide();
+            _baseGlobalParam.ShowNoInternet = false;
+        }
+
+        function _baseDisConnectedStatusInfo() {
+            var wifiSSID = _baseGlobalParam.BaseInfo.EX_SSID1;
+            var wifiStatus = _baseGlobalParam.BaseInfo.sta_ip_status;
+            if (wifiSSID && wifiStatus == "connect") {
+                window._service.getHotspotList({}, function (data) {
+                    var extSSID = "";
+                    for (var i = 0, len = data.hotspotList.length; i < len; i++) {
+                        if (data.hotspotList[i].connectStatus == "1") {
+                            extSSID = data.hotspotList[i].ssid;
+                            break;
+                        }
+                    }
+                    if (extSSID) {
+                        $('#spanConnNetTitle').attr('data-trans', 'SSID: ' + extSSID);
+                        $('#spanNetworkStatusImg').removeClass('bg-wrap-off').addClass('bg-wrap-on');
+                        $('#spanNetworkStatusStr').attr('data-trans', 'connected');
+                    } else {
+                        $('#spanConnNetTitle').attr('data-trans', 'MTSNetwork');
+                        $('#spanNetworkStatusImg').removeClass('bg-wrap-on').addClass('bg-wrap-off');
+                        $('#spanNetworkStatusStr').attr('data-trans', 'disconnected');
+                    }
+                });
+            } else {
+                $('#spanConnNetTitle').attr('data-trans', 'MTSNetwork');
+                $('#spanNetworkStatusImg').removeClass('bg-wrap-on').addClass('bg-wrap-off');
+                $('#spanNetworkStatusStr').attr('data-trans', 'disconnected');
+            }
+        }
+
+        var need_refresh = 0,
+            modem_removed = false;
+
+        function refreshDeviceStatus() {
+            $.ajax({
+                url: '/goform/goform_get_cmd_process',
+                type: "Get",
+                timeout: 8000,
+                cache: false,
+                data: {
+                    isTest: 'false',
+                    cmd: encodeURI("loginfo"),
+                    multi_data: 1
+                },
+                success: function (data, status) {
+                    need_refresh = 0;
+                    if (modem_removed) {
+                        hideConfirm();
+                        modem_removed = false;
+                    }
+                },
+                error: function (x, t, m) {
+                    if (t === "timeout" || t === "error") {
+                        if (need_refresh < 5) need_refresh++;
+                        if (need_refresh == 4) to_404();
+                    }
+                }
+            })
+        }
+
+        function to_404() {
+            var content = $.i18n.prop('modem_removed');
+            modem_removed = true;
+            showInfo2(content);
+        }
+
+        function gotoSmsList() {
+            $('#sms_page_tab').val(0)
+            if ('#sms' == window.location.hash) {
+                goRouter('smslist')
+            } else {
+                goRouter('sms')
+            }
+
+        }
+        function tohelp(){
+        	if($('#selLanguage').val() =='ru'){
+        		$("#help").attr('href','help_ru.html')
+        	}else{
+        		$("#help").attr('href','help.html')
+        	}
+        }
+      
+       
+    </script>
+</head>
+
+<body class="lng-en">
+    <div class="main-wrapper pc" id="main-top">
+        <header class="main-header">
+            <nav class="top-nav">
+                <div style="position: relative;">
+                    <div class="container clearfix" style="height:120px;position: relative;">
+                        <a href="#" class="main-logo" style="margin-top:17px;margin-left:-13%"></a>
+                        <div class="border-block floatRight" style="margin:24px 25% 0 0;height:0;">
+                           <!-- <iframe class="b-iframe_header_user"
+                                src="http://login.mts.ru/profile/header?ref=http://wwW.mts.ru/&scheme=http&service=lk&style=2015v3"
+                                width="296" height="45" frameborder="0" scrolling="no"
+                                allowtransparency="true"></iframe> -->
+                        </div>
+                        <div class="network-mts-wrap" style="float:none;margin-left:17%">
+                            <label style="text-align:center;">
+                                <span id="spanConnNetTitle" class="title"></span>
+                                <span id="spanNetworkStatusImg" class="bg-wrap-off network-status-ext"></span>
+                                <span id="spanNetworkStatusStr" class="title network-status-ext"></span>
+                            </label>
+                        </div>
+                        <div style="position:absolute;right: -15%;display: inline-block;line-height: 84px;top: 0px;">
+                            <span>
+                                <img id="batterCharging" src="img/battery_full.png" style="vertical-align: middle" hidden=""/>
+                            </span>&nbsp;
+                            <select id="selLanguage" class="marginright10 hide" style="display: inline-block;"
+                                onchange="window.LTELanguageChange($('#selLanguage').val());">
+                                <option value="ru">Русский</option>
+                                <option value="en">English</option>
+                            </select>
+                            <span>
+                            	 
+                                <a class="logout marginright10 hide" id="help" target="_blank" onclick="tohelp()"  href=""
+                                    style="display: inline;" data-trans="Help"></a>
+                            </span>
+                            <span>
+                                <a class="logout marginright10 hide" href="javascript:;" onclick="_baseLogout();"
+                                    style="display: inline;" data-trans="logout"></a>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </nav>
+            <nav class="site-nav" >
+                <div class="container clearfix" style="width:1170px;">
+                    <ul class="main-nav" style="float:left;width:86px;">
+                        <li class="menu-item menu-first" style="width: 110px;line-height:52px;padding:0;"
+                            id="first-menu">
+                            <a href="#home">
+                                <span class="text" data-trans="Menu"></span>
+                                <span class="icon"></span>
+                            </a>
+                            <ul class="toggle-menu" style="z-index:100;">
+                                <li data-topic="home">
+                                    <a href="#home" style="cursor:pointer">
+                                        <span class="toggle-text" data-trans="home"></span>
+                                    </a>
+                                </li>
+                                <li data-topic="statistic">
+                                    <a href="#statistic" style="cursor:pointer">
+                                        <span class="toggle-text" data-trans="traffic_statistics"></span>
+                                        <span class="toggle-icon statistics"
+                                            style="background-image:url('/img/11.png');background-repeat:no-repeat;"></span>
+                                    </a>
+                                </li>
+                               <!-- <li data-topic="pay">
+                                    <a href="#pay" style="cursor:pointer">
+                                        <span class="toggle-text" data-trans="payment"></span>
+                                        <span class="toggle-icon payment"
+                                            style="background-image:url('/img/10.png');background-repeat:no-repeat;"></span>
+                                    </a> -->
+                                </li>
+                                <li data-topic="settings">
+                                    <a href="#settings_quick" style="cursor:pointer"> 
+                                        <span class="toggle-text" data-trans="Settings"></span>
+                                        <span class="toggle-icon settings"
+                                            style="background-image:url('/img/8.png');background-repeat:no-repeat;"></span>
+                                    </a> 
+                                </li>
+                                <li data-topic="sms">
+                                    <a href="#sms" onclick="sms_changePage(0,true);" style="cursor:pointer">
+                                        <span class="toggle-text" data-trans="sms_messages"></span>
+                                        <span class="toggle-icon messages"
+                                            style="background-image:url('/img/9.png');background-repeat:no-repeat;"></span>
+                                    </a>
+                                </li>
+                               <!-- <li data-topic="apps">
+                                    <a href="http://www.mts.ru/mob_connect/entertainment/all_for_tel/mtsapps/?utm_source=MTS&utm_medium=APP_WEB_UI&utm_campaign=APP_WEB_UI_092017"
+                                        target="_blank">
+                                        <span class="toggle-text" data-trans="MTSApps"></span>
+                                        <span class="toggle-icon card"
+                                            style="background-image:url('/img/12.png');background-repeat:no-repeat;"></span>
+                                    </a> -->
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="main-nav" style="float:right;width:1060px;">
+                        <li class="menu-item" style="width:15%;">
+                            <a href="#statistic">
+                                <span class="icon g4">
+                                    <span class="signal signal0"></span>
+                                </span>
+                                <span class="text" id="spanNetworkType" ></span>
+                            </a>
+                        </li>
+                        <li class="menu-item" style="width:23%;">
+                            <a href="#statistic">
+                                <span class="icon get-post" style="background-image:url('/img/3.png')"></span>
+                                <span class="text">
+                                    <small data-trans="Receivedandsent"></small>
+                                    <span id="spanRecSent">0 Mb/0 Mb</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="menu-item" style="width:14%;">
+                            <a href="#statistic">
+                                <span class="icon downlink" style="background-image:url('/img/5.png')"></span>
+                                <span class="text">
+                                    <small data-trans="Downlink"></small>
+                                    <span id="spanDownlink">0b/s</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="menu-item" style="width:14%;">
+                            <a href="#statistic">
+                                <span class="icon uplink" style="background-image:url('/img/4.png')"></span>
+                                <span class="text">
+                                    <small data-trans="Uplink"></small>
+                                    <span id="spanUplink">0b/s</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="menu-item" style="width:25%;">
+                            <a href="#statistic">
+                                <span class="icon clients" style="background-image:url('/img/6.png')"></span>
+                                <span class="text">
+                                    <small data-trans='Clientsconnected'></small>
+                                    <span id="spanClientCount">0</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="menu-item" style="width:5%;">
+                            <a href="#sms" onclick="sms_changePage(0,true);">
+                                <span class="icon messages">
+                                    <span class="message-header icon" style="background-image:url('/img/7.png')"></span>
+                                </span>
+                                <span class="text" id="spanSMSUnReadCount">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <div id="ifrContainer" style="width:100%;"></div>
+
+        <footer class="main-footer">
+            <div class="main-content-section">
+                <div class="top-bg"></div>
+                <div class="container">
+                    <p data-trans="footer_content">Only © 2015 MTS PJSC shall be shown</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div id='result-overlay'>
+        <div class='header'></div>
+        <br />
+        <div class="text-center">
+            <div>
+                <div id="result-image"></div>
+            </div>
+            <div id="result_wording"></div>
+        </div>
+    </div>
+    <div id="loading" class="base-popup service-message-popup" style="top:0;width:200px;text-align: center">
+        <div class="popup-wrap">
+            <h4 class="p-heading" id="load-title"></h4>
+            <div class="btn-wrap" style="margin-top:10px;">
+                <img id="loadingImg" src="media/img/loading.gif" />
+            </div>
+        </div>
+    </div>
+
+    <div id="confirm" class="base-popup service-message-popup" style="top:0;width:400px;text-align: center">
+        <div class="popup-wrap">
+            <h4 class="p-heading" id="confirm-title"></h4>
+            <p class="p-text" id="confirm-content"></p>
+            <div class="btn-wrap">
+                <a class="btn" id="yesbtn">OK</a>
+                <a class="btn gray" id="nobtn" data-trans="cancel">Cancel</a>
+            </div>
+            <div class="close-btn send-sms-dialog-close" id="closeBtn">
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="sms_page_tab" value="0" />
+
+    <div class="no-connection-popup active" id="no-connection-popup" style="display:none;">
+        <div class="popup-wrap">
+            <div style="text-align:center;color: red;padding-top:20px" id="noInternetMsg"></div>
+            <div class="no-connection-popup-content">
+                <h4 data-trans="no_internet_connect">No internet connection</h4>
+                <div class="content-wrap">
+                    <h6 data-trans="try_to_steps">Try to follow these steps?</h6>
+                    <ul>
+                        <li><a href="#" data-trans="check_network_signal"> Check network signal strength</a></li>
+                        <li><a href="#" data-trans="check_simcard_installed"> Check if SIM-card has been correctly
+                                installed into the device</a></li>
+                        <li><a href="#" data-trans="check_whether_is_used"> Check whether MTS SIM card is used</a></li>
+                    </ul>
+                </div>
+                <div class="close-btn" onclick="_baseCloseNoInternet()"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id='progress'>
+        <div class='header'>
+            <span id="barMsg"></span>
+        </div>
+        <br />
+        <div class="progress-content">
+            <div class="progress-bar-container">
+                <div id="bar" class="progress-bar"></div>
+                <div id="barValue" class="progress-bar-value"></div>
+            </div>
+            <div id="progress_container" class="progress-prompt"></div>
+        </div>
+    </div>
+<script type="text/x-jquery-tmpl" id="newMessagePopTmpl">
+    <div class="bubbleItem ${report}" id="${mark}">
+        <h3>
+			<span data-trans="${titletrans}">${title}</span> ${name} <a href="javascript:void(0);" data-targetid="${mark}" class="bubbleCloseBtn"></a>
+		</h3>
+        <div class="bubbleContainer">
+            <div class="bubbleContent">${content}</div>
+            <div class="bubbleDatetime">${datetime}</div>
+        </div>
+    </div>
+</script>
+    <div id="buttom-bubble"></div>
+</body>
+
+</html>
+<script src="js/jquery.mCustomScrollbar.min.js"></script>
+<script src="js/jquery.validate.en.js"></script>
+<script src="js/echarts.js"></script>
+<script src="js/mask.js"></script>
+<script src="js/main.js"></script>
+<script src="/js/lib/jquery/additional-methods.js"></script>
+<script src="js/lib/jquery/jquery.i18n.properties-1.0.9.js"></script>
+<script src="js/config/jQuery.fileinput.js"></script>
+<script src="js/lib/underscore/underscore-min.js"></script>

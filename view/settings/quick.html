@@ -1,0 +1,756 @@
+<!--<form id="apn_setting_form" novalidate="novalidate" autocomplete="off">
+    <div class="form-body">
+        <div class="form-title"></div>
+        <div class="content">
+               <table cellspacing="0" cellpadding="0" border="0" class="wizard-table">
+                <tbody>
+                        <tr id="step_title">
+                        <td id="step_1" class="step-active-middle" data-step="1" data-trans="step_name_1">1.Quick Setup</td>
+                        <td id="right_step_1" class="step-active-right"></td>
+                        <td id="step_2" class="step-middle" data-step="2">2</td>
+                        <td id="right_step_2" class="step-left"></td>
+                        <td id="step_3" class="step-middle" data-step="3">3</td>
+                        <td id="right_step_3" class="step-left"></td>
+                        <td id="step_4" class="step-middle" data-step="2">2</td>
+                        <td id="right_step_4" class="step-left"></td>
+                        <td id="step_5" class="step-middle" data-step="3">3</td>
+                        <td id="right_step_5" class="step-left"></td>
+                        <td id="step_6" class="step-middle" data-step="4">4</td>
+                        <td id="right_step_6" class="step-right-end"></td> 
+                    </tr>
+                </tbody> 
+            </table> 
+
+            <div class="row-fluid side-right">
+                <input id="btnBack" name="btnBack" type="button" class="btn-1" value="Previous" data-trans="prev_step" style="display: none">
+                <input id="btnNext" name="btnNext" type="button" class="btn-1" value="Next" data-trans="next_step" style="margin-right: 10px;">
+                <input id="btnSave" type="button" class="btn-1" value="Apply" data-trans="apply" style="display: none;margin-right: 10px;">
+            </div>
+
+            <div id="step1" style="margin-left: 20px;width:600px;">
+                <div class="step1Note" >
+                    <p class="explain" data-trans="step1_exp1_exten">The wizard will show you how to set up gateway safely: Click "Next" to continue, click "Previous" &amp; "Next" to navigate, and click "Apply" to save settings.</p>
+                    <p class="explain" data-trans="step1_exp2">Set basic parameters in this wizard. For advanced parameters, set them in other menu.</p>
+                </div>
+            </div>
+
+            <div style="display: none" id="step2">
+                <div class="form-title"></div>
+                <div class="content">
+                    <div class="row-fluid">
+                        <label class="span4 side-right"><span data-trans="apn_settings">APN Settings</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <input type="radio" name="apnMode" id="radAuto" value="auto">
+                            <label for="radAuto" data-trans="Auto">Auto</label>
+                           <input type="radio" name="apnMode" id="radManual" value="manual" style="display: none;">
+                            <label for="radManual" data-trans="Manual" style="display: none;">Manual</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="apnSetting">
+                    <div class="form-title" style="display: none;" data-trans="apn_profile">Profile</div>
+                    <div class="content" style="display: none">
+                        <div class="row-fluid">
+                            <label class="span4 side-right" for="profile_name"><span data-trans="apn_profile_name">Profile Name</span>
+                                <i class="colorRed">&nbsp;</i>
+                            </label>
+                            <div class="span8">
+                                <input type="text" name="txtProfileName" id="profile_name" class="required" maxlength="32" value="">
+                            </div>
+                        </div>
+                        <div class="row-fluid">
+                            <label class="span4 side-right" for="txtAPN"><span data-trans="apn">APN</span>
+                                <i class="colorRed">&nbsp;</i>
+                            </label>
+                            <div class="span8">
+                                <input type="text" name="txtAPN" id="txtAPN" class="required" maxlength="32" value="">
+                            </div>
+                        </div>
+                        <div class="row-fluid" style="display: none;">
+                            <label class="span4 side-right" for="txtIPv6APN"><span data-trans="apn_ipv6_apn">IPv6 APN</span>
+                                <i class="colorRed">&nbsp;</i>
+                            </label>
+                            <div class="span8">
+                                <input type="text" name="txtIPv6APN" id="txtIPv6APN" class="required" maxlength="32">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-note">
+                    <div class="notes-title">&nbsp;</div>
+                    <ul class="notes-content">
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="display: none" id="step3">
+                <div class="form-title"></div>
+                <div class="content">
+                    <div class="row-fluid">
+                        <label class="span4 side-right" for="selAuthMode"><span data-trans="apn_authentication">Authentication</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <select id="selAuthMode" name="selAuthMode">
+                                <option value="3">Auto</option> 
+                                <option value="pap" data-trans="PAP">PAP</option>
+                                <option value="chap" data-trans="CHAP">CHAP</option>
+                                <option value="none" data-trans="None">None</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <label class="span4 side-right" for="txtUserName"><span data-trans="apn_user_name">User Name</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <input type="text" name="txtUserName" id="txtUserName" maxlength="32">
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <label class="span4 side-right" for="txtPassword"><span data-trans="apn_password">Password</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <input type="password" name="txtPassword" id="txtPassword" maxlength="32">
+                        </div>
+                    </div>
+                    <div class="row-fluid" style="display: none;">
+                        <label class="span4 side-right" for="selIPv6AuthMode"><span data-trans="apn_authentication_ipv6">IPv6 Authentication</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <select id="selIPv6AuthMode" name="selIPv6AuthMode" disabled="">
+                                <option value="none" data-trans="None">NONE</option>
+                                <option value="chap" data-trans="CHAP">CHAP</option>
+                                <option value="pap" data-trans="PAP">PAP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row-fluid" style="display: none;">
+                        <label class="span4 side-right" for="txtIPv6UserName"><span data-trans="apn_user_name_ipv6">IPv6 User Name</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <input type="text" name="txtIPv6UserName" id="txtIPv6UserName" maxlength="32" disabled="">
+                        </div>
+                    </div>
+                    <div class="row-fluid" style="display: none;">
+                        <label class="span4 side-right" for="txtIPv6Password"><span data-trans="apn_password_ipv6">IPv6 Password></span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <input type="password" name="txtIPv6Password" id="txtIPv6Password" maxlength="32" disabled="">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-note">
+                    <div class="notes-title">&nbsp;</div>
+                    <ul class="notes-content">
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div style="display: none" id="step4">
+                <div class="form-title"></div>
+                <div class="content">
+                    <div class="row-fluid">
+                        <label class="span6 side-right" for="txtSSID"><span data-trans="ssid_name">Network Name(SSID)</span>
+                            <i class="colorRed">&nbsp;</i>
+                        </label>
+                        <div class="span4">
+                            <input type="text" name="txtSSID" id="txtSSID" class="required valid" maxlength="32">
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <label class="span6 side-right"><span data-trans="network_name_broadcast">Broadcast Network Name (SSID)</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <label id="switch_brd" class="span4 side-left paddingtop10">
+                            <span style="cursor: pointer" class="bg-switch-enable"></span>
+                            <span class="switch_note"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-note">
+                    <div class="notes-title">&nbsp;</div>
+                    <ul class="notes-content">
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="display: none" id="step5">
+                <div class="form-title"></div>
+                <div class="content">
+                    <div class="row-fluid">
+                        <label class="span4 side-right" for="selSecurityMode"><span data-trans="security_mode">Security Mode</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <select id="selSecurityMode" name="selSecurityMode" transid="security_mode" style="width: 185px" class="valid">
+                                <option value="OPEN" data-trans="security_mode_OPEN">OPEN</option>
+                                <option value="WPA2PSK" data-trans="security_mode_WPA2PSK">WPA2(AES)-PSK</option>
+                                <option value="WPAPSKWPA2PSK" data-trans="security_mode_WPAPSKWPA2PSK">WPA-PSK/WPA2-PSK</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="div_pass" class="row-fluid">
+                        <label class="span4 side-right" for="txtWPAKey"><span data-trans="pass_phrase">Pass Phrase</span>
+                            <i class="colorRed">&nbsp;</i>
+                        </label>
+                        <div class="span8">
+                            <input type="password" name="pwdWPAKey" id="pwdWPAKey" class="floatleft margintop5" style="width: 175px; " minlength="8" maxlength="32" required="" onkeyup="$('#txtWPAKey').val($('#pwdWPAKey').val())">
+                            <input class="required floatleft margintop5 error" type="text" name="txtWPAKey" id="txtWPAKey" minlength="8" maxlength="63" style="width: 175px;display: none;" onkeyup="$('#pwdWPAKey').val($('#txtWPAKey').val())">
+
+                            <p id="wrap_showWifiPassword" class="checkbox floatleft margintop10 marginleft5 marginright5" onclick="_setquickShowWifiPasswordHandler();">
+                                <input id="showWifiPassword" type="checkbox" />
+                            </p>
+
+                             <p class="checkbox floatleft margintop10 marginleft5 marginright5 checkbox_selected">
+                                <input id="showWifiPassword" type="checkbox">
+                            </p> 
+                            <label class="floatleft margintop5 lineheight25" data-trans="display_password">Display Password</label>
+                            <br>
+                            <div id="lblShowWifiPassword" class="clear"></div>
+                            <label for="txtWPAKey" class="error" style="display: none;" data-trans="please_least_eit_char">Please input at least 8 characters</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: none" id="step6">
+                <div class="content">
+                    <div class="row-fluid">
+                        <label class="span4 side-right"><span data-trans="apn_settings">APN Settings</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <label class="span8" id="apn-mode-label"></label>
+                    </div>
+                    <div id="apn_manual_content" style="display: none;">
+                        <div class="row-fluid">
+                            <label class="span4 side-right"><span data-trans="apn_profile_name">Profile Name</span>
+                                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                            </label>
+                            <label class="span8" id="apn-name-label"></label>
+                        </div>
+                        <div class="row-fluid">
+                            <label class="span4 side-right"><span data-trans="apn">APN</span>
+                                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                            </label>
+                            <label class="span8 ellipsis" title="" id="apn-value-label"></label>
+                        </div>
+                        <div class="row-fluid">
+                            <label class="span4 side-right"><span data-trans="apn_authentication">Authentication</span>
+                                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                            </label>
+                            <label class="span8" id="apn-auth-label"></label>
+                        </div>
+                        <div class="row-fluid">
+                            <label class="span4 side-right"><span data-trans="apn_user_name">User Name</span>
+                                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                            </label>
+                            <label class="span8 ellipsis" title="mts" id="apn-username-label"></label>
+                        </div>
+                        <div class="row-fluid">
+                            <label class="span4 side-right"><span data-trans="apn_password">Password</span>
+                                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                            </label>
+                            <label class="span8 ellipsis" title="" id="apn-pwd-label"></label>
+                        </div>
+                    </div>
+                     
+                        <div class="row-fluid" style="display: none;">
+                            <label class="span4 side-right">IPv6 APN
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                        </label>
+                            <label class="span8"></label>
+                        </div>
+                        <div class="row-fluid" style="display: none;">
+                            <label class="span4 side-right">IPv6 Authentication
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                        </label>
+                            <label class="span8">NONE</label>
+                        </div>
+                        <div class="row-fluid" style="display: none;">
+                            <label class="span4 side-right">IPv6 User Name
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                        </label>
+                            <label class="span8 ellipsis"></label>
+                        </div> 
+                    <div class="row-fluid">
+                        <label class="span4 side-right"><span data-trans="ssid_name">Network Name(SSID)</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <label class="span8" id="wifi-ssid-label"></label>
+                    </div>
+                    <div class="row-fluid">
+                        <label class="span4 side-right"><span data-trans="network_name_broadcast">Broadcast Network Name (SSID)</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                        </label>
+                        <label class="span8" id="wifi-brd-label"></label>
+                    </div>
+                    <div class="row-fluid">
+                        <label class="span4 side-right"><span data-trans="security_mode">Security Mode</span>
+                            <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+                        </label>
+                        <label class="span8" id="wifi-sec-lebel"></label>
+                    </div>
+                    <div class="form-note">
+                        <div class="notes-title">&nbsp;</div>
+                        <ul class="notes-content">
+                            <li data-trans="step6_apply_explain">You need to reconnect wireless network when committing.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form> -->
+
+<script type="text/javascript">
+    var _setquickObj = {
+        QuickSetupInfo: {},
+        CurrAPN: {},
+        ValidateObj: null,
+        Step: {
+            CurrentStep: 1,
+            Detail: {
+                1: 'step_name_1',
+                2: 'step_name_2',
+                3: 'step_name_3',
+                4: 'step_name_4',
+                5: 'step_name_5',
+                6: 'step_name_6'
+            }
+        }
+    };
+
+    function _setquickInitParam() {
+        var info = _setquickObj.QuickSetupInfo;
+        var strAPN = info["APN_config" + info.apn_index];
+        var apnItems = [];
+        if (strAPN) {
+            apnItems = strAPN.split("($)");
+        }
+
+        var strIPv6APN = info["ipv6_APN_config" + info.apn_index];
+        var ipv6APNItems = [];
+        if (strIPv6APN) {
+            ipv6APNItems = strIPv6APN.split("($)");
+        }
+
+        _setquickObj.CurrAPN = {
+            m_profile_name: apnItems[0],
+            wan_apn: apnItems[1],
+            pdp_type: apnItems[7],
+            ppp_auth_mode: apnItems[4] == "" || typeof(apnItems[4]) == "undefined" ? "" : apnItems[4].toLowerCase(),
+            ppp_username: apnItems[5],
+            ppp_passwd: apnItems[6],
+            ipv6_pdp_type: ipv6APNItems[7],
+            ipv6_wan_apn: ipv6APNItems[1],
+            ipv6_ppp_auth_mode: typeof(ipv6APNItems[4]) == "undefined" || ipv6APNItems[4] == "" ? "" : ipv6APNItems[4].toLowerCase(),
+            ipv6_ppp_username: ipv6APNItems[5],
+            ipv6_ppp_passwd: ipv6APNItems[6]
+        }
+    }
+
+    $(function() {
+        $.getJSON("/goform/goform_get_cmd_process", {
+            isTest: 'false',
+            cmd: encodeURI("pdp_type,ipv6_pdp_type,wifi_cur_state,SSID1,HideSSID,AuthMode,WscModeOption,ppp_status,apn_index,ipv6_apn_index,ipv6_APN_index,m_profile_name,apn_mode,EncrypType,DefaultKeyID,Key1Str1,Key2Str1,Key3Str1,Key4Str1,WPAPSK1_encode,APN_config0,APN_config1,APN_config2,APN_config3,APN_config4,APN_config5,APN_config6,APN_config7,APN_config8,APN_config9,APN_config10,APN_config11,APN_config12,APN_config13,APN_config14,APN_config15,APN_config16,APN_config17,APN_config18,APN_config19,ipv6_APN_config0,ipv6_APN_config1,ipv6_APN_config2,ipv6_APN_config3,ipv6_APN_config4,ipv6_APN_config5,ipv6_APN_config6,ipv6_APN_config7,ipv6_APN_config8,ipv6_APN_config9,ipv6_APN_config10,ipv6_APN_config11,ipv6_APN_config12,ipv6_APN_config13,ipv6_APN_config14,ipv6_APN_config15,ipv6_APN_config16,ipv6_APN_config17,ipv6_APN_config18,ipv6_APN_config19,WPAPSK1"),
+            multi_data: 1,
+            "_": new Date().getTime()
+        }, function(data) {
+            _setquickObj.QuickSetupInfo = data;
+            _setquickInitParam();
+            // APN Settings
+            $(':radio[name="apnMode"][value="auto"]').attr('checked', true);
+            var apnConfig = (data['APN_config' + data.apn_index] || '').split('($)');
+            if (apnConfig.length > 0) {
+                $('#profile_name').val(apnConfig[0]);
+            }
+            if (apnConfig.length > 1) {
+                $('#txtAPN').val(apnConfig[1]);
+            }
+            _setquickAPNModeChange();
+
+            // Authentication
+            $('#selAuthMode').find('option[value="' + _setquickObj.CurrAPN.ppp_auth_mode.toLowerCase() + '"]').attr('selected', true);
+            $('#txtUserName').val(_setquickObj.CurrAPN.ppp_username);
+            $('#txtPassword').val(_setquickObj.CurrAPN.ppp_passwd);
+
+            // SSID
+            $('#txtSSID').val(_setquickObj.QuickSetupInfo.SSID1);
+            setSwitch("switch_brd span:eq(0)", _setquickObj.QuickSetupInfo.HideSSID == '0');
+
+            // Security
+            var securityMode = _setquickObj.QuickSetupInfo.AuthMode.toUpperCase();
+            $('#selSecurityMode').find('option[value="' + securityMode + '"]').attr('selected', true);
+            if (securityMode == 'OPEN') {
+                $('#div_pass').hide();
+            }
+            $('#pwdWPAKey').val(_setquickObj.QuickSetupInfo.WPAPSK1);
+            $('#txtWPAKey').val(_setquickObj.QuickSetupInfo.WPAPSK1);
+        });
+
+        $(':radio[name="apnMode"]').bind('change', _setquickAPNModeChange);
+
+        jQuery.validator.addMethod("checkchar", function(value, element) {
+            return this.optional(element) || !checkcharwidth(value);
+        }, $.i18n.prop('text_must_ascii_char'));
+        _setquickObj.ValidateObj = $('#apn_setting_form').validate({
+            errorPlacement: function(error, element) {
+                error.appendTo(element.parent())
+            },
+            rules: {
+                profile_name: {
+                    required: true
+                },
+                txtSSID: {
+                    required: true,
+                    minlength: 4,
+                    checkchar: true
+                },
+                apn_ipv4_apn: {
+                    required: true
+                }
+            },
+            messages: {
+                profile_name: {
+                    required: rule_required
+                },
+                txtSSID: {
+                    required: rule_required,
+                    minlength: rule_txtSSID_minlength,
+                    checkchar: rule_txtSSID_checkchar
+                },
+                apn_ipv4_apn: {
+                    required: rule_required
+                }
+            }
+        });
+
+        function rule_required() {
+            return $.i18n.prop('required')
+        }
+
+        function rule_txtSSID_minlength() {
+            return $.i18n.prop('ssid_length_rule')
+        }
+
+        function rule_txtSSID_checkchar() {
+            return $.i18n.prop('ssid_type_chare')
+        }
+
+        $('#switch_brd span').click(function() {
+            switchClick("switch_brd span:eq(0)")
+        });
+
+        $('#selSecurityMode').change(function() {
+            if ($(this).val() == 'OPEN') {
+                $('#pwdWPAKey').removeAttr('minlength required')
+                $("#div_pass").hide();
+            } else {
+                $('#pwdWPAKey').attr({
+                    'minlength': 8,
+                    'required': 'required'
+                });
+                $("#div_pass").show();
+            }
+        });
+
+        $('#btnBack').bind('click', function() {
+            if (_setquickObj.Step.CurrentStep > 0&&_setquickObj.Step.CurrentStep !=4) {
+                _setquickObj.Step.CurrentStep = _setquickObj.Step.CurrentStep - 1;
+            }
+          /*  // 如果当前是第三步则验证且apn mode选择的是auto则直接跳过第三步
+            if (_setquickObj.Step.CurrentStep == 3 && $(':radio[name="apnMode"]:checked').val().toLowerCase() == 'auto') {
+                _setquickObj.Step.CurrentStep = _setquickObj.Step.CurrentStep - 1;
+            }*/
+             if (_setquickObj.Step.CurrentStep ==4) {
+                _setquickObj.Step.CurrentStep = 1;
+            }
+
+            _setquickInit();
+        });
+        $('#btnNext').bind('click', function() {
+            if (!_setquickObj.ValidateObj.form()) {
+                return false;
+            }
+
+            if (_setquickObj.Step.CurrentStep < 6&&_setquickObj.Step.CurrentStep !=1) {
+                _setquickObj.Step.CurrentStep = _setquickObj.Step.CurrentStep + 1;
+            }
+             if (_setquickObj.Step.CurrentStep ==1) {
+                _setquickObj.Step.CurrentStep = 4;
+            }
+           /* // 如果当前是第三步则验证且apn mode选择的是auto则直接跳过第三步
+            if (_setquickObj.Step.CurrentStep == 3 && $(':radio[name="apnMode"]:checked').val().toLowerCase() == 'auto') {
+                _setquickObj.Step.CurrentStep = _setquickObj.Step.CurrentStep + 1;
+            }*/
+
+            _setquickInit();
+            if (_setquickObj.Step.CurrentStep == 6) {
+                _setquickFillData();
+            }
+        });
+        $('#btnSave').bind('click', function() {
+            _setquickGetWpsInfo(function(data) {
+                if (data.wpsFlag == '1') {
+                    showAlert('wps_already_enabled');
+                    return;
+                }
+
+                var content = (data.radioFlag == "0") ?
+                    $.i18n.prop('confirm_wifi_turne_off') : // Wi-Fi 已关闭，�?Wi-Fi 相关的设置不会生效。要继续吗？
+                    $.i18n.prop('confirm_wifi_device_may'); //Wi-Fi 配置更改后已连接�?Wi-Fi 设备可能需要重连。要继续吗？
+                showConfirm('confirm', content, function() {
+                    _setquickSetting4IPv6();
+                });
+            });
+        });
+
+        $('#containerSettings').translate();
+    });
+
+    function _setquickGetWpsInfo(callback) {
+        $.getJSON("/goform/goform_get_cmd_process", {
+            isTest: 'false',
+            cmd: encodeURI("wifi_wps_index,WscModeOption,AuthMode,wifi_cur_state,EncrypType,wps_mode,WPS_SSID,m_ssid_enable,SSID1,m_SSID,m_EncrypType,m_AuthMode,wifi_sta_connection"),
+            multi_data: 1,
+            "_": new Date().getTime()
+        }, function(data) {
+            var result = {};
+            result.wpsFlag = data.WscModeOption;
+            result.authMode = data.AuthMode;
+            result.wpsType = data.wps_mode;
+            result.radioFlag = data.wifi_cur_state == "1" ? "1" : "0";
+            result.encrypType = data.EncrypType;
+            result.wpsSSID = data.WPS_SSID;
+            result.ssidEnable = data.m_ssid_enable;
+            result.ssid = data.SSID1;
+            result.multiSSID = data.m_SSID;
+            result.m_encrypType = data.m_EncrypType;
+            result.wifi_wps_index = data.wifi_wps_index;
+            result.AuthMode = data.AuthMode;
+            result.m_AuthMode = data.m_AuthMode;
+            result.ap_station_enable = data.wifi_sta_connection;
+            if (callback) {
+                callback(result);
+            }
+        });
+    }
+
+    function _setquickSetting4IPv6() {
+        showLoading();
+        var param = {
+            apn_index: _setquickObj.QuickSetupInfo.apn_index,
+            pdp_type: _setquickObj.QuickSetupInfo.pdp_type == "IP" ? "IP" : _setquickObj.QuickSetupInfo.ipv6_pdp_type,
+            apnMode: _setquickObj.QuickSetupInfo.apn_mode,
+            profile_name: _setquickObj.CurrAPN.m_profile_name,
+            wan_apn: _setquickObj.CurrAPN.wan_apn,
+            ppp_auth_mode: _setquickObj.CurrAPN.ppp_auth_mode,
+            ppp_username: _setquickObj.CurrAPN.ppp_username,
+            ppp_passwd: _setquickObj.CurrAPN.ppp_passwd,
+            ipv6_wan_apn: _setquickObj.CurrAPN.wan_apn,
+            ipv6_ppp_auth_mode: _setquickObj.CurrAPN.ppp_auth_mode,
+            ipv6_ppp_username: _setquickObj.CurrAPN.ppp_username,
+            ipv6_ppp_passwd: _setquickObj.CurrAPN.ppp_passwd,
+            SSID_name: _setquickObj.QuickSetupInfo.SSID1,
+            SSID_Broadcast: _setquickObj.QuickSetupInfo.HideSSID,
+            Encryption_Mode_hid: _setquickObj.QuickSetupInfo.AuthMode,
+            WPA_PreShared_Key: $('#pwdWPAKey').val(),
+            //目前加密模式只有2种，下面3个参数为固定�?
+            //如果需要定制为5种，参数值需要设�?
+            security_shared_mode: "NONE",
+            wep_default_key: 0,
+            WPA_ENCRYPTION_hid: _setquickObj.QuickSetupInfo.AuthMode.toUpperCase() == "OPEN" ? "NONE" : _setquickObj.QuickSetupInfo.AuthMode.toUpperCase() == "WPA2PSK" ? 1 : 2
+        };
+        param.wep_default_key = _setquickObj.QuickSetupInfo.DefaultKeyID;
+        if (_setquickObj.QuickSetupInfo.EncrypType.toUpperCase() == "WPAPSKWPA2PSK") {
+            param.security_shared_mode = "NONE";
+        } else if (_setquickObj.QuickSetupInfo.EncrypType.toUpperCase() == "WEP" || _setquickObj.QuickSetupInfo.AuthMode.toUpperCase() == "SHARED") {
+            param.security_shared_mode = "WEP";
+            param.wep_key_1 = _setquickObj.QuickSetupInfo.Key1Str1;
+            param.wep_key_2 = _setquickObj.QuickSetupInfo.Key2Str1;
+            param.wep_key_3 = _setquickObj.QuickSetupInfo.Key3Str1;
+            param.wep_key_4 = _setquickObj.QuickSetupInfo.Key4Str1;
+
+            var WEPSelectTmp = '0';
+            var wepPassword = _setquickObj.QuickSetupInfo.DefaultKeyID == '3' ?
+                _setquickObj.QuickSetupInfo.Key4Str1 :
+                (_setquickObj.QuickSetupInfo.DefaultKeyID == '2' ?
+                    _setquickObj.QuickSetupInfo.Key3Str1 :
+                    _setquickObj.QuickSetupInfo.DefaultKeyID == '1' ?
+                    _setquickObj.QuickSetupInfo.Key2Str1 :
+                    _setquickObj.QuickSetupInfo.Key1Str1);
+            if (wepPassword.length == '5' || wepPassword.length == '13') {
+                WEPSelectTmp = '1';
+            } else {
+                WEPSelectTmp = '0';
+            }
+            if (_setquickObj.QuickSetupInfo.DefaultKeyID == '1') {
+                param.wep_key_2 = wepPassword;
+                param.WEP2Select = WEPSelectTmp;
+            } else if (_setquickObj.QuickSetupInfo.DefaultKeyID == '2') {
+                param.wep_key_3 = wepPassword;
+                param.WEP3Select = WEPSelectTmp;
+            } else if (_setquickObj.QuickSetupInfo.DefaultKeyID == '3') {
+                param.wep_key_4 = wepPassword;
+                param.WEP4Select = WEPSelectTmp;
+            } else {
+                param.wep_key_1 = wepPassword;
+                param.WEP1Select = WEPSelectTmp;
+            }
+        } else {
+            param.security_shared_mode = "NONE";
+        }
+
+        var params = param;
+        var requestParams = {
+            isTest: false,
+            goformId: "QUICK_SETUP_EX",
+            index: params.apn_index,
+            pdp_type: params.pdp_type,
+            apn_mode: params.apnMode,
+            profile_name: params.profile_name,
+            wan_apn: params.wan_apn,
+            ppp_auth_mode: params.ppp_auth_mode,
+            ppp_username: params.ppp_username,
+            ppp_passwd: params.ppp_passwd,
+            ipv6_wan_apn: params.ipv6_wan_apn,
+            ipv6_ppp_auth_mode: params.ipv6_ppp_auth_mode,
+            ipv6_ppp_username: params.ipv6_ppp_username,
+            ipv6_ppp_passwd: params.ipv6_ppp_passwd,
+            SSID_name: params.SSID_name,
+            SSID_Broadcast: params.SSID_Broadcast,
+            Encryption_Mode_hid: params.Encryption_Mode_hid,
+            security_shared_mode: params.security_shared_mode,
+            WPA_PreShared_Key: $.base64.encode(params.WPA_PreShared_Key),
+            wep_default_key: params.wep_default_key,
+            WPA_ENCRYPTION_hid: params.WPA_ENCRYPTION_hid
+        }
+        requestParams.wep_key_1 = params.wep_key_1;
+        requestParams.wep_key_2 = params.wep_key_2;
+        requestParams.wep_key_3 = params.wep_key_3;
+        requestParams.wep_key_4 = params.wep_key_4;
+        if (params.wep_default_key == '1') {
+            requestParams.WEP2Select = params.WEP2Select;
+        } else if (params.wep_default_key == '2') {
+            requestParams.WEP3Select = params.WEP3Select;
+        } else if (params.wep_default_key == '3') {
+            requestParams.WEP4Select = params.WEP4Select;
+        } else {
+            requestParams.WEP1Select = params.WEP1Select;
+        }
+
+        $.post('/goform/goform_set_cmd_process', requestParams, function(data) {
+            hideLoading();
+            if (typeof(data) == 'string') {
+                data = JSON.parse(data);
+            }
+
+            if (data.result == "success") {
+                showAlert('success_info', function() {
+                    location.hash = "#home";
+                });
+            } else {
+                showAlert(error_info);
+            }
+        });
+    }
+
+    function _setquickShowWifiPasswordHandler() {
+        $("#txtWPAKey").parent().find(".error").hide();
+        $("#pwdWPAKey").parent().find(".error").hide();
+        $('#txtWPAKey,#pwdWPAKey').hide();
+
+        var checkbox = $("#showWifiPassword:checked");
+        if (checkbox && checkbox.length == 0) {
+            $('#txtWPAKey').show();
+            $('#wrap_showWifiPassword').addClass('checkbox_selected');
+            $('#showWifiPassword').attr('checked', 'checked');
+        } else {
+            $('#pwdWPAKey').show();
+            $('#wrap_showWifiPassword').removeClass('checkbox_selected');
+            $('#showWifiPassword').attr('checked', false);
+        }
+    };
+
+    function _setquickInit() {
+        $('.step-active-left').removeClass().addClass('step-left');
+        $('#step_title').find('td').removeAttr('data-trans')
+        var activeMiddleNode = $('.step-active-middle');
+        activeMiddleNode.removeClass().addClass('step-middle').html(activeMiddleNode.attr('data-step'));
+        $('.step-active-right').removeClass().addClass('step-left');
+        var activeStep = $('#step_' + _setquickObj.Step.CurrentStep);
+        activeStep.removeClass().addClass('step-active-middle').html($.i18n.prop(_setquickObj.Step.Detail[_setquickObj.Step.CurrentStep]));
+        activeStep.attr('data-trans', _setquickObj.Step.Detail[_setquickObj.Step.CurrentStep])
+        $('#right_step_' + _setquickObj.Step.CurrentStep).removeClass().addClass('step-active-right');
+        if (activeStep.prev()) {
+            activeStep.prev().removeClass().addClass('step-active-left');
+        }
+        $('#right_step_6').removeClass().addClass('step-right-end');
+        if (_setquickObj.Step.CurrentStep == 6) {
+            $('#right_step_6').removeClass().addClass('step-active-right-end');
+        }
+
+        $('#step1,#step2,#step3,#step4,#step5,#step6,#btnBack,#btnNext,#btnSave').hide();
+        $('#step' + _setquickObj.Step.CurrentStep).show();
+        if (_setquickObj.Step.CurrentStep == 1) {
+            $('#btnNext').show();
+        } else if (_setquickObj.Step.CurrentStep == 6) {
+            $('#btnBack,#btnSave').show();
+        } else {
+            $('#btnBack,#btnNext').show();
+        }
+    }
+
+    function _setquickAPNModeChange() {
+        var checkedVal = $(':radio[name="apnMode"]:checked').val().toLowerCase();
+        if (checkedVal == 'auto') {
+            $('#apnSetting .content').hide();
+        } else {
+            $('#apnSetting .content').show();
+        }
+    }
+
+    function _setquickFillData() {
+        var apnmodeManualChecked = $('#radManual').attr('checked');
+        _setquickObj.QuickSetupInfo.apn_mode = 'auto';
+        $('#apn-mode-label').html((apnmodeManualChecked == 'checked' || apnmodeManualChecked == true) ? 'Manual' : 'Auto');
+        if (apnmodeManualChecked == 'checked' || apnmodeManualChecked == true) {
+            _setquickObj.QuickSetupInfo.apn_mode = 'manual';
+            $('#apn_manual_content').show();
+            _setquickObj.CurrAPN.m_profile_name = $('#profile_name').val();
+            $('#apn-name-label').html(_setquickObj.CurrAPN.m_profile_name);
+            _setquickObj.CurrAPN.wan_apn = $('#txtAPN').val();
+            $('#apn-value-label').html(_setquickObj.CurrAPN.wan_apn);
+
+            _setquickObj.CurrAPN.ppp_auth_mode = $('#selAuthMode').val();
+            $('#apn-auth-label').html(_setquickObj.CurrAPN.ppp_auth_mode);
+            _setquickObj.CurrAPN.ppp_username = $('#txtUserName').val();
+            $('#apn-username-label').html(_setquickObj.CurrAPN.ppp_username);
+            _setquickObj.CurrAPN.ppp_passwd = $('#txtPassword').val();
+            $('#apn-pwd-label').html(_setquickObj.CurrAPN.ppp_passwd);
+        }
+
+        _setquickObj.QuickSetupInfo.SSID1 = $('#txtSSID').val();
+        $('#wifi-ssid-label').html(_setquickObj.QuickSetupInfo.SSID1);
+        _setquickObj.QuickSetupInfo.HideSSID = $('#switch_brd').find('.bg-switch-enable').length > 0 ? '0' : '1';
+        $('#wifi-brd-label').html($('#switch_brd').find('.switch_note').html());
+        _setquickObj.QuickSetupInfo.AuthMode = $('#selSecurityMode').find('option:selected').val();
+        $('#wifi-sec-lebel').html($('#selSecurityMode').find('option:selected').html());
+    }
+</script>

@@ -1,0 +1,449 @@
+<div class="form-body" style="padding:0 10px;">
+    <form id="macFilterForm" novalidate="novalidate" autocomplete="off">
+        <div class="form-title" style="display: none;" data-trans="black_list">Black List</div>
+        <div class="content">
+            <div class="row-fluid">
+                <span class="span4 side-right">
+                    <label data-trans="black_list_switch">Black List Switch</label>
+                    <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+                </span>
+
+                <label class="span8 side-left">
+                    <span id="black_switch" style="cursor: pointer" data-bind="click:function(){blackSwitchChange();},attr:{'class':(blackListEnabled()?'bg-switch-enable':'bg-switch-disable')}"></span>
+                    <span id="black_switch_text" class="switch_note" data-bind="attr:{'data-trans': blackListEnabled()?'enable':'disable'}"></span>
+                </label>
+            </div>
+            <div class="form-buttons">
+                <input type="submit" id="btn-apply-switch-mac" class="btn-1 " data-trans="apply" value="Apply">
+            </div>
+        </div>
+    </form>
+    <form id="macAddressForm" autocomplete="off">
+        <div class="content" data-bind="visible: blackListEnabled">
+            <div class="row-fluid">
+                <label class="span4 side-right"><span data-trans="mac_white_address">MAC Address</span>
+                        <i class="colorRed">&nbsp;</i>
+                    </label>
+                <div class="span8">
+                    <input name="mac_1" type="text" id="mac_1" class="required valid" maxlength="17" minlength="12">
+                    <label trans="macExam" id="macExamLabel" data-trans="macExam">(e.g., 00:1E:90:FF:FF:FF)</label>
+                </div>
+            </div>
+            <div class="form-buttons">
+                <input type="submit" class="btn-1" value="Apply" data-trans="apply" id="btn-apply-mac">
+            </div>
+        </div>
+    </form>
+    <div data-bind="visible: blackListEnabled" style="overflow-y: auto;">
+        <div class="content">
+            <div class="ko-grid-container marginnone">
+                <table cellpadding="0" cellspacing="0" class="ko-grid colorHoverTable marginnone">
+                    <thead>
+                        <tr>
+                            <th width="10%" data-trans="station_number">No.</th>
+                            <th width="35%" data-trans="host_name">Host Name</th>
+                            <th width="35%" data-trans="mac_white_address">MAC Address</th>
+                            <th width="20%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="blacklist">
+                        <tr data-bind="visible:mac1()">
+                            <td>1</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac1,attr:{'data-mac':mac1}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(1)}" index="1"></td>
+                        </tr>
+                        <tr data-bind="visible:mac2()">
+                            <td>2</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac2,attr:{'data-mac':mac2}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(2)}" index="2"></td>
+                        </tr>
+                        <tr data-bind="visible:mac3()">
+                            <td>3</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac3,attr:{'data-mac':mac3}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac"  data-trans="delete" value="Delete" data-bind="click:function(){remove(3)}" index="3"></td>
+                        </tr>
+                        <tr data-bind="visible:mac4()">
+                            <td>4</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac4,attr:{'data-mac':mac4}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(4)}" index="4"></td>
+                        </tr>
+                        <tr data-bind="visible:mac5()">
+                            <td>5</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac5,attr:{'data-mac':mac5}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(5)}" index="5"></td>
+                        </tr>
+                        <tr data-bind="visible:mac6()">
+                            <td>6</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac6,attr:{'data-mac':mac6}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(6)}" index="6"></td>
+                        </tr>
+                        <tr data-bind="visible:mac7()">
+                            <td>7</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac7,attr:{'data-mac':mac7}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(7)}" index="7"></td>
+                        </tr>
+                        <tr data-bind="visible:mac8()">
+                            <td>8</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac8,attr:{'data-mac':mac8}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(8)}" index="8"></td>
+                        </tr>
+                        <tr data-bind="visible:mac9()">
+                            <td>9</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac9,attr:{'data-mac':mac9}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(9)}" index="9"></td>
+                        </tr>
+                        <tr data-bind="visible:mac10()">
+                            <td>10</td>
+                            <td></td>
+                            <td class="mac" data-bind="html:mac10,attr:{'data-mac':mac10}"></td>
+                            <td><input type="button" class="btn-1 btn-ex btn-del-mac" data-trans="delete" value="Delete" data-bind="click:function(){remove(10)}" index="10"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="content">
+            <div class="form-title" style="display: none;" data-trans="device_information">Device Information</div>
+            <div class="ko-grid-container marginnone">
+                <table cellpadding="0" cellspacing="0" id="tabStation" class="ko-grid colorHoverTable marginnone">
+                    <thead>
+                        <tr class="">
+                            <th width="10%" data-trans="station_number">No.</th>
+                            <th width="35%" data-trans="host_name">Host Name</th>
+                            <th width="35%" data-trans="mac_address">MAC Address</th>
+                            <th width="20%"></th>
+                        </tr>
+                    </thead>
+                    <!-- <tbody data-bind="foreach:deviceInfo">
+                        <tr>
+                            <td data-bind="text: $index()+1"></td>
+                            <td>
+                                <span data-bind="text: hostName, attr: {id: 'hostname_txt_'+idx}"></span>
+                            </td>
+                            <td data-bind="text: macAddress"></td>
+                            <td>
+                                <a class="btn-1 btn-ex btn-del-mac" data-trans="block" data-bind="click: $root.wirelessBlockHandler"></a>
+                            </td>
+                        </tr>
+                    </tbody> -->
+                    <tbody id="searchCurrentWifiUserList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        var service = window._service;
+        var config = service.config;
+
+        /**
+         * macFilterViewModel
+         * @class macFilterViewModel
+         */
+        function macFilterViewModel() {
+            var self = this;
+            var info = service.getMacFilterInfo();
+            var wifiBaseInfo = service.getWifiBasic();
+            self.multi_ssid_enable = ko.observable(wifiBaseInfo.multi_ssid_enable);
+            self.origin_ap_station_enable = wifiBaseInfo.ap_station_enable;
+            self.hasWifiSwitch = config.WIFI_SWITCH_SUPPORT;
+            self.hasMultiSSID = config.HAS_MULTI_SSID;
+            self.showIsolated = config.SHOW_WIFI_AP_ISOLATED;
+            self.wifi_enable = ko.observable(wifiBaseInfo.wifi_enable);
+            self.hasAPStation = config.AP_STATION_SUPPORT;
+            self.deviceInfo = ko.observableArray([]);
+
+            self.isShowSSIDInfoDiv = ko.observable(false);
+            if (config.WIFI_SWITCH_SUPPORT) {
+                if (wifiBaseInfo.wifi_enable == "1") {
+                    self.isShowSSIDInfoDiv(true);
+                } else {
+                    self.isShowSSIDInfoDiv(false);
+                }
+            } else {
+                self.isShowSSIDInfoDiv(true); //如果不支持软开关，整个SSID信息块显示
+            }
+
+            self.selectedAction = ko.observable(info.ACL_mode);
+            self.blackListEnabled = ko.observable(self.selectedAction() == '2' ? true : false);
+            self.mac1 = ko.observable("");
+            self.mac2 = ko.observable("");
+            self.mac3 = ko.observable("");
+            self.mac4 = ko.observable("");
+            self.mac5 = ko.observable("");
+            self.mac6 = ko.observable("");
+            self.mac7 = ko.observable("");
+            self.mac8 = ko.observable("");
+            self.mac9 = ko.observable("");
+            self.mac10 = ko.observable("");
+            if (info.ACL_mode == "2") {
+                macInfoBlack = info.wifi_mac_black_list.split(";");
+                self.mac1 = ko.observable(macInfoBlack[0]);
+                self.mac2 = ko.observable(macInfoBlack[1]);
+                self.mac3 = ko.observable(macInfoBlack[2]);
+                self.mac4 = ko.observable(macInfoBlack[3]);
+                self.mac5 = ko.observable(macInfoBlack[4]);
+                self.mac6 = ko.observable(macInfoBlack[5]);
+                self.mac7 = ko.observable(macInfoBlack[6]);
+                self.mac8 = ko.observable(macInfoBlack[7]);
+                self.mac9 = ko.observable(macInfoBlack[8]);
+                self.mac10 = ko.observable(macInfoBlack[9]);
+            }
+            var maclist_arr = new Array(self.mac1(), self.mac2(), self.mac3(), self.mac4(), self.mac5(), self.mac6(), self.mac7(), self.mac8(), self.mac9(), self.mac10());
+            self.blackDevices = ko.observableArray(maclist_arr);
+            self.blackDevicesMac = ko.computed(function() {
+                return _.map(self.blackDevices(), function(ele) {
+                    // return ele.macAddress;
+                    return ele;
+                });
+            });
+            self.hostNameList = ko.observable(service.getHostNameList({}).devices);
+
+            // 黑名单开关
+            self.setBlackSwitch = function() {
+                var status = service.getWpsInfo();
+                if (status.wpsFlag == '1') {
+                    showAlert('wps_on_info');
+                    return true;
+                }
+
+                var params = {};
+                params.ACL_mode = self.blackListEnabled() ? '2' : '0';
+                showLoading('waiting');
+                service.setMacFilter(params, function(result) {
+                    if (result.result == "success") {
+                        successOverlay();
+                    } else {
+                        errorOverlay();
+                    }
+                });
+            };
+
+            /**
+             * 保存设置
+             * @event save
+             */
+            self.save = function(type) {
+                var status = service.getWpsInfo();
+                if (status.wpsFlag == '1') {
+                    showAlert('wps_on_info');
+                    return true;
+                }
+
+                var maclist_arr = [];
+                $('#blacklist').find('.mac').each(function(index, item) {
+                    var macStr = $(item).html();
+                    if (macStr) {
+                        maclist_arr[maclist_arr.length] = macStr;
+                    }
+                });
+                if (maclist_arr.length >= 10) {
+                    showAlert('black_list_max');
+                    return true;
+                }
+
+                if (type == 'add') {
+                    maclist_arr[maclist_arr.length] = $('#mac_1').val();
+                }
+
+                if (self.blackListEnabled() && info.client_mac_address != "" && $.inArray(info.client_mac_address, maclist_arr) != -1) {
+                    showAlert('black_yourself_tip');
+                    return false;
+                }
+                var nary = maclist_arr.sort(); //对数组排序
+                for (var i = 0; i < nary.length - 1; i++) {
+                    if (nary[i] != "" && nary[i] == nary[i + 1]) {
+                        showAlert('mac_repeat_tip');
+                        return false;
+                    }
+                }
+                var maclist_str = "";
+                for (var i = 0; i < 10; i++) {
+                    if (maclist_str == "") {
+                        maclist_str = maclist_arr[i];
+                    } else {
+                        if (maclist_arr[i]) {
+                            maclist_str = maclist_str + ";" + maclist_arr[i];
+                        }
+                    }
+                }
+
+                var params = {};
+                params.ACL_mode = self.blackListEnabled() ? '2' : '0';
+                if (self.blackListEnabled()) {
+                    params.wifi_mac_black_list = maclist_str;
+                }
+                showLoading('waiting');
+                service.setMacFilter(params, function(result) {
+                    if (result.result == "success") {
+                        successOverlay();
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        errorOverlay();
+                    }
+                });
+            };
+
+            self.remove = function(index) {
+                $($('#blacklist').find(':button[index="' + index + '"]').parents('tr')[0]).remove();
+                self.save('delete');
+            };
+
+            self.blackSwitchChange = function() {
+                if (self.blackListEnabled()) {
+                    self.blackListEnabled(false);
+                    $('#black_switch').removeClass().addClass('bg-switch-disable');
+                    $('#black_switch_text').html($.i18n.prop('disable'));
+                } else {
+                    self.blackListEnabled(true);
+                    $('#black_switch').removeClass().addClass('bg-switch-enable');
+                    $('#black_switch_text').html($.i18n.prop('enable'));
+                }
+            };
+
+            /**
+             * WiFi已连接设备列表block按钮事件，加入黑名单
+             * @method wirelessBlockHandler
+             */
+            self.wirelessBlockHandler = function(eleData) {
+                $('#mac_1').val(eleData.macAddress);
+                $('#btn-apply-mac').click();
+                $('#mac_1').val('');
+            };
+
+            self.getCurrentWifiUser = function() {
+                $.get('goform/goform_get_cmd_process?isTest=false&cmd=active_station_list&_=' + new Date().getTime(), {}, function(data) {
+                    if (typeof(data) == 'string') {
+                        data = $.parseJSON(data);
+                    }
+                   
+                    var currentWifiUserList = [];
+                    var currentWifiUserStr = '';
+                    _.map(data.station_list, function(ele, idx) {
+                        // 过滤已经再黑名单中的mac
+                        if ($('#blacklist').find('td[class="mac"][data-mac="' + ele.mac_addr + '"]').length == 0) {
+                            ele.inBlackList = $('#blacklist').find('td[class="mac"][data-mac="' + ele.mac_addr + '"]').length == 0;
+                            ele.idx = _.uniqueId('wireless_');
+                            ele.hostName = ele.hostname;
+                            ele.macAddress = ele.mac_addr;
+                            currentWifiUserList.push(ele);
+
+                            currentWifiUserStr += '<tr>';
+                            currentWifiUserStr += '<td>' + (idx + 1) + '</td>';
+                            currentWifiUserStr += '<td><span id="hostname_txt_' + idx + '">' + ele.hostname + '</span></td>';
+                            currentWifiUserStr += '<td>' + ele.mac_addr + '</td>';
+                            currentWifiUserStr += '<td><a class="btn-1 btn-ex btn-del-mac" data-trans="block" onclick="_outwirelessBlockHandler(\'' + ele.mac_addr + '\');"></a></td>';
+                            currentWifiUserStr += '</tr>';
+                        }
+                    });
+                    self.deviceInfo(currentWifiUserList);
+                    $('#searchCurrentWifiUserList').html(currentWifiUserStr);
+
+                    $('#tabStation').translate();
+                });
+            };
+        }
+
+        /**
+         * view model初始化
+         * @method init
+         */
+        function init() {
+            var container = $('#containerSettings');
+            ko.cleanNode(container[0]);
+            var vm = new macFilterViewModel();
+            ko.applyBindings(vm, container[0]);
+            $('#macAddressForm').validate({
+                submitHandler: function() {
+                    vm.save('add');
+                },
+                rules: {
+                    mac_1: 'mac_check'
+                }
+            });
+
+            $('#macFilterForm').validate({
+                submitHandler: function() {
+                    vm.save();
+                }
+            });
+
+            vm.getCurrentWifiUser();
+            // 定时获取链接wifi用户
+            addInterval(function () {            
+                vm.getCurrentWifiUser();  
+            }, 3000);
+        }
+
+        var stationUtil = {
+            dealElement: function(showEdit, idx) {
+                if (idx == "all") {
+                    $("input[id^='hostname_txt_'],a[id^='edit_btn_']").show();
+                    $("input[id^='hostname_input_'],a[id^='cancel_btn_'],a[id^='save_btn_']").hide();
+                } else {
+                    if (showEdit) {
+                        $("#edit_btn_" + idx + ",#hostname_txt_" + idx).hide();
+                        $("#save_btn_" + idx + ",#cancel_btn_" + idx + ",#hostname_input_" + idx).show();
+                    } else {
+                        $("#edit_btn_" + idx + ",#hostname_txt_" + idx).show();
+                        $("#save_btn_" + idx + ",#cancel_btn_" + idx + ",#hostname_input_" + idx).hide();
+                    }
+                }
+            },
+            /**
+             * 匹配黑名单列表和主机名
+             * @method parseBlackString
+             */
+            parseBlackString: function(macStr, hostnameStr) {
+                if (macStr == "") {
+                    return [];
+                }
+                var tempHostName = hostnameStr.split(';');
+                var tempMac = macStr.split(';');
+                var result = [];
+                for (var i = 0; i < tempMac.length; i++) {
+                    var obj = {};
+                    obj.hostName = tempHostName[i];
+                    obj.macAddress = tempMac[i];
+                    result.push({
+                        hostName: tempHostName[i],
+                        macAddress: tempMac[i]
+                    });
+                }
+                return result;
+            },
+            /**
+             * 根据MAC匹配主机名
+             * @method getHostName
+             */
+            getHostName: function(hostName, mac, hostNameList) {
+                var ele = _.find(hostNameList, function(ele) {
+                    return ele.mac == mac;
+                });
+                return ele ? ele.hostname : hostName;
+            }
+        };
+
+        init();
+        $('#containerSettings').translate();
+    });
+
+    function _outwirelessBlockHandler(mac) {
+        $('#mac_1').val(mac);
+        $('#btn-apply-mac').click();
+        $('#mac_1').val('');
+    }
+</script>

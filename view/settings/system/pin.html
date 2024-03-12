@@ -1,0 +1,631 @@
+<form id="settings_system_pin" novalidate="novalidate" autocomplete="off">
+	<div class="form-body">
+		<div class="form-title" style="display: none;" data-trans="pin_management">PIN Management</div>
+		<div id="puk_not_lock">
+			<div class="content">
+				<div id="div_pin">
+					<div id="div_enable_disable_pin" class="row-fluid">
+						<label class="span4 side-right"><pan data-trans="pin_status">PIN Status</pan>
+                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+              </label>
+						<label class="span4 side-left">
+                <span id="pin_sw" style="cursor: pointer" class="bg-switch-disable" ></span>
+                <span class="switch_note" data-trans="disable">Disable</span>
+              </label>
+						<label class="span4 side-left">
+                <input id="btnModifyPin" data-trans="modify_pin" type="button" class="btn-1 disabled" disabled="disabled" value="Change PIN" />
+              </label>
+					</div>
+					<div id="div_current_pin" class="row-fluid">
+						<label class="span4 side-right" for="txtPin"><span data-trans="current_pin">Current PIN</span>
+                <i class="colorRed">&nbsp;</i>
+              </label>
+						<div class="span8">
+							<input id="txtPin" name="txtPin" type="password" class="required disabled" maxlength="8" disabled="disabled" />
+						</div>
+					</div>
+				</div>
+				<div id="div_puk" style="display: none;">
+					<div>
+						<p class="prompt" data-trans="enter_puk">
+							SIM card is PIN-locked, please input PUK to unlock.
+						</p>
+					</div>
+					<div class="row-fluid">
+						<label class="span4 side-right" for="txtPuk"><span data-trans="puk">PUK</span>
+                <i class="colorRed">&nbsp;</i>
+              </label>
+						<div class="span8">
+							<input id="txtPuk" name="txtPuk" type="password" class="required disabled" maxlength="8" disabled="disabled" />
+						</div>
+					</div>
+				</div>
+				<div id="div_change_pin" data-bind="visible:pageState()==2 || pageState()==3" style="display: none;">
+					<div class="row-fluid">
+						<label class="span4 side-right" for="txtNewPin"><span data-trans="new_pin">New PIN</span>
+                <i class="colorRed">&nbsp;</i>
+              </label>
+						<div class="span8">
+							<input id="txtNewPin" name="txtNewPin" type="password" class="required disabled" maxlength="8" disabled="disabled" />
+						</div>
+					</div>
+					<div class="row-fluid">
+						<label class="span4 side-right" for="txtConfirmPin"><span data-trans="confirm_pin">Confirm New PIN</span>
+                <i class="colorRed">&nbsp;</i>
+              </label>
+						<div class="span8">
+							<input id="txtConfirmPin" name="txtConfirmPin" type="password" class="required disabled" maxlength="8" disabled="disabled" />
+						</div>
+					</div>
+				</div>
+				<div id="div_pin_cnt" data-bind="visible:pageState()<3">
+					<div id="pinLeftMsg" class="row-fluid">
+						<label class="span4 side-right">
+                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+              </label>
+						<div class="span8">
+							<p id="sim_locked" data-trans="enter_pin" style="display:none">SIM card is locked, please input PIN to unlock.</p>
+							<p class="important-prompt" id="pin_count">
+								<span data-trans="attempts_left">Attempts Left:</span>
+								<span id="pin_cnt">3</span>
+							</p>
+						</div>
+					</div>
+					<div id="pinLastMsg" style="display: none;">
+						<label class="span4 side-right"></label>
+						<div class="span8">
+							<p class="important-prompt" style="margin-left: 50px;">
+								<span data-trans="last_enter_pin">Final attempt. If incorrect again, your SIM card will be locked!</span >
+                </p>
+              </div>
+            </div>
+          </div>
+          <div id="div_puk_cnt" style="display: none;">
+            <div id="pukLeftMsg" class="row-fluid">
+              <label class="span4 side-right">
+                <i class="colorRed" style="visibility: hidden;">&nbsp;</i>
+              </label>
+              <div class="span8">
+                <p class="important-prompt" id="puk_count">
+                  <span data-trans="attempts_left_puk">Attempts Left:</span>
+								<span id="puk_cnt">10</span>
+							</p>
+						</div>
+					</div>
+					<div id="pukLastMsg" style="display: none;">
+						<p class="important-prompt" data-trans="last_enter_puk" >
+							Final attempt. If incorrect again, your SIM card will be corrupted!
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="form-buttons" style="padding-right:20px;">
+				<input type="submit" data-trans="apply" class="btn-1  disabled" id="btnPinApply" disabled="disabled" value="Apply" />
+				<input type="button" data-trans="cancel" class="btn-1 disabled" disabled="disabled" id="btnPinBack" value="Cancel" style="display: none;" />
+			</div>
+		</div>
+		<div id="puk_locked" data-trans="puk_locked" class="important-prompt" style="display: none;">
+			Your SIM card is locked permanently. Please contact your operator.
+		</div>
+		<div class="form-note">
+			<div class="notes-title">&nbsp;</div>
+			<ul class="notes-content">
+				<li data-trans="diconneted_operate_note">To change current setting, please disconnect from network.</li>
+				<li data-trans="change_operate_note">You can change PIN status and PIN code on this page.</li>
+				<li data-trans="enter_puk_to_unlock">
+					SIM card will be locked if you've continuously typed incorrect PIN 3 times. And you have to type PUK to unlock.
+				</li>
+				<li data-trans="enter_pin_to_possible">
+					PIN code and PUK code may be offered together with a SIM card. If not, contact your operator. Please change default PIN code as soon as possible.
+				</li>
+			</ul>
+		</div>
+	</div>
+</form>
+
+<script>
+	window.LTELanguageInitPart('#settings_system_pin')
+
+	function load_mark() {
+		var pin_state = 0 // 0：未启用1：启用2：未登录pin3：pin锁定
+		var pageState = 0
+
+		function load_setting() {
+			disableBtn($('#txtPin'))
+			disableBtn($('#btnPinApply'))
+			$('#txtPin').val('')
+			$('#txtPuk').val('')
+			$('#txtNewPin').val('')
+			$('#txtConfirmPin').val('')
+
+			var data = window._service.getPinData();
+			var state = parseInt(data.pin_status)
+			var pin_cnt = parseInt(data.pinnumber)
+			var puk_cnt = parseInt(data.puknumber)
+			if(pin_cnt == 0) {
+				pin_state = 3
+			} else {
+				if(data.pin_status == '') {
+					pin_state = 2
+				} else {
+					pin_state = state
+				}
+			}
+
+			switch(pin_state) {
+				case 0:
+					$('#div_enable_disable_pin').show()
+					$('#div_current_pin').show()
+					setSwitch('pin_sw', false)
+					disableBtn($('#btnModifyPin'))
+					$('#pin_cnt').html(pin_cnt)
+					break
+				case 1:
+					$('#div_enable_disable_pin').show()
+					$('#div_current_pin').show()
+					setSwitch('pin_sw', true)
+					enableBtn($('#btnModifyPin'))
+					$('#pin_cnt').html(pin_cnt)
+					break
+				case 2:
+					$('#div_enable_disable_pin').hide()
+					$('#div_current_pin').show()
+					$('#pin_cnt').html(pin_cnt)
+					enableBtn($('#txtPin'))
+					$('#txtPin').focus()
+					enableBtn($('#btnPinApply'))
+					break
+				case 3:
+					$('#div_enable_disable_pin').hide()
+					$('#div_current_pin').hide()
+					$('#puk_cnt').html(puk_cnt)
+					break
+				case 4:
+				default:
+					return
+			}
+			if(pin_state < 3) {
+				if(pin_cnt == 1) {
+					$('#pinLastMsg').show()
+				} else {
+					$('#pinLastMsg').hide()
+				}
+				$('#div_pin_cnt').show()
+				$('#div_puk_cnt').hide()
+				$('#div_puk').hide()
+				$('#div_change_pin').hide()
+			} else if(pin_state == 3) {
+				$('#div_puk').show()
+				$('#div_change_pin').show()
+				if(puk_cnt == 0) {
+					$('#puk_locked').show()
+					$('#puk_not_lock').hide()
+				} else if(puk_cnt == 1) {
+					$('#pukLastMsg').show()
+				} else {
+					$('#pukLastMsg').hide()
+				}
+				$('#div_pin_cnt').hide()
+				$('#div_puk_cnt').show()
+				enableBtn($('#settings_system_pin input'))
+			} else {
+				$('#div_pin_cnt').hide()
+				$('#div_puk_cnt').hide()
+			}
+
+			if(pin_state != 3 || puk_cnt != 0) {
+				$('#puk_locked').hide()
+				$('#puk_not_lock').show()
+			}
+		}
+
+		$('#pin_sw').click(function() {
+			var st = switchClick('pin_sw')
+			if(pin_state == 0 && st) {
+				enableBtn($('#txtPin'))
+				$('#txtPin').focus()
+				enableBtn($('#btnPinApply'))
+			}
+			if(pin_state == 1 && !st) {
+				enableBtn($('#txtPin'))
+				$('#txtPin').focus()
+				enableBtn($('#btnPinApply'))
+			}
+		})
+
+		function callback(data) {
+			hideLoading()
+			if(data && data.result == true) {
+				showInfo("success_info")
+			} else {
+				showAlert("error_info")
+			}
+			load_setting()
+		}
+
+		$('#btnPinApply').click(function(event) {
+			event.preventDefault()
+			var pin
+			if(pin_state < 3) {
+				pin = $('#txtPin').val()
+				if(!verifyPIN(pin)) {
+					showAlert('pin_check')
+					return
+				}
+			}
+
+			var para = {
+				oldPin: $('#txtPin').val(),
+				newPin: $('#txtNewPin').val()
+			};
+			if(pin_state == 0) {
+				showLoading("saving");
+				window._service.enablePin(para, callback);
+			} else if(pin_state == 1) {
+				var pin = $('#txtPin').val()
+				if($('#btnPinBack').is(':visible')) {
+					//modify
+					var new_pin = $('#txtNewPin').val()
+					var new_pin_confirm = $('#txtConfirmPin').val()
+
+					if(!verifyPIN(new_pin) || !verifyPIN(new_pin_confirm)) {
+						showAlert('pin_check')
+						return
+					}
+					if(new_pin != new_pin_confirm) {
+						showAlert('equalTo')
+						return
+					}
+					showLoading("saving");
+					window._service.changePin(para, callback);
+					$('#btnPinBack').hide()
+				} else {
+					window._service.disablePin(para, callback);
+				}
+			} else if(pin_state == 2) {
+				showLoading();
+				var pin = $('#txtPin').val()
+				window._service.enterPIN({
+					PinNumber: pin
+				}, function(data) {
+					hideLoading()
+
+					if(data.result == false) {
+						showAlert("pin_error")
+					}
+					load_setting()
+				})
+			} else if(pin_state == 3) {
+				var puk = $('#txtPuk').val()
+
+				if(!verifyPUK(puk)) {
+					showAlert('puk_check')
+					return
+				}
+
+				var new_pin = $('#txtNewPin').val()
+				var new_pin_confirm = $('#txtConfirmPin').val()
+				if(!verifyPIN(new_pin) || !verifyPIN(new_pin_confirm)) {
+					showAlert('pin_check')
+					return
+				}
+				if(new_pin != new_pin_confirm) {
+					showAlert('equalTo')
+					return
+				}
+				para = {
+					PinNumber: new_pin,
+					PUKNumber: puk
+				};
+				showLoading("saving");
+				window._service.enterPUK(para, callback);
+			}
+		})
+
+		$('#btnModifyPin').click(function(event) {
+			event.preventDefault()
+			$('#div_enable_disable_pin').hide()
+			$('#div_change_pin').show()
+			$('#btnPinBack').show()
+			enableBtn($('#settings_system_pin input'))
+		})
+
+		$('#btnPinBack').click(function() {
+			$(this).hide()
+			load_setting()
+		})
+
+		load_setting()
+	}
+	load_mark()
+
+	function load_mark_pin() {
+		var service = window._service
+		var config = window._service.config
+		var pageState = {
+			common: 0,
+			requirePin: 1,
+			modifyPin: 2,
+			requirePuk: 3,
+			destroyed: 4
+		};
+		var pinStatus = {
+			enable: "1",
+			disable: "0"
+		};
+
+		function pinModel() {
+			var self = this;
+			var data = service.getPinData();
+			self.isDataCard = config.PRODUCT_TYPE == 'DATACARD';
+			self.originPinStatus = data.pin_status;
+			self.pinStatus = data.pin_status;
+			self.pinNumber = data.pinnumber;
+			self.pukNumber = data.puknumber;
+			self.currentPin = '';
+			self.newPin = '';
+			self.confirmPin = '';
+			self.puk = '';
+			self.pageState = 0;
+			//请求操作后成功标志位
+			self.optSuccess = true;
+
+			/**
+			 * 确定按钮事件处理，包括修改PIN，根据PUK设置PIN，设置PIN的使能状态
+			 * @event changePin
+			 */
+			self.changePin = function() {
+				if(self.isConnectedNetWork()) {
+					showAlert("cannot_operate_when_connected");
+					return;
+				}
+
+				if(self.pageState == pageState.common) {
+					return;
+				}
+
+				var para = {
+					oldPin: self.currentPin,
+					newPin: self.newPin
+				};
+				showLoading();
+
+				if(self.pageState == pageState.modifyPin) {
+					service.changePin(para, self.callback);
+				} else if(self.pageState() == pageState.requirePuk) {
+					para = {
+						PinNumber: self.newPin,
+						PUKNumber: self.puk
+					};
+					service.enterPUK(para, self.callback);
+				} else {
+					if(self.pinStatus == pinStatus.enable) {
+						service.enablePin(para, self.callback);
+					} else {
+						service.disablePin(para, self.callback);
+					}
+				}
+			};
+
+			/**
+			 * 回调函数
+			 * @method callback
+			 */
+			self.callback = function(data) {
+				if(data && data.result == true) {
+					self.optSuccess = true;
+					successOverlay();
+				} else {
+					self.optSuccess = false;
+					//最后一次时要弹框提示
+					if(self.pinNumber == 2) {
+						showAlert("last_enter_pin");
+					} else if(self.pukNumber == 2) {
+						showAlert("last_enter_puk");
+					} else {
+						errorOverlay();
+					}
+				}
+				init(self);
+			};
+
+			/**
+			 * 页面显示设置
+			 * @method viewHtml
+			 */
+			self.viewHtml = function() {
+				switch(self.pageState) {
+					case 0:
+						$('#div_pin,#div_pin_cnt').show()
+						setSwitch('pin_sw', self.originPinStatus == 1)
+
+						$('#div_puk,#div_puk_cnt').hide()
+						$('#div_change_pin').hide()
+						break
+					case 1:
+						$('#div_pin,#div_pin_cnt').show()
+						setSwitch('pin_sw', self.originPinStatus == 1)
+
+						$('#div_puk,#div_puk_cnt').hide()
+						$('#div_change_pin').hide()
+						break
+					case 2:
+						$('#div_pin,#div_pin_cnt').show()
+						setSwitch('pin_sw', self.originPinStatus == 1)
+
+						$('#div_puk,#div_puk_cnt').hide()
+						$('#div_change_pin').show()
+						break
+					case 3:
+						$('#div_pin,#div_pin_cnt').hide()
+						$('#div_puk,#div_puk_cnt').show()
+						$('#div_change_pin').show()
+						break
+					case 4:
+						$('#puk_not_lock').hide()
+						$('#puk_lock').show()
+					default:
+						break
+				}
+
+				if(self.pinNumber != 1) {
+					$('#pinLeftMsg').show()
+					$('#pinLastMsg').hide()
+					$('#pin_cnt').html(self.pinNumber)
+				} else {
+					$('#pinLeftMsg').hide()
+					$('#pinLastMsg').show()
+				}
+
+				if(self.pukNumber != 1) {
+					$('#pukLeftMsg').show()
+					$('#pukLastMsg').hide()
+					$('#puk_cnt').html(self.pukNumber)
+				} else {
+					$('#pukLeftMsg').hide()
+					$('#pukLastMsg').show()
+				}
+			}
+
+			/**
+			 * 进入PIN修改状态事件处理
+			 * @event displayModifyPinPage
+			 */
+			self.displayModifyPinPage = function() {
+				if(self.isConnectedNetWork()) {
+					showAlert("cannot_operate_when_connected");
+					return;
+				}
+				self.pinStatus = self.originPinStatus;
+				self.pageState = pageState.modifyPin;
+				self.clear();
+			};
+
+			/**
+			 * 取消事件处理
+			 * @event cancel
+			 */
+			self.cancel = function() {
+				self.pageState = pageState.common;
+				self.pinStatus = self.originPinStatus;
+				self.clear();
+			};
+			/**
+			 * 清除页面输入和检测消息
+			 * @event clear
+			 */
+			self.clear = function() {
+				self.currentPin = "";
+				self.newPin = "";
+				self.confirmPin = "";
+				self.puk = "";
+				clearValidateMsg();
+				self.viewHtml()
+			};
+
+			/**
+			 * PIN使能改变时事件处理
+			 * @method pinStatusChangeEvent
+			 */
+			self.pinStatusChangeEvent = ko.dependentObservable(function() {
+				if(self.pinStatus == self.originPinStatus) {
+					self.pageState = pageState.common;
+				} else {
+					self.pageState = pageState.requirePin;
+				}
+				self.clear();
+			}, this);
+			/**
+			 * 根据数据，设置当前的页面状态
+			 * @method computePageState
+			 */
+			self.computePageState = function(data) {
+				if(data.pinnumber > 0) {
+					//操作成功页面回到初始状态，操作失败并且pinnumber>0,页面不跳转
+					if(self.optSuccess) {
+						self.cancel();
+					} else {
+						self.clear();
+					}
+				} else {
+					self.clear();
+					if(data.puknumber > 0) {
+						self.pageState = pageState.requirePuk;
+					} else {
+						self.pageState = pageState.destroyed;
+					}
+				}
+			};
+			self.computePageState(data);
+
+			/**
+			 * 是否已联网
+			 * @method isConnectedNetWork
+			 */
+			self.isConnectedNetWork = function() {
+				var info = service.getConnectionInfo();
+				return info.connectStatus == "ppp_connected";
+			}
+
+			/**
+			 * 处理页面元素的可用状态
+			 * @method fixPageEnable
+			 */
+			self.fixPageEnable = function() {
+				if(self.isConnectedNetWork()) {
+					$('#settings_system_pin :input').each(function() {
+						disableBtn($(this));
+					});
+					clearValidateMsg();
+				} else {
+					$('#settings_system_pin :input').each(function() {
+						if(this.id == "txtPin" || this.id == "btnPinApply") {
+							if(self.pageState == pageState.common) {
+								disableBtn($(this));
+								return;
+							}
+						}
+						if(this.id == "btnModifyPin") {
+							if(self.originPinStatus != pinStatus.enable) {
+								disableBtn($(this));
+								return;
+							}
+						}
+						if(this.id == "pinEnable" || this.id == "pinDisable") {
+							if(self.pageState == pageState.modifyPin) {
+								disableBtn($(this));
+								return;
+							}
+						}
+						enableBtn($(this));
+					});
+				}
+			}
+		}
+
+		function init(oldVM) {
+			var vm = oldVM;
+			if(vm) {
+				var data = service.getPinData();
+				vm.originPinStatus = data.pin_status;
+				vm.pinNumber = data.pinnumber;
+				vm.pukNumber = data.puknumber;
+				vm.computePageState(data);
+			} else {
+				vm = new pinModel();
+				addInterval(function() {
+					vm.fixPageEnable();
+				}, 1000);
+
+				$('#btnModifyPin').click(function() {
+					vm.displayModifyPinPage()
+				})
+			}
+
+			vm.fixPageEnable();
+		}
+
+		init()
+	}
+	//load_mark_pin()
+</script>

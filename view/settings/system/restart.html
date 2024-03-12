@@ -1,0 +1,33 @@
+<form id="settings_system_restart" novalidate="novalidate" autocomplete="off" style="padding-top:20px;">
+    <div class="form-body">
+        <div class="form-title" style="display: none;" data-trans="restart">Restart</div>
+        <div class="note paddingleft15" data-trans="restart_button">Restart Device</div>
+        <div class="form-buttons" style="padding-right:20px;margin-top:20px;">
+            <input id="button_restart" type="submit" data-trans="reboot_device" class="btn-1 " value="Restart" />
+        </div>
+    </div>
+</form>
+<script>
+window.LTELanguageInitPart('#settings_system_restart')
+function load_mark() {
+    $('#button_restart').click(function(event) {
+        event.preventDefault()
+        showConfirm("",'confirm_restart_device', function(){
+            showLoading('load_restart')
+            window._service.restart({}, function (data) {
+                hideLoading()
+                if (data && data.result == "success") {
+                    showInfo("success_info")
+                } else {
+                    showAlert("error_info")
+                }
+            }, function () {
+                hideLoading()
+            });
+        })
+        return false
+    })
+}
+load_mark()
+</script>
+      

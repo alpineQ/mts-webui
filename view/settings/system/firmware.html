@@ -1,0 +1,372 @@
+<div class="settings-block" style="padding-top:20px;" id="autoSection">
+        <!-- <form id="frmOTAUpdate" novalidate="novalidate" autocomplete="off"> -->
+    <div id="div_fota" class="form-body">
+        <div class="">
+            <div class="row-fluid">
+            <label class="span4 side-left" style="height:38px;width:40%">
+                <span data-trans="current_soft_version">Current Software Version:</span>
+                <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+            </label>
+            <div class="span8" id="info_sw" style="width:55%"></div>
+            </div>
+            <div class="row-fluid">
+            <label class="span4 side-left" style="height:38px;width:40%">
+                <span data-trans="current_hardware_version">Hardware Version:</span>
+                <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+            </label>
+            <div class="span8" id="info_hw" style="width:55%"></div>
+            </div>
+           <!-- <div class="row-fluid">
+            <label class="span4 side-left" style="height:38px;width:40%">
+                <span data-trans="current_software_data">Current Software Date:</span>
+                <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+            </label>
+            <div class="span8" id="info_date" style="width:55%"></div>
+            </div>-->
+            <div class="row-fluid" style="display:none">
+            <input id="btnFireware" onclick="location.href='firmware.html'" type="button" class="btn-1" data-trans="manual_update"value="Manual update"style="float: left;margin-left: 0;"/>
+            </div>
+            <p style="border-bottom: 1px solid #ccc; margin-top: 15px;"></p>
+        </div>
+        <div class="">
+            <div class="row-fluid">
+            <label class="span4" style="width:38%"><span data-trans="ota_auto_update_switch">Auto-check New Version</span>
+                <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+            </label>
+            <div class="span8" style="width:58%">
+                <input type="radio" name="updateMode" id="auto_update_enable" value="1" />
+                <label for="auto_update_enable" data-trans="enable">Enable</label>
+                <input type="radio" name="updateMode" id="auto_update_disable" value="0" />
+                <label for="auto_update_disable" data-trans="disable">Disable</label>
+            </div>
+            </div>
+            <div class="row-fluid" style="display: none;">
+            <label class="span4 side-right" for="selInterValDay" >Auto-check Cycle
+                <i class="colorRed" style="visibility: hidden;">&nbsp;*</i>
+            </label>
+            <div class="span8">
+                <select id="selInterValDay" name="selInterValDay" data-bind="value: updateIntervalDay" >
+                <option value="1">Every day</option>
+                <option value="7">7 days</option>
+                <option value="15">15 days</option>
+                <option value="30">30 days</option>
+                </select>
+            </div>
+            </div>
+            <div class="row-fluid" id="allowRoamingUpdateDiv">
+            <div class="b-checkbox_wrap" style="width: 600px;" id="clickAllowRoamingUpdate">
+                <input class="b-radio" type="checkbox" id="chkUpdateRoamPermission" style="display:none">
+                <label for="chkUpdateRoamPermission" data-trans="ota_update_roaming_remind">Check this option, the device will update when roaming, which will incur roaming charges.</label>
+            </div>
+            </div>
+        
+            <div class="form-buttons" style="margin-right: 0">
+                <input id="btnApply" type="button" class="btn-1 " data-trans="apply" value="Apply" />
+            </div>
+            <p style="border-bottom: 1px solid #ccc; margin-top: 15px;"></p>
+        </div>
+        <div class="">
+            <div class="row-fluid">
+                <label class="span4 side-left" style="height:38px;width:100%">
+                    <span data-trans="update_version_tip">Click the "Check" button to check for a new version</span>
+                    <br>
+                    <span data-trans="version_is_new" style="color:red;display: none">The current version is the latest!</span>
+                </label>
+            </div>
+            <div class="form-buttons" style="margin-right: 0">
+                <input id="btnCheckNewVersion" type="button" class="btn-1 " data-trans="ota_check_new_version" value="Check" />
+            </div>
+        </div>
+        <div class="">
+            <div class="row-fluid">
+            <div id="fota_content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div  class="settings-block" style="padding-top:20px; display: none;" id="uploadSection">
+    <div class="wifi-block" style="border-bottom: 1px solid #ccc;padding-bottom:10px;margin-bottom:10px;">
+        <span class="title" data-trans="software_upload">Software Upload</span>
+    </div>
+    <div class="settings-line btn-wrap">
+        <iframe id="fileUploadIframe" name="fileUploadIframe" scrolling="no" frameborder="0" width="0" height="0" style="height:0px;width:0px;"></iframe>
+    </div>
+    <form method="post" name="fileUploadForm" id="fileUploadForm" action="../../cgi-bin/zte_upload/upload.cgi" enctype="multipart/form-data" target="fileUploadIframe"></form>
+        <div class="settings-line">
+            <input id="fileField" name="filename" maxlength="200" type="file" dir="ltr"/>
+        </div>
+        <div class="settings-line btn-wrap">
+            <a class="btn" style="margin-left: 475px;" id="fileUploadApplyBtn" name="fileUploadApplyBtn" data-trans="update_settings">Update</a>
+        </div>
+    </form>
+</div>
+    
+<script>
+window.LTELanguageInitPart('#containerSettings')
+function load_mark() {
+    var self = this;
+    self.hasUssd = window._service.config.HAS_USSD;
+    self.hasUpdateCheck = window._service.config.HAS_UPDATE_CHECK;
+    self.updateType = window._service.getUpdateType().update_type;
+    self.hasDdns = window._service.config.DDNS_SUPPORT;
+    self.hasProbe = window._service.config.HAS_PROBE;
+
+    var setting =  window._service.getOTAUpdateSetting();
+    self.isDataCard =  window._service.config.PRODUCT_TYPE == 'DATACARD';
+    self.updateMode = setting.updateMode;
+    self.updateIntervalDay = setting.updateIntervalDay;
+    self.allowRoamingUpdate = setting.allowRoamingUpdate;
+    self.lastCheckTime = '';
+    window._service.getOTAlastCheckTime({}, function(data){
+        self.lastCheckTime=data.dm_last_check_time;
+    });
+
+    self.sw_version=''
+    self.hw_version=''
+    var deviceInfo =window._service.getDeviceInfo();
+    self.sw_version=verifyDeviceInfo(deviceInfo.sw_version),
+    self.hw_version=verifyDeviceInfo(deviceInfo.hw_version)
+    $('#info_sw').text(self.sw_version)
+    $('#info_hw').text(self.hw_version)
+    $('#info_date').text(verifyDeviceInfo(self.lastCheckTime))
+    $('#chkUpdateRoamPermission').attr('checked',self.allowRoamingUpdate==1)
+
+    $('#clickAllowRoamingUpdate').die().live('change', function() {
+        var checkbox = $("#chkUpdateRoamPermission:checked");
+        if (checkbox && checkbox.length == 1) {
+            self.allowRoamingUpdate=1;
+        } else {
+            self.allowRoamingUpdate=0;
+        }
+    })
+    $('input[name="updateMode"]').click(function() {
+        self.updateMode = $('input[name=updateMode]:checked').val();
+        setAllowRoamingUpdateDiv();
+    })
+    $('#btnApply').click(function(){
+        var para = {
+            updateMode: self.updateMode,
+            updateIntervalDay: self.updateIntervalDay,
+            allowRoamingUpdate: self.allowRoamingUpdate
+        };
+       showLoading('saving');        
+                 window._service.setOTAUpdateSetting(para, function (data) {
+            if (data && data.result == "success") {
+                setting.allowRoamingUpdate = self.allowRoamingUpdate;
+                successOverlay();
+            } else {
+                errorOverlay();
+            }
+        });
+           
+      
+    })
+
+    $('#btnCheckNewVersion').click(function(){
+        var s = window._service.getNewVersionState();
+        if(s.fota_package_already_download == "yes"){
+            showAlert("fota_package_already_download");
+            return;
+        }
+        
+        if(window._service.config.UPGRADE_TYPE=="FOTA"){
+            var runningState = ["checking"];
+            if ($.inArray(s.fota_current_upgrade_state, runningState) != -1) {
+                showAlert("ota_update_running");
+                return;
+            }
+        }
+        //OTA开始下载时，会将fota_new_version_state清空，此处判断是否已经在下载过程�?
+        var info = window._service.getStatusInfo();
+        if (s.fota_current_upgrade_state == "prepare_install") {
+            showInfo('ota_download_success');
+            return;
+        }
+        var upgradingState = ["downloading", "confirm_dowmload"];
+        if ($.inArray(s.fota_current_upgrade_state, upgradingState) != -1) {
+            window._status.showOTAAlert();
+            return;
+        }
+
+        if (info.roamingStatus) {          
+            showConfirm('',"ota_check_roaming_confirm", function () {
+                checkNewVersion();
+            });
+        } else {
+            checkNewVersion();
+        }
+
+        /**
+         * 检测是否有新版�?
+         * @method checkNewVersion
+         */
+        function checkNewVersion() {
+            showLoading("ota_new_version_checking");
+            function checkResult() {
+                var r = window._service.getNewVersionState();
+                if (r.hasNewVersion) {
+                    if(r.fota_new_version_state == "already_has_pkg"&&r.fota_current_upgrade_state !="prepare_install"&&r.fota_current_upgrade_state !="low_battery"){
+                        addTimeout(checkResult, 1000);
+                    }
+                    else{
+                      hideLoading();
+                      window._status.showOTAAlert();                                    
+                    }
+                } else if (r.fota_new_version_state == "no_new_version") {
+                    showAlert("ota_no_new_version");
+                }else if (r.fota_new_version_state == "check_failed" ) {
+                    errorOverlay("ota_check_fail");
+                } else if ( r.fota_new_version_state == "bad_network"){
+                    errorOverlay("ota_connect_server_failed");
+                }else {
+                    addTimeout(checkResult, 1000);
+                }
+            }
+
+            window._service.setUpgradeSelectOp({selectOp: 'check'}, function (result) {
+                if (result.result == "success") {
+                    checkResult();
+                } else {
+                    errorOverlay();
+                }
+            });
+        }
+    })
+
+    /**
+     * 处理页面元素的可用状�?
+     * @method fixPageEnable
+     */
+    function fixPageEnable () {
+        var info = window._service.getStatusInfo();
+        var modeData = window._service.getOpMode();
+        if (checkConnectedStatus(info.connectStatus, modeData.rj45_state, info.connectWifiStatus)) {
+            enableBtn($("#btnCheckNewVersion"));
+        } else {
+            disableBtn($("#btnCheckNewVersion"));
+        }
+    };
+
+    /**
+     * 获取文件大小
+     * @method getFileSize
+     */	
+    function getFileSize(obj){
+        var fileLenth = 0;
+        var isIE = /msie/i.test(navigator.userAgent) && !window.opera; 
+        if (isIE) {  //如果是ie
+            var objValue = obj.value;
+            try {  
+                var fso = new ActiveXObject("Scripting.FileSystemObject");  
+                fileLenth = parseInt(fso.GetFile(objValue).size);
+                } catch (e) {  
+                fileLenth = 1;					
+            } 
+        }else{  //对于非IE获得要上传文件的大小			
+            try{			
+                fileLenth = parseInt(obj.files[0].size);
+                }catch (e) {
+                fileLenth = 1;  //获取不到�?1
+            }
+        }
+        return fileLenth/1024/1024;
+    } 
+
+    
+    function setAllowRoamingUpdateDiv(){
+        if(self.updateMode==1){
+            $('#allowRoamingUpdateDiv').show()
+        }else{
+            $('#allowRoamingUpdateDiv').hide()
+        }
+    }
+
+    /**
+     * 文件上传按钮点击事件
+     * @event deleteBtnClickHandler
+     */
+    $('#fileUploadApplyBtn').click(function() {
+        var fileName = $(".customfile").attr('title');
+        if(typeof fileName == "undefined" || fileName == '' || fileName == $.i18n.prop("no_file_selected")){
+                showAlert("sd_no_file_selected");
+                return false;
+        }else {
+            //judge size
+            //todo check fileName 
+            var fileExt = fileName.substring(fileName.lastIndexOf(".")).toLowerCase(); 
+            if (!fileExt.match(/.bin/i)) {
+                showAlert("error_file_selected");
+                return false;  
+            }  
+            var fileSize = getFileSize($("#fileField")[0]);
+            if (fileSize > config.NATIVE_UPDATE_FILE_SIZE){  //no more than 55M
+                showAlert("error_file_selected");
+                return false;
+            }
+        }
+        showLoading('uploading', '<span data-trans="upload_tip">' + $.i18n.prop('upload_tip') + '</span>');
+        if(!iframeLoadBinded){
+            bindIframeLoad();
+        }
+        $("#fileUploadForm").submit();
+    })
+    
+    var iframeLoadBinded = false;
+    function bindIframeLoad(){
+        iframeLoadBinded = true;
+        $('#fileUploadIframe').load(function() {
+            var txt = $('#fileUploadIframe').contents().find("body").html().toLowerCase();
+            $("#fileField").closest('.customfile').before('<input id="fileField" name="filename" maxlength="200" type="file" dir="ltr"/>').remove();
+            addTimeout(function(){
+                $("#fileField").customFileInput();
+            }, 0);
+            var alertShown = false;
+            if (txt.indexOf('success') != -1) {
+                showAlert("upload_update_success");
+            } else if (txt.indexOf('failure0') != -1) {
+                showAlert("upload_update_failed0");	
+            } else if (txt.indexOf('failure1') != -1) {
+                showAlert("upload_update_failed1");
+            } else if (txt.indexOf('failure2') != -1) {
+                showAlert("upload_update_failed2");
+            } else if (txt.indexOf('failure3') != -1) {
+                showAlert("upload_update_failed3");
+            } else if (txt.indexOf('failure4') != -1) {
+                showAlert("upload_update_failed4");
+            }
+
+            $("#uploadBtn", "#uploadSection").attr("data-trans", "browse_btn").html($.i18n.prop('browse_btn'));
+            $(".customfile", "#uploadSection").removeAttr("title");
+            $(".customfile span.customfile-feedback", "#uploadSection")
+                .html('<span data-trans="no_file_selected">'+$.i18n.prop('no_file_selected')+'</span>')
+                .attr('class', 'customfile-feedback');
+        });
+    }
+
+
+    function OTAUpdateSetting(){
+        $('input[name=updateMode]').eq(Math.abs(self.updateMode-1)).prop('checked', true)
+
+        setAllowRoamingUpdateDiv()
+
+        if(self.updateType == "mifi_fota"){
+            $('#autoSection').show()
+            $('#uploadSection').hide()
+            fixPageEnable();
+            addInterval(function () {            
+                fixPageEnable();          
+            }, 1000);
+        }else{	
+            $('#autoSection').hide()
+            $('#uploadSection').show()		
+            if ($(".customfile").length == 0) {
+                $("#fileField").customFileInput();
+            }
+        }
+    }
+
+    OTAUpdateSetting()
+}
+load_mark()
+</script>
